@@ -562,7 +562,7 @@ if st.session_state.page == 'analysis':
     c1.metric("Price", f"${price:.2f}", f"{change:+.2f}%")
     c2.metric("Market Cap", f"${info.get('marketCap', 0)/1e9:.1f}B")
     c3.metric("P/E", f"{info.get('trailingPE', 0):.2f}")
-    c4.metric("Volume", f"{data['Volume'].iloc[-1]/1e6:.1f}M")
+    c4.metric("Trading Volume", f"{data['Trading Volume'].iloc[-1]/1e6:.1f}M")
     c5.metric("52W Range", f"${info.get('fiftyTwoWeekLow', 0):.0f}-{info.get('fiftyTwoWeekHigh', 0):.0f}")
     
     st.markdown(f"""
@@ -666,8 +666,8 @@ elif st.session_state.page == 'portfolio':
                             <div style='font-size: 1.1rem; font-weight: 700; color: #1e293b;'>{i.get('trailingPE', 0):.2f}</div>
                         </div>
                         <div>
-                            <div style='font-size: 0.75rem; color: #64748b; font-weight: 600;'>VOLUME</div>
-                            <div style='font-size: 1.1rem; font-weight: 700; color: #1e293b;'>{d['Volume'].iloc[-1]/1e6:.1f}M</div>
+                            <div style='font-size: 0.75rem; color: #64748b; font-weight: 600;'> TRADING VOLUME</div>
+                            <div style='font-size: 1.1rem; font-weight: 700; color: #1e293b;'>{d['Trading Volume'].iloc[-1]/1e6:.1f}M</div>
                         </div>
                         <div>
                             <div style='font-size: 0.75rem; color: #64748b; font-weight: 600;'>52W RANGE</div>
@@ -887,7 +887,7 @@ elif st.session_state.page == 'compare':
                             <div><span style='color: #1e293b; font-size: 0.85rem;'>Change:</span><br><strong style='font-size: 1.3rem; color: {"#10b981" if change1 >= 0 else "#ef4444"};'>{change1:+.2f}%</strong></div>
                             <div><span style='color: #1e293b; font-size: 0.85rem;'>Market Cap:</span><br><strong>${info1.get('marketCap', 0)/1e9:.1f}B</strong></div>
                             <div><span style='color: #1e293b; font-size: 0.85rem;'>P/E:</span><br><strong>{info1.get('trailingPE', 0):.2f}</strong></div>
-                            <div><span style='color: #1e293b; font-size: 0.85rem;'>Volume:</span><br><strong>{data1['Volume'].iloc[-1]/1e6:.1f}M</strong></div>
+                            <div><span style='color: #1e293b; font-size: 0.85rem;'>Trading Volume:</span><br><strong>{data1['Trading Volume'].iloc[-1]/1e6:.1f}M</strong></div>
                             <div><span style='color: #1e293b; font-size: 0.85rem;'>Profit Margin:</span><br><strong>{info1.get('profitMargins', 0)*100:.1f}%</strong></div>
                         </div>
                     </div>
@@ -904,7 +904,7 @@ elif st.session_state.page == 'compare':
                             <div><span style='color: #1e293b; font-size: 0.85rem;'>Change:</span><br><strong style='font-size: 1.3rem; color: {"#10b981" if change2 >= 0 else "#ef4444"};'>{change2:+.2f}%</strong></div>
                             <div><span style='color: #1e293b; font-size: 0.85rem;'>Market Cap:</span><br><strong>${info2.get('marketCap', 0)/1e9:.1f}B</strong></div>
                             <div><span style='color: #1e293b; font-size: 0.85rem;'>P/E:</span><br><strong>{info2.get('trailingPE', 0):.2f}</strong></div>
-                            <div><span style='color: #1e293b; font-size: 0.85rem;'>Volume:</span><br><strong>{data2['Volume'].iloc[-1]/1e6:.1f}M</strong></div>
+                            <div><span style='color: #1e293b; font-size: 0.85rem;'>Trading Volume:</span><br><strong>{data2['Trading Volume'].iloc[-1]/1e6:.1f}M</strong></div>
                             <div><span style='color: #1e293b; font-size: 0.85rem;'>Profit Margin:</span><br><strong>{info2.get('profitMargins', 0)*100:.1f}%</strong></div>
                         </div>
                     </div>
