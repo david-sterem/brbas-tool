@@ -53,6 +53,7 @@ st.markdown("""
         letter-spacing: 0.5rem;
         text-align: center;
         margin-bottom: 2rem !important;
+        color: white !important;
     }
     
     .model-card {
@@ -65,7 +66,7 @@ st.markdown("""
     }
     
     .model-header {
-        font-size: 1.5rem;
+        font-size: 1.8rem;
         font-weight: 700;
         color: #1e293b;
         margin-bottom: 1rem;
@@ -82,6 +83,14 @@ st.markdown("""
         margin-bottom: 1rem;
     }
     
+    .model-description {
+        color: #64748b;
+        font-size: 1rem;
+        line-height: 1.6;
+        margin: 1rem 0 1.5rem 0;
+        font-style: italic;
+    }
+    
     .model-detail {
         padding: 1rem;
         margin: 0.75rem 0;
@@ -90,6 +99,7 @@ st.markdown("""
         border-radius: 4px;
         font-size: 1rem;
         line-height: 1.6;
+        color: #1e293b;
     }
     
     .section-header {
@@ -131,6 +141,10 @@ st.markdown("""
         background: linear-gradient(180deg, #1e40af 0%, #1e3a8a 100%);
     }
     
+    [data-testid="stSidebar"] .stMarkdown {
+        color: white !important;
+    }
+    
     [data-testid="stSidebar"] button {
         width: 100%;
         background: rgba(255, 255, 255, 0.1);
@@ -148,6 +162,29 @@ st.markdown("""
         padding: 1.5rem;
         border-radius: 12px;
         box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+    }
+    
+    .stMetric label {
+        color: #64748b !important;
+        font-size: 0.75rem !important;
+        font-weight: 600 !important;
+    }
+    
+    .stMetric [data-testid="stMetricValue"] {
+        color: #1e293b !important;
+        font-size: 2rem !important;
+        font-weight: 800 !important;
+    }
+    
+    .portfolio-card {
+        background: white;
+        padding: 1.5rem;
+        border-radius: 12px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        margin-bottom: 1rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
     }
 </style>
 """, unsafe_allow_html=True)
@@ -227,33 +264,63 @@ def analyze_valuation(info):
     if peg and peg > 0:
         if peg < 1:
             score += 2
-            details.append(f"PEG Ratio of {peg:.2f} indicates undervaluation. The stock trades below its growth rate.")
+            details.append(f"PEG Ratio of {peg:.2f} indicates undervaluation. The stock trades below its growth rate, suggesting a compelling value opportunity.")
         elif peg < 2:
             score += 1
-            details.append(f"PEG Ratio of {peg:.2f} suggests fair valuation.")
+            details.append(f"PEG Ratio of {peg:.2f} suggests fair valuation. The stock is reasonably priced relative to its growth.")
         else:
             score -= 2
-            details.append(f"PEG Ratio of {peg:.2f} indicates overvaluation relative to growth.")
+            details.append(f"PEG Ratio of {peg:.2f} indicates overvaluation. The stock is expensive relative to its growth prospects.")
     else:
-        details.append("PEG Ratio unavailable.")
+        details.append("PEG Ratio data unavailable. This metric compares P/E to growth rate.")
+    
+    pe = info.get('trailingPE')
+    if pe and pe > 0:
+        if pe < 15:
+            score += 1
+            details.append(f"P/E Ratio of {pe:.1f} is below market average, suggesting potential undervaluation.")
+        elif pe > 30:
+            score -= 1
+            details.append(f"P/E Ratio of {pe:.1f} is elevated, indicating premium pricing.")
+    else:
+        details.append("P/E Ratio unavailable.")
+    
     return score, details
 
 def analyze_momentum(data):
     score = 0
     details = []
     price = data['Close'].iloc[-1]
+    
     if 'MA50' in data.columns and 'MA200' in data.columns:
         ma50 = data['MA50'].iloc[-1]
         ma200 = data['MA200'].iloc[-1]
         if pd.notna(ma50) and pd.notna(ma200):
             if ma50 > ma200 and price > ma50:
                 score += 2
-                details.append(f"Golden Cross active. Price ${price:.2f} above both moving averages.")
+                details.append(f"Golden Cross active with price at ${price:.2f} above both 50-day (${ma50:.2f}) and 200-day (${ma200:.2f}) moving averages. This bullish configuration suggests strong upward momentum.")
             elif ma50 < ma200 and price < ma50:
                 score -= 2
-                details.append(f"Death Cross active. Price ${price:.2f} below both moving averages.")
+                details.append(f"Death Cross active with price at ${price:.2f} below both moving averages. This bearish pattern indicates downward pressure.")
+            else:
+                details.append(f"Mixed signals with price at ${price:.2f}. The stock is in transition between trends.")
+        else:
+            details.append("Insufficient data for moving average analysis.")
     else:
         details.append("Moving average data unavailable.")
+    
+    if 'MA20' in data.columns:
+        ma20 = data['MA20'].iloc[-1]
+        if pd.notna(ma20):
+            deviation = ((price / ma20) - 1) * 100
+            if abs(deviation) > 3:
+                if deviation > 0:
+                    score += 1
+                    details.append(f"Strong short-term momentum with price {deviation:.1f}% above 20-day MA.")
+                else:
+                    score -= 1
+                    details.append(f"Weak short-term momentum with price {abs(deviation):.1f}% below 20-day MA.")
+    
     return score, details
 
 def analyze_earnings(info):
@@ -263,15 +330,27 @@ def analyze_earnings(info):
     if growth is not None:
         if growth > 0.15:
             score += 2
-            details.append(f"Strong earnings growth of {growth*100:.1f}% significantly exceeds market averages.")
-        elif growth > 0:
+            details.append(f"Exceptional earnings growth of {growth*100:.1f}% significantly exceeds market averages, demonstrating strong operational performance.")
+        elif growth > 0.05:
             score += 1
-            details.append(f"Positive earnings growth of {growth*100:.1f}%.")
+            details.append(f"Solid earnings growth of {growth*100:.1f}% indicates healthy business expansion.")
+        elif growth > 0:
+            details.append(f"Modest earnings growth of {growth*100:.1f}% shows steady but slow expansion.")
         else:
             score -= 2
-            details.append(f"Negative earnings growth of {growth*100:.1f}% is concerning.")
+            details.append(f"Earnings decline of {growth*100:.1f}% is concerning and suggests operational challenges.")
     else:
         details.append("Earnings growth data unavailable.")
+    
+    margin = info.get('profitMargins')
+    if margin:
+        if margin > 0.20:
+            details.append(f"Strong profit margin of {margin*100:.1f}% demonstrates pricing power and operational efficiency.")
+        elif margin > 0.10:
+            details.append(f"Decent profit margin of {margin*100:.1f}% indicates reasonable profitability.")
+        else:
+            details.append(f"Thin profit margin of {margin*100:.1f}% suggests limited pricing power.")
+    
     return score, details
 
 def analyze_technical(data):
@@ -281,14 +360,26 @@ def analyze_technical(data):
     if rsi:
         if rsi < 30:
             score += 2
-            details.append(f"RSI at {rsi:.1f} indicates oversold conditions.")
+            details.append(f"RSI at {rsi:.1f} indicates oversold conditions. Historically, readings below 30 precede price reversals as selling pressure becomes exhausted.")
         elif rsi > 70:
             score -= 2
-            details.append(f"RSI at {rsi:.1f} signals overbought conditions.")
+            details.append(f"RSI at {rsi:.1f} signals overbought conditions. Readings above 70 typically lead to pullbacks as buyers become exhausted.")
         else:
-            details.append(f"RSI at {rsi:.1f} is neutral.")
+            details.append(f"RSI at {rsi:.1f} is in neutral territory, indicating balanced buying and selling pressure.")
     else:
         details.append("RSI data unavailable.")
+    
+    if 'MACD' in data.columns and 'Signal' in data.columns:
+        macd = data['MACD'].iloc[-1]
+        signal = data['Signal'].iloc[-1]
+        if pd.notna(macd) and pd.notna(signal):
+            if macd > signal:
+                score += 1
+                details.append(f"MACD bullish at {macd:.2f} above signal line {signal:.2f}, indicating upward momentum.")
+            else:
+                score -= 1
+                details.append(f"MACD bearish at {macd:.2f} below signal line {signal:.2f}, suggesting downward pressure.")
+    
     return score, details
 
 @st.cache_data(ttl=300)
@@ -365,7 +456,7 @@ if st.session_state.page == 'analysis':
                 <div class='recommendation-badge {rec_class}'>{rec}</div>
             </div>
             <div>
-                <p style='font-size: 1.1rem; line-height: 1.8;'>Based on comprehensive analysis, this stock shows a {confidence}% confidence score.</p>
+                <p style='font-size: 1.1rem; line-height: 1.8; color: #334155;'>Based on comprehensive analysis across valuation, momentum, earnings, and technical indicators, this stock receives a {confidence}% confidence score with a {rec} recommendation.</p>
             </div>
         </div>
     </div>
@@ -373,16 +464,19 @@ if st.session_state.page == 'analysis':
     
     st.markdown("<h2 class='section-header'>Investment Analysis Models</h2>", unsafe_allow_html=True)
     
-    for title, score, dets in [
-        ("Valuation Model", val_score, val_details),
-        ("Momentum Model", mom_score, mom_details),
-        ("Earnings Model", earn_score, earn_details),
-        ("Technical Model", tech_score, tech_details)
-    ]:
+    models = [
+        ("Valuation Model", val_score, val_details, "Analyzes whether the stock is over or undervalued using PEG ratio, P/E trends, and price-to-book metrics."),
+        ("Momentum Model", mom_score, mom_details, "Evaluates trend strength using moving average crossovers and price positioning."),
+        ("Earnings Model", earn_score, earn_details, "Assesses business health through earnings growth, revenue trends, and profitability margins."),
+        ("Technical Model", tech_score, tech_details, "Uses RSI and MACD indicators to identify overbought/oversold conditions.")
+    ]
+    
+    for title, score, dets, desc in models:
         st.markdown(f"""
         <div class='model-card'>
             <div class='model-header'>{title}</div>
             <span class='model-score'>Score: {score+6}/12</span>
+            <div class='model-description'>{desc}</div>
         </div>
         """, unsafe_allow_html=True)
         for det in dets:
@@ -397,13 +491,80 @@ elif st.session_state.page == 'portfolio':
     else:
         for t in st.session_state.portfolio:
             d, i, _ = get_stock_data(t, "1mo")
-            if d is not None:
-                st.write(f"**{t}**: ${d['Close'].iloc[-1]:.2f}")
-                if st.button(f"Remove {t}", key=f"rm_{t}"):
-                    st.session_state.portfolio.remove(t)
-                    st.rerun()
+            if d is not None and not d.empty:
+                col_info, col_button = st.columns([4, 1])
+                with col_info:
+                    st.markdown(f"""
+                    <div class='portfolio-card'>
+                        <div>
+                            <h3 style='margin: 0; color: #1e293b; font-size: 1.5rem;'>{t}</h3>
+                            <p style='margin: 0.25rem 0; color: #64748b;'>{i.get('longName', t)}</p>
+                            <p style='margin: 0.5rem 0; font-size: 1.3rem; font-weight: 700; color: #1e293b;'>${d['Close'].iloc[-1]:.2f}</p>
+                        </div>
+                    </div>
+                    """, unsafe_allow_html=True)
+                with col_button:
+                    if st.button("Analyze", key=f"analyze_{t}"):
+                        st.session_state.page = 'analysis'
+                        st.rerun()
 
 elif st.session_state.page == 'top_stocks':
     st.markdown("<div class='brbas-header'><h1 class='brbas-title'>BRBAS</h1></div>", unsafe_allow_html=True)
-    st.markdown("<h2 class='section-header'>Top Stocks</h2>", unsafe_allow_html=True)
-    st.info("Top stocks feature - analyze major sectors for highest confidence picks")
+    st.markdown("<h2 class='section-header'>Top Stocks by Sector</h2>", unsafe_allow_html=True)
+    
+    sectors = {
+        'Technology': ['AAPL', 'MSFT', 'GOOGL'],
+        'Healthcare': ['JNJ', 'UNH', 'PFE'],
+        'Financial': ['JPM', 'BAC', 'WFC'],
+        'Consumer': ['AMZN', 'TSLA', 'HD'],
+        'Energy': ['XOM', 'CVX', 'COP']
+    }
+    
+    with st.spinner("Analyzing sectors..."):
+        results = {}
+        for sector, tickers in sectors.items():
+            best_conf = 0
+            best_stock = None
+            for t in tickers:
+                d, i, e = get_stock_data(t, "3mo")
+                if e or d is None or d.empty:
+                    continue
+                for ma in [20, 50, 100, 200]:
+                    d[f'MA{ma}'] = d['Close'].rolling(window=ma).mean()
+                d = calculate_ema(d)
+                d['RSI'] = calculate_rsi(d)
+                d['MACD'], d['Signal'], d['Histogram'] = calculate_macd(d)
+                
+                vs, _ = analyze_valuation(i)
+                ms, _ = analyze_momentum(d)
+                es, _ = analyze_earnings(i)
+                ts, _ = analyze_technical(d)
+                
+                conf = calculate_confidence_score(i, d, vs, ms, es, ts)
+                if conf > best_conf:
+                    best_conf = conf
+                    rec, rc = get_recommendation_from_confidence(conf)
+                    best_stock = {'ticker': t, 'name': i.get('longName', t), 'price': d['Close'].iloc[-1], 
+                                'conf': conf, 'rec': rec, 'rc': rc}
+            
+            if best_stock:
+                results[sector] = best_stock
+    
+    cols = st.columns(2)
+    for idx, (sector, stock) in enumerate(results.items()):
+        with cols[idx % 2]:
+            color = '#10b981' if 'BUY' in stock['rec'] else '#ef4444' if 'SELL' in stock['rec'] else '#f59e0b'
+            st.markdown(f"""
+            <div style='background: white; padding: 1.5rem; border-radius: 12px; border-left: 4px solid {color}; 
+                        box-shadow: 0 2px 8px rgba(0,0,0,0.1); margin-bottom: 1rem;'>
+                <div style='font-size: 0.85rem; color: #64748b; text-transform: uppercase;'>{sector}</div>
+                <h3 style='margin: 0.5rem 0; color: #1e293b;'>{stock['ticker']}</h3>
+                <p style='color: #64748b; font-size: 0.9rem;'>{stock['name'][:35]}</p>
+                <div style='font-size: 1.5rem; font-weight: 700; color: #1e293b;'>${stock['price']:.2f}</div>
+                <div style='background: {color}; color: white; padding: 0.4rem 1rem; border-radius: 20px; 
+                            display: inline-block; margin-top: 0.5rem; font-weight: 600;'>{stock['rec']}</div>
+                <div style='font-size: 1.2rem; font-weight: 700; color: #1e293b; margin-top: 0.5rem;'>
+                    Confidence: {stock['conf']}%
+                </div>
+            </div>
+            """, unsafe_allow_html=True)
