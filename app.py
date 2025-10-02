@@ -9,7 +9,7 @@ from scipy import stats
 import warnings
 warnings.filterwarnings('ignore')
 
-st.set_page_config(page_title="BRBAS", layout="wide", page_icon="📊", initial_sidebar_state="expanded")
+st.set_page_config(page_title="BARBAS", layout="wide", page_icon="📊", initial_sidebar_state="expanded")
 
 # Professional CSS
 st.markdown("""
@@ -39,7 +39,7 @@ st.markdown("""
     }
     
     .brbas-title {
-        font-size: 6rem;
+        font-size: 10rem;
         font-weight: 800;
         color: white;
         letter-spacing: 1.5rem;
@@ -48,7 +48,7 @@ st.markdown("""
     }
     
     .sidebar-title {
-        font-size: 2.5rem !important;
+        font-size: 3.5rem !important;
         font-weight: 800;
         letter-spacing: 0.75rem;
         text-align: center;
