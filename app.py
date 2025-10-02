@@ -21,54 +21,60 @@ st.markdown("""
     }
     
     .main {
-        background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+        background: #ffffff;
         padding: 0;
     }
     
     .block-container {
         padding: 2rem 3rem;
-        max-width: 1600px;
+        max-width: 1400px;
     }
     
-    .barbas-header {
+    .brbas-header {
         text-align: center;
-        padding: 3rem 0;
+        padding: 4rem 0;
         background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%);
         margin: -2rem -3rem 2rem -3rem;
-        box-shadow: 0 4px 20px rgba(30, 64, 175, 0.15);
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
     }
     
-    .barbas-title {
-        font-size: 10rem;
+    .brbas-title {
+        font-size: 7rem;
         font-weight: 800;
         color: white;
-        letter-spacing: 1.5rem;
+        letter-spacing: 2rem;
         margin: 0;
-        text-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+        text-shadow: none;
     }
     
     .sidebar-title {
-        font-size: 3.5rem !important;
+        font-size: 2.8rem !important;
         font-weight: 800;
-        letter-spacing: 0.75rem;
+        letter-spacing: 0.8rem;
         text-align: center;
         margin-bottom: 2rem !important;
         color: white !important;
+        text-shadow: none;
     }
     
     .model-card {
         background: white;
         padding: 2rem;
-        border-radius: 16px;
-        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
-        border-left: 5px solid #3b82f6;
+        border-radius: 12px;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        border: 1px solid #e5e7eb;
         margin: 1.5rem 0;
+        transition: box-shadow 0.2s ease;
+    }
+    
+    .model-card:hover {
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
     }
     
     .model-header {
-        font-size: 1.8rem;
+        font-size: 1.5rem;
         font-weight: 700;
-        color: #1e293b;
+        color: #111827;
         margin-bottom: 1rem;
     }
     
@@ -77,64 +83,64 @@ st.markdown("""
         padding: 0.5rem 1.5rem;
         background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
         color: white;
-        border-radius: 50px;
-        font-weight: 700;
-        font-size: 1.2rem;
+        border-radius: 24px;
+        font-weight: 600;
+        font-size: 1rem;
         margin-bottom: 1rem;
     }
     
     .model-description {
-        color: #334155;
-        font-size: 1.05rem;
-        line-height: 1.9;
+        color: #374151;
+        font-size: 1rem;
+        line-height: 1.7;
         margin: 1rem 0 0 0;
     }
     
     .model-detail {
         padding: 0;
         margin: 0;
-        font-size: 1.05rem;
-        line-height: 1.9;
-        color: #334155;
+        font-size: 1rem;
+        line-height: 1.7;
+        color: #374151;
     }
     
     .section-header {
-        font-size: 2rem;
+        font-size: 1.875rem;
         font-weight: 700;
-        color: #1e293b;
+        color: #111827;
         margin: 3rem 0 1.5rem 0;
         padding-bottom: 0.75rem;
-        border-bottom: 3px solid #3b82f6;
+        border-bottom: 2px solid #e5e7eb;
     }
     
     .confidence-card {
         background: white;
         padding: 2.5rem;
-        border-radius: 20px;
-        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-        border-left: 6px solid #3b82f6;
+        border-radius: 12px;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        border: 1px solid #e5e7eb;
         margin: 2rem 0;
     }
     
     .recommendation-badge {
         display: inline-block;
         padding: 0.75rem 2rem;
-        border-radius: 50px;
+        border-radius: 24px;
         font-weight: 700;
-        font-size: 1.2rem;
+        font-size: 1.1rem;
         margin: 1rem 0;
         text-transform: uppercase;
-        letter-spacing: 1px;
+        letter-spacing: 0.5px;
     }
     
-    .strong-buy { background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: white; }
-    .buy { background: linear-gradient(135deg, #34d399 0%, #10b981 100%); color: white; }
-    .hold { background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%); color: white; }
-    .sell { background: linear-gradient(135deg, #f87171 0%, #ef4444 100%); color: white; }
-    .strong-sell { background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%); color: white; }
+    .strong-buy { background: #10b981; color: white; }
+    .buy { background: #34d399; color: white; }
+    .hold { background: #fbbf24; color: white; }
+    .sell { background: #f87171; color: white; }
+    .strong-sell { background: #ef4444; color: white; }
     
     [data-testid="stSidebar"] {
-        background: linear-gradient(180deg, #1e40af 0%, #1e3a8a 100%);
+        background: linear-gradient(180deg, #1e40af 0%, #3b82f6 100%);
     }
     
     [data-testid="stSidebar"] .stMarkdown {
@@ -144,60 +150,84 @@ st.markdown("""
     [data-testid="stSidebar"] button {
         width: 100%;
         background: rgba(255, 255, 255, 0.1);
-        color: white;
+        color: white !important;
         border: 1px solid rgba(255, 255, 255, 0.2);
-        padding: 1rem;
+        padding: 0.875rem;
         border-radius: 8px;
         margin: 0.5rem 0;
         font-weight: 600;
-        font-size: 1.1rem;
+        font-size: 1rem;
+        transition: all 0.2s ease;
+    }
+    
+    [data-testid="stSidebar"] button:hover {
+        background: rgba(255, 255, 255, 0.2);
+        border-color: rgba(255, 255, 255, 0.3);
     }
     
     .stMetric {
         background: white;
         padding: 1.5rem;
         border-radius: 12px;
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        border: 1px solid #e5e7eb;
     }
     
     .stMetric label {
-        color: #64748b !important;
+        color: #6b7280 !important;
         font-size: 0.75rem !important;
         font-weight: 600 !important;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
     }
     
     .stMetric [data-testid="stMetricValue"] {
-        color: #1e293b !important;
+        color: #111827 !important;
         font-size: 2rem !important;
-        font-weight: 800 !important;
+        font-weight: 700 !important;
     }
     
     .portfolio-card {
         background: white;
         padding: 1.5rem;
         border-radius: 12px;
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        border: 1px solid #e5e7eb;
         margin-bottom: 1rem;
         display: flex;
         justify-content: space-between;
         align-items: center;
+        transition: box-shadow 0.2s ease;
+    }
+    
+    .portfolio-card:hover {
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
     }
     
     .disclaimer-footer {
-        background: #f8fafc;
+        background: #f9fafb;
         padding: 2rem;
         border-radius: 12px;
         margin-top: 4rem;
-        border-top: 2px solid #e2e8f0;
+        border-top: 1px solid #e5e7eb;
         text-align: center;
     }
     
     .disclaimer-text {
-        font-size: 0.85rem;
-        color: #64748b;
+        font-size: 0.8rem;
+        color: #6b7280;
         line-height: 1.6;
         max-width: 1200px;
         margin: 0 auto;
+    }
+    
+    /* Dark text for all content */
+    p, span, div {
+        color: #374151;
+    }
+    
+    h1, h2, h3, h4, h5, h6 {
+        color: #111827;
     }
 </style>
 """, unsafe_allow_html=True)
@@ -510,7 +540,7 @@ def get_stock_data(ticker, period):
 
 # PAGES
 if st.session_state.page == 'analysis':
-    st.markdown("<div class='barbas-header'><h1 class='barbas-title'>BARBAS</h1></div>", unsafe_allow_html=True)
+    st.markdown("<div class='brbas-header'><h1 class='brbas-title'>BARBAS</h1></div>", unsafe_allow_html=True)
     
     col1, col2, col3 = st.columns([4, 2, 2])
     with col1:
@@ -562,7 +592,7 @@ if st.session_state.page == 'analysis':
     c1.metric("Price", f"${price:.2f}", f"{change:+.2f}%")
     c2.metric("Market Cap", f"${info.get('marketCap', 0)/1e9:.1f}B")
     c3.metric("P/E", f"{info.get('trailingPE', 0):.2f}")
-    c4.metric("Trading Volume", f"{data['Trading Volume'].iloc[-1]/1e6:.1f}M")
+    c4.metric("Trading Volume", f"{data['Volume'].iloc[-1]/1e6:.1f}M")
     c5.metric("52W Range", f"${info.get('fiftyTwoWeekLow', 0):.0f}-{info.get('fiftyTwoWeekHigh', 0):.0f}")
     
     st.markdown(f"""
@@ -570,11 +600,11 @@ if st.session_state.page == 'analysis':
         <div style='display: grid; grid-template-columns: 1fr 2fr; gap: 2rem;'>
             <div style='text-align: center;'>
                 <div style='font-size: 4rem; font-weight: 800; color: #3b82f6;'>{confidence}%</div>
-                <div style='font-size: 0.9rem; color: #64748b; text-transform: uppercase; margin-bottom: 1rem;'>Confidence Score</div>
+                <div style='font-size: 0.9rem; color: #6b7280; text-transform: uppercase; margin-bottom: 1rem;'>Confidence Score</div>
                 <div class='recommendation-badge {rec_class}'>{rec}</div>
             </div>
             <div>
-                <p style='font-size: 1.25rem; line-height: 1.8; color: #1e293b; font-weight: 500;'>
+                <p style='font-size: 1.25rem; line-height: 1.8; color: #111827; font-weight: 500;'>
                     Based on comprehensive analysis across four distinct analytical models—Valuation, Momentum, Earnings, and Technical—this stock receives a <strong>{confidence}%</strong> confidence score with a <strong>{rec}</strong> recommendation. Each model contributes weighted inputs (Valuation 30%, Momentum 25%, Earnings 25%, Technical 20%) that are synthesized into this overall assessment. The confidence score reflects the degree of alignment across these independent analytical approaches, with higher scores indicating strong consensus and lower scores suggesting conflicting signals that warrant caution.
                 </p>
             </div>
@@ -587,10 +617,10 @@ if st.session_state.page == 'analysis':
                                                    val_details, mom_details, earn_details, tech_details, info, data, ticker)
     
     st.markdown(f"""
-    <div style='background: white; padding: 2.5rem; border-radius: 16px; box-shadow: 0 4px 16px rgba(0,0,0,0.1); 
-                margin: 2rem 0; border-left: 6px solid #3b82f6;'>
-        <h2 style='font-size: 2rem; font-weight: 700; color: #1e293b; margin-bottom: 1.5rem;'>Comprehensive Investment Analysis</h2>
-        <div style='font-size: 1.05rem; line-height: 1.9; color: #334155;'>
+    <div style='background: white; padding: 2.5rem; border-radius: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); 
+                margin: 2rem 0; border: 1px solid #e5e7eb;'>
+        <h2 style='font-size: 2rem; font-weight: 700; color: #111827; margin-bottom: 1.5rem;'>Comprehensive Investment Analysis</h2>
+        <div style='font-size: 1.05rem; line-height: 1.9; color: #374151;'>
             {detailed_analysis}
         </div>
     </div>
@@ -630,7 +660,7 @@ if st.session_state.page == 'analysis':
     """, unsafe_allow_html=True)
 
 elif st.session_state.page == 'portfolio':
-    st.markdown("<div class='barbas-header'><h1 class='barbas-title'>BARBAS</h1></div>", unsafe_allow_html=True)
+    st.markdown("<div class='brbas-header'><h1 class='brbas-title'>BARBAS</h1></div>", unsafe_allow_html=True)
     st.markdown("<h2 class='section-header'>Portfolio</h2>", unsafe_allow_html=True)
     
     if not st.session_state.portfolio:
@@ -658,24 +688,37 @@ elif st.session_state.page == 'portfolio':
                     </div>
                     <div style='display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; padding-top: 1rem; border-top: 1px solid #e2e8f0;'>
                         <div>
-                            <div style='font-size: 0.75rem; color: #64748b; font-weight: 600;'>MARKET CAP</div>
-                            <div style='font-size: 1.1rem; font-weight: 700; color: #1e293b;'>${i.get('marketCap', 0)/1e9:.1f}B</div>
+                            <div style='font-size: 0.75rem; color: #6b7280; font-weight: 600;'>MARKET CAP</div>
+                            <div style='font-size: 1.1rem; font-weight: 700; color: #111827;'>${i.get('marketCap', 0)/1e9:.1f}B</div>
                         </div>
                         <div>
-                            <div style='font-size: 0.75rem; color: #64748b; font-weight: 600;'>P/E RATIO</div>
-                            <div style='font-size: 1.1rem; font-weight: 700; color: #1e293b;'>{i.get('trailingPE', 0):.2f}</div>
+                            <div style='font-size: 0.75rem; color: #6b7280; font-weight: 600;'>P/E RATIO</div>
+                            <div style='font-size: 1.1rem; font-weight: 700; color: #111827;'>{i.get('trailingPE', 0):.2f}</div>
                         </div>
                         <div>
-                            <div style='font-size: 0.75rem; color: #64748b; font-weight: 600;'> TRADING VOLUME</div>
-                            <div style='font-size: 1.1rem; font-weight: 700; color: #1e293b;'>{d['Trading Volume'].iloc[-1]/1e6:.1f}M</div>
+                            <div style='font-size: 0.75rem; color: #6b7280; font-weight: 600;'>TRADING VOLUME</div>
+                            <div style='font-size: 1.1rem; font-weight: 700; color: #111827;'>{d['Volume'].iloc[-1]/1e6:.1f}M</div>
                         </div>
                         <div>
-                            <div style='font-size: 0.75rem; color: #64748b; font-weight: 600;'>52W RANGE</div>
-                            <div style='font-size: 1.1rem; font-weight: 700; color: #1e293b;'>${i.get('fiftyTwoWeekLow', 0):.0f}-{i.get('fiftyTwoWeekHigh', 0):.0f}</div>
+                            <div style='font-size: 0.75rem; color: #6b7280; font-weight: 600;'>52W RANGE</div>
+                            <div style='font-size: 1.1rem; font-weight: 700; color: #111827;'>${i.get('fiftyTwoWeekLow', 0):.0f}-{i.get('fiftyTwoWeekHigh', 0):.0f}</div>
                         </div>
                     </div>
                 </div>
                 """, unsafe_allow_html=True)
+
+    # Disclaimer Footer
+    st.markdown("""
+    <div class='disclaimer-footer'>
+        <div class='disclaimer-text'>
+            <strong>Disclaimer:</strong> The information provided by BARBAS is for informational and educational purposes only and should not be construed as financial, investment, or legal advice. 
+            All analysis, recommendations, and confidence scores are generated using automated models and historical data, which may not accurately predict future performance. 
+            Past performance is not indicative of future results. Investing in stocks and securities involves risk, including the potential loss of principal. 
+            You should consult with a qualified financial advisor, accountant, or other professional before making any investment decisions. 
+            BARBAS and its creators assume no responsibility or liability for any financial losses or damages resulting from the use of this tool or reliance on its outputs.
+        </div>
+    </div>
+    """, unsafe_allow_html=True)
                 
                 if st.button("Analyze Full Report", key=f"analyze_{t}", use_container_width=True):
                     st.session_state.page = 'analysis'
@@ -698,7 +741,7 @@ elif st.session_state.page == 'portfolio':
     """, unsafe_allow_html=True)
 
 elif st.session_state.page == 'top_stocks':
-    st.markdown("<div class='barbas-header'><h1 class='barbas-title'>BARBAS</h1></div>", unsafe_allow_html=True)
+    st.markdown("<div class='brbas-header'><h1 class='brbas-title'>BARBAS</h1></div>", unsafe_allow_html=True)
     st.markdown("<h2 class='section-header'>Top Stocks by Sector</h2>", unsafe_allow_html=True)
     
     sectors = {
@@ -762,24 +805,37 @@ elif st.session_state.page == 'top_stocks':
     st.markdown("<h2 class='section-header' style='margin-top: 3rem;'>Sector Analysis Summary</h2>", unsafe_allow_html=True)
     
     summary_text = f"""
-    <div style='background: white; padding: 2.5rem; border-radius: 16px; box-shadow: 0 4px 16px rgba(0,0,0,0.1); 
-                margin: 2rem 0; border-left: 6px solid #3b82f6;'>
-        <p style='font-size: 1.05rem; line-height: 1.9; color: #334155; margin-bottom: 1.5rem;'>
+    <div style='background: white; padding: 2.5rem; border-radius: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); 
+                margin: 2rem 0; border: 1px solid #e5e7eb;'>
+        <p style='font-size: 1.05rem; line-height: 1.9; color: #374151; margin-bottom: 1.5rem;'>
             Our sector analysis methodology evaluates the top holdings within each major market sector to identify the most attractive opportunities based on our comprehensive four-model framework. For each sector, we analyzed {sum(len(tickers) for tickers in sectors.values())} leading stocks across {len(sectors)} major sectors, applying the same rigorous Valuation, Momentum, Earnings, and Technical analysis used in our individual stock assessments.
         </p>
-        <p style='font-size: 1.05rem; line-height: 1.9; color: #334155; margin-bottom: 1.5rem;'>
+        <p style='font-size: 1.05rem; line-height: 1.9; color: #374151; margin-bottom: 1.5rem;'>
             The stocks presented above represent the highest-confidence opportunities within their respective sectors—essentially the "best of breed" based on current market conditions and fundamental health. These selections change dynamically as market conditions evolve, with our models continuously re-evaluating sector leadership based on the latest data.
         </p>
-        <p style='font-size: 1.05rem; line-height: 1.9; color: #334155;'>
+        <p style='font-size: 1.05rem; line-height: 1.9; color: #374151;'>
             <strong>Interpretation Guide:</strong> Sectors showing multiple BUY recommendations suggest favorable industry dynamics and strong fundamental momentum. Conversely, sectors with HOLD or SELL recommendations may be facing headwinds that warrant caution. Diversified investors should consider maintaining exposure across multiple sectors while overweighting those showing the strongest conviction scores. Remember that sector rotation is a natural market phenomenon—today's laggards can become tomorrow's leaders, so periodic reassessment is crucial.
         </p>
     </div>
     """
     
     st.markdown(summary_text, unsafe_allow_html=True)
+    
+    # Disclaimer Footer
+    st.markdown("""
+    <div class='disclaimer-footer'>
+        <div class='disclaimer-text'>
+            <strong>Disclaimer:</strong> The information provided by BARBAS is for informational and educational purposes only and should not be construed as financial, investment, or legal advice. 
+            All analysis, recommendations, and confidence scores are generated using automated models and historical data, which may not accurately predict future performance. 
+            Past performance is not indicative of future results. Investing in stocks and securities involves risk, including the potential loss of principal. 
+            You should consult with a qualified financial advisor, accountant, or other professional before making any investment decisions. 
+            BARBAS and its creators assume no responsibility or liability for any financial losses or damages resulting from the use of this tool or reliance on its outputs.
+        </div>
+    </div>
+    """, unsafe_allow_html=True)
 
 elif st.session_state.page == 'compare':
-    st.markdown("<div class='barbas-header'><h1 class='barbas-title'>BARBAS</h1></div>", unsafe_allow_html=True)
+    st.markdown("<div class='brbas-header'><h1 class='brbas-title'>BARBAS</h1></div>", unsafe_allow_html=True)
     st.markdown("<h2 class='section-header'>Compare Stocks</h2>", unsafe_allow_html=True)
     
     col1, col2 = st.columns(2)
@@ -880,15 +936,15 @@ elif st.session_state.page == 'compare':
                     price1 = data1['Close'].iloc[-1]
                     change1 = ((data1['Close'].iloc[-1] / data1['Close'].iloc[0]) - 1) * 100
                     st.markdown(f"""
-                    <div style='background: white; padding: 2rem; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);'>
-                        <h4 style='color: #1e293b; margin-bottom: 1.5rem;'>{ticker1}</h4>
+                    <div style='background: white; padding: 2rem; border-radius: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); border: 1px solid #e5e7eb;'>
+                        <h4 style='color: #111827; margin-bottom: 1.5rem;'>{ticker1}</h4>
                         <div style='display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;'>
-                            <div><span style='color: #1e293b; font-size: 0.85rem;'>Price:</span><br><strong style='font-size: 1.3rem;'>${price1:.2f}</strong></div>
-                            <div><span style='color: #1e293b; font-size: 0.85rem;'>Change:</span><br><strong style='font-size: 1.3rem; color: {"#10b981" if change1 >= 0 else "#ef4444"};'>{change1:+.2f}%</strong></div>
-                            <div><span style='color: #1e293b; font-size: 0.85rem;'>Market Cap:</span><br><strong>${info1.get('marketCap', 0)/1e9:.1f}B</strong></div>
-                            <div><span style='color: #1e293b; font-size: 0.85rem;'>P/E:</span><br><strong>{info1.get('trailingPE', 0):.2f}</strong></div>
-                            <div><span style='color: #1e293b; font-size: 0.85rem;'>Trading Volume:</span><br><strong>{data1['Trading Volume'].iloc[-1]/1e6:.1f}M</strong></div>
-                            <div><span style='color: #1e293b; font-size: 0.85rem;'>Profit Margin:</span><br><strong>{info1.get('profitMargins', 0)*100:.1f}%</strong></div>
+                            <div><span style='color: #6b7280; font-size: 0.85rem;'>Price:</span><br><strong style='font-size: 1.3rem; color: #111827;'>${price1:.2f}</strong></div>
+                            <div><span style='color: #6b7280; font-size: 0.85rem;'>Change:</span><br><strong style='font-size: 1.3rem; color: {"#10b981" if change1 >= 0 else "#ef4444"};'>{change1:+.2f}%</strong></div>
+                            <div><span style='color: #6b7280; font-size: 0.85rem;'>Market Cap:</span><br><strong style='color: #111827;'>${info1.get('marketCap', 0)/1e9:.1f}B</strong></div>
+                            <div><span style='color: #6b7280; font-size: 0.85rem;'>P/E:</span><br><strong style='color: #111827;'>{info1.get('trailingPE', 0):.2f}</strong></div>
+                            <div><span style='color: #6b7280; font-size: 0.85rem;'>Trading Volume:</span><br><strong style='color: #111827;'>{data1['Volume'].iloc[-1]/1e6:.1f}M</strong></div>
+                            <div><span style='color: #6b7280; font-size: 0.85rem;'>Profit Margin:</span><br><strong style='color: #111827;'>{info1.get('profitMargins', 0)*100:.1f}%</strong></div>
                         </div>
                     </div>
                     """, unsafe_allow_html=True)
@@ -897,15 +953,18 @@ elif st.session_state.page == 'compare':
                     price2 = data2['Close'].iloc[-1]
                     change2 = ((data2['Close'].iloc[-1] / data2['Close'].iloc[0]) - 1) * 100
                     st.markdown(f"""
-                    <div style='background: white; padding: 2rem; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);'>
-                        <h4 style='color: #1e293b; margin-bottom: 1.5rem;'>{ticker2}</h4>
+                    <div style='background: white; padding: 2rem; border-radius: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); border: 1px solid #e5e7eb;'>
+                        <h4 style='color: #111827; margin-bottom: 1.5rem;'>{ticker2}</h4>
                         <div style='display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;'>
-                            <div><span style='color: #1e293b; font-size: 0.85rem;'>Price:</span><br><strong style='font-size: 1.3rem;'>${price2:.2f}</strong></div>
-                            <div><span style='color: #1e293b; font-size: 0.85rem;'>Change:</span><br><strong style='font-size: 1.3rem; color: {"#10b981" if change2 >= 0 else "#ef4444"};'>{change2:+.2f}%</strong></div>
-                            <div><span style='color: #1e293b; font-size: 0.85rem;'>Market Cap:</span><br><strong>${info2.get('marketCap', 0)/1e9:.1f}B</strong></div>
-                            <div><span style='color: #1e293b; font-size: 0.85rem;'>P/E:</span><br><strong>{info2.get('trailingPE', 0):.2f}</strong></div>
-                            <div><span style='color: #1e293b; font-size: 0.85rem;'>Trading Volume:</span><br><strong>{data2['Trading Volume'].iloc[-1]/1e6:.1f}M</strong></div>
-                            <div><span style='color: #1e293b; font-size: 0.85rem;'>Profit Margin:</span><br><strong>{info2.get('profitMargins', 0)*100:.1f}%</strong></div>
+                            <div><span style='color: #6b7280; font-size: 0.85rem;'>Price:</span><br><strong style='font-size: 1.3rem; color: #111827;'>${price2:.2f}</strong></div>
+                            <div><span style='color: #6b7280; font-size: 0.85rem;'>Change:</span><br><strong style='font-size: 1.3rem; color: {"#10b981" if change2 >= 0 else "#ef4444"};'>{change2:+.2f}%</strong></div>
+                            <div><span style='color: #6b7280; font-size: 0.85rem;'>Market Cap:</span><br><strong style='color: #111827;'>${info2.get('marketCap', 0)/1e9:.1f}B</strong></div>
+                            <div><span style='color: #6b7280; font-size: 0.85rem;'>P/E:</span><br><strong style='color: #111827;'>{info2.get('trailingPE', 0):.2f}</strong></div>
+                            <div><span style='color: #6b7280; font-size: 0.85rem;'>Trading Volume:</span><br><strong style='color: #111827;'>{data2['Volume'].iloc[-1]/1e6:.1f}M</strong></div>
+                            <div><span style='color: #6b7280; font-size: 0.85rem;'>Profit Margin:</span><br><strong style='color: #111827;'>{info2.get('profitMargins', 0)*100:.1f}%</strong></div>
+                        </div>
+                    </div>
+                    """, unsafe_allow_html=True)<span style='color: #64748b; font-size: 0.85rem;'>Profit Margin:</span><br><strong>{info2.get('profitMargins', 0)*100:.1f}%</strong></div>
                         </div>
                     </div>
                     """, unsafe_allow_html=True)
@@ -917,14 +976,14 @@ elif st.session_state.page == 'compare':
                 winner_conf = max(conf1, conf2)
                 
                 st.markdown(f"""
-                <div style='background: white; padding: 2.5rem; border-radius: 16px; box-shadow: 0 4px 16px rgba(0,0,0,0.1); 
-                            margin: 2rem 0; border-left: 6px solid #3b82f6;'>
-                    <h4 style='color: #1e293b; margin-bottom: 1rem;'>Investment Verdict</h4>
-                    <p style='font-size: 1.05rem; line-height: 1.8; color: #334155;'>
+                <div style='background: white; padding: 2.5rem; border-radius: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); 
+                            margin: 2rem 0; border: 1px solid #e5e7eb;'>
+                    <h4 style='color: #111827; margin-bottom: 1rem;'>Investment Verdict</h4>
+                    <p style='font-size: 1.05rem; line-height: 1.8; color: #374151;'>
                         Based on our comprehensive four-model analysis, <strong>{winner}</strong> emerges as the stronger investment opportunity with a confidence score of {winner_conf}%. 
                         {ticker1} scored {conf1}% while {ticker2} scored {conf2}%, representing a {abs(conf1-conf2):.1f} percentage point difference.
                     </p>
-                    <p style='font-size: 1.05rem; line-height: 1.8; color: #334155; margin-top: 1rem;'>
+                    <p style='font-size: 1.05rem; line-height: 1.8; color: #374151; margin-top: 1rem;'>
                         {'Both stocks show strong characteristics and could be suitable for a diversified portfolio.' if abs(conf1-conf2) < 10 else 
                          f'The {winner} demonstrates notably superior characteristics across multiple analytical dimensions.' if winner != "Tie" else
                          'Both stocks are evenly matched in terms of investment attractiveness.'}
