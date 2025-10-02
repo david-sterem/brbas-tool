@@ -9,9 +9,9 @@ from scipy import stats
 import warnings
 warnings.filterwarnings('ignore')
 
-st.set_page_config(page_title="BRBAS - Professional Stock Analysis", layout="wide", page_icon="📊")
+st.set_page_config(page_title="BRBAS", layout="wide", page_icon="📊", initial_sidebar_state="expanded")
 
-# Professional Light Theme CSS
+# Professional CSS
 st.markdown("""
 <style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
@@ -32,14 +32,14 @@ st.markdown("""
     
     .brbas-header {
         text-align: center;
-        padding: 3rem 0 2rem 0;
+        padding: 2rem 0 1.5rem 0;
         background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%);
         margin: -2rem -3rem 2rem -3rem;
         box-shadow: 0 4px 20px rgba(30, 64, 175, 0.15);
     }
     
     .brbas-title {
-        font-size: 4rem;
+        font-size: 3rem;
         font-weight: 800;
         color: white;
         letter-spacing: 0.5rem;
@@ -47,20 +47,15 @@ st.markdown("""
         text-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
     }
     
-    .brbas-subtitle {
-        font-size: 1rem;
-        color: rgba(255, 255, 255, 0.9);
-        letter-spacing: 0.3rem;
-        margin-top: 0.5rem;
-        font-weight: 300;
-    }
-    
-    .search-container {
+    .search-bar-container {
         background: white;
-        padding: 2rem;
-        border-radius: 16px;
+        padding: 1.5rem;
+        border-radius: 12px;
         box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
         margin-bottom: 2rem;
+        display: flex;
+        gap: 1rem;
+        align-items: center;
     }
     
     .confidence-card {
@@ -80,15 +75,6 @@ st.markdown("""
         -webkit-text-fill-color: transparent;
         line-height: 1;
         margin: 0;
-    }
-    
-    .confidence-label {
-        font-size: 0.9rem;
-        color: #64748b;
-        text-transform: uppercase;
-        letter-spacing: 2px;
-        font-weight: 600;
-        margin-top: 0.5rem;
     }
     
     .recommendation-badge {
@@ -134,7 +120,7 @@ st.markdown("""
     
     .advice-text {
         font-size: 1.1rem;
-        line-height: 1.7;
+        line-height: 1.8;
         color: #334155;
         margin: 1.5rem 0;
         font-weight: 500;
@@ -154,12 +140,6 @@ st.markdown("""
         font-weight: 800;
         margin: 0 0 0.5rem 0;
         color: white;
-    }
-    
-    .company-ticker {
-        font-size: 1.2rem;
-        opacity: 0.9;
-        font-weight: 600;
     }
     
     .company-description {
@@ -188,53 +168,6 @@ st.markdown("""
         border-bottom: 3px solid #3b82f6;
     }
     
-    .stTabs [data-baseweb="tab-list"] {
-        gap: 0.5rem;
-        background: transparent;
-    }
-    
-    .stTabs [data-baseweb="tab"] {
-        background: white;
-        border-radius: 10px;
-        padding: 0.75rem 1.5rem;
-        border: 2px solid #e2e8f0;
-        color: #64748b;
-        font-weight: 600;
-        transition: all 0.2s;
-    }
-    
-    .stTabs [data-baseweb="tab"]:hover {
-        border-color: #3b82f6;
-        background: #f8fafc;
-    }
-    
-    .stTabs [aria-selected="true"] {
-        background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%);
-        color: white;
-        border-color: #3b82f6;
-    }
-    
-    .disclaimer {
-        background: #fee2e2;
-        border: 2px solid #ef4444;
-        padding: 2rem;
-        border-radius: 12px;
-        margin: 3rem 0;
-    }
-    
-    .disclaimer-title {
-        font-size: 1.3rem;
-        font-weight: 700;
-        color: #991b1b;
-        margin-bottom: 1rem;
-    }
-    
-    .disclaimer-text {
-        color: #7f1d1d;
-        line-height: 1.7;
-        font-size: 0.95rem;
-    }
-    
     .stMetric {
         background: white;
         padding: 1.5rem;
@@ -256,35 +189,311 @@ st.markdown("""
         font-size: 2rem !important;
         font-weight: 800 !important;
     }
+    
+    [data-testid="stSidebar"] {
+        background: linear-gradient(180deg, #1e40af 0%, #1e3a8a 100%);
+    }
+    
+    [data-testid="stSidebar"] .stMarkdown {
+        color: white !important;
+    }
+    
+    [data-testid="stSidebar"] button {
+        width: 100%;
+        background: rgba(255, 255, 255, 0.1);
+        color: white;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        padding: 0.75rem;
+        border-radius: 8px;
+        margin: 0.5rem 0;
+        font-weight: 600;
+        transition: all 0.2s;
+    }
+    
+    [data-testid="stSidebar"] button:hover {
+        background: rgba(255, 255, 255, 0.2);
+        border-color: rgba(255, 255, 255, 0.4);
+        transform: translateX(5px);
+    }
+    
+    /* Micro-interactions and Animations */
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+    
+    @keyframes slideIn {
+        from {
+            opacity: 0;
+            transform: translateX(-20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateX(0);
+        }
+    }
+    
+    @keyframes pulse {
+        0%, 100% {
+            transform: scale(1);
+        }
+        50% {
+            transform: scale(1.05);
+        }
+    }
+    
+    @keyframes shimmer {
+        0% {
+            background-position: -1000px 0;
+        }
+        100% {
+            background-position: 1000px 0;
+        }
+    }
+    
+    .company-header {
+        animation: fadeInUp 0.6s ease-out;
+    }
+    
+    .stMetric {
+        animation: fadeInUp 0.4s ease-out;
+        animation-fill-mode: both;
+    }
+    
+    .stMetric:nth-child(1) { animation-delay: 0.1s; }
+    .stMetric:nth-child(2) { animation-delay: 0.2s; }
+    .stMetric:nth-child(3) { animation-delay: 0.3s; }
+    .stMetric:nth-child(4) { animation-delay: 0.4s; }
+    .stMetric:nth-child(5) { animation-delay: 0.5s; }
+    
+    .stMetric:hover {
+        transform: translateY(-5px) scale(1.02);
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    
+    .confidence-card {
+        animation: fadeInUp 0.7s ease-out;
+        transition: all 0.3s ease;
+    }
+    
+    .confidence-card:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 12px 36px rgba(0, 0, 0, 0.15);
+    }
+    
+    .confidence-score {
+        animation: pulse 2s ease-in-out infinite;
+    }
+    
+    .recommendation-badge {
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        cursor: default;
+    }
+    
+    .recommendation-badge:hover {
+        transform: scale(1.1);
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+    }
+    
+    .company-name {
+        transition: all 0.3s ease;
+    }
+    
+    .company-name:hover {
+        transform: scale(1.02);
+        text-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    }
+    
+    .tag {
+        transition: all 0.2s ease;
+        cursor: pointer;
+    }
+    
+    .tag:hover {
+        background: rgba(255, 255, 255, 0.35);
+        transform: translateY(-2px);
+    }
+    
+    .section-header {
+        animation: slideIn 0.5s ease-out;
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .section-header::after {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        height: 3px;
+        background: linear-gradient(90deg, #3b82f6, transparent);
+        animation: shimmer 2s linear infinite;
+    }
+    
+    .stTextInput input:focus,
+    .stSelectbox select:focus {
+        border-color: #3b82f6;
+        box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        transform: scale(1.01);
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    
+    .stButton button {
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .stButton button:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
+    }
+    
+    .stButton button:active {
+        transform: translateY(0);
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+    
+    .stButton button::after {
+        content: '';
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        width: 0;
+        height: 0;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.3);
+        transform: translate(-50%, -50%);
+        transition: width 0.6s, height 0.6s;
+    }
+    
+    .stButton button:hover::after {
+        width: 300px;
+        height: 300px;
+    }
+    
+    .stDataFrame {
+        animation: fadeInUp 0.5s ease-out;
+        transition: all 0.3s ease;
+    }
+    
+    .stDataFrame:hover {
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    }
+    
+    .stExpander {
+        transition: all 0.3s ease;
+    }
+    
+    .stExpander:hover {
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    }
+    
+    .streamlit-expanderHeader:hover {
+        background: rgba(59, 130, 246, 0.05);
+        border-color: #3b82f6;
+    }
+    
+    /* Loading shimmer effect */
+    .loading-shimmer {
+        background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+        background-size: 1000px 100%;
+        animation: shimmer 2s linear infinite;
+    }
+    
+    /* Smooth page transitions */
+    .main > div {
+        animation: fadeInUp 0.4s ease-out;
+    }
+    
+    /* Interactive chart container */
+    .stPlotlyChart {
+        animation: fadeInUp 0.6s ease-out;
+        transition: all 0.3s ease;
+    }
+    
+    .stPlotlyChart:hover {
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
+        transform: scale(1.01);
+    }
+    
+    /* Tooltip enhancement */
+    [data-testid="stTooltipIcon"] {
+        transition: all 0.2s ease;
+    }
+    
+    [data-testid="stTooltipIcon"]:hover {
+        transform: scale(1.2) rotate(15deg);
+    }
+    
+    /* Card hover effects */
+    div[style*='background: white'][style*='padding: 1.5rem'] {
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    
+    div[style*='background: white'][style*='padding: 1.5rem']:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 12px 28px rgba(0, 0, 0, 0.15);
+    }
+    
+    /* Success/Error message animations */
+    .stSuccess, .stError, .stWarning, .stInfo {
+        animation: slideIn 0.4s ease-out;
+    }
+    
+    /* Smooth scrolling */
+    html {
+        scroll-behavior: smooth;
+    }
 </style>
 """, unsafe_allow_html=True)
 
-# BRBAS Header
-st.markdown("""
-<div class='brbas-header'>
-    <h1 class='brbas-title'>BRBAS</h1>
-    <p class='brbas-subtitle'>PROFESSIONAL STOCK ANALYSIS PLATFORM</p>
-</div>
-""", unsafe_allow_html=True)
+# Initialize session state
+if 'page' not in st.session_state:
+    st.session_state.page = 'analysis'
+if 'portfolio' not in st.session_state:
+    st.session_state.portfolio = []
 
-# Search and Filter Section
-with st.container():
-    st.markdown("<div class='search-container'>", unsafe_allow_html=True)
+# Sidebar Navigation
+with st.sidebar:
+    st.markdown("<h1 style='color: white; text-align: center; margin-bottom: 2rem;'>BRBAS</h1>", unsafe_allow_html=True)
     
-    col_search1, col_search2, col_search3 = st.columns([3, 2, 2])
+    if st.button("📊 Stock Analysis"):
+        st.session_state.page = 'analysis'
+    if st.button("⚖️ Compare Stocks"):
+        st.session_state.page = 'compare'
+    if st.button("⭐ Portfolio"):
+        st.session_state.page = 'portfolio'
     
-    with col_search1:
-        ticker = st.text_input("", value="AAPL", placeholder="Enter stock ticker (e.g., AAPL, TSLA, GOOGL)", label_visibility="collapsed").upper()
-    
-    with col_search2:
-        period = st.selectbox("Time Period", ["1mo", "3mo", "6mo", "1y", "2y", "5y"], index=3)
-    
-    with col_search3:
-        analysis_depth = st.selectbox("Analysis Depth", ["Standard", "Detailed", "Advanced"], index=1)
-    
-    st.markdown("</div>", unsafe_allow_html=True)
+    st.markdown("---")
+    st.markdown("<p style='color: rgba(255,255,255,0.7); font-size: 0.85rem; text-align: center;'>Professional Stock Analysis Platform</p>", unsafe_allow_html=True)
 
-# Function definitions
+# Helper functions
+def search_ticker(query):
+    """Search for ticker by company name"""
+    try:
+        # Common stock mappings
+        mapping = {
+            'apple': 'AAPL', 'microsoft': 'MSFT', 'google': 'GOOGL', 'amazon': 'AMZN',
+            'tesla': 'TSLA', 'meta': 'META', 'nvidia': 'NVDA', 'netflix': 'NFLX',
+            'disney': 'DIS', 'walmart': 'WMT', 'coca cola': 'KO', 'pepsi': 'PEP'
+        }
+        
+        query_lower = query.lower()
+        if query_lower in mapping:
+            return mapping[query_lower]
+        return query.upper()
+    except:
+        return query.upper()
+
 def calculate_confidence_score(info, data, valuation_score, momentum_score, earnings_score, technical_score):
     weights = {
         'valuation': 0.30,
@@ -319,19 +528,95 @@ def get_recommendation_from_confidence(confidence):
     else:
         return "STRONG SELL", "strong-sell"
 
-def generate_advice(confidence, recommendation, ticker, info):
+def generate_detailed_advice(confidence, recommendation, ticker, info, valuation_score, momentum_score, earnings_score, technical_score, valuation_details, momentum_details, earnings_details, technical_details):
+    """Generate comprehensive analytical advice"""
     company_name = info.get('longName', ticker)
     
+    # Base recommendation
     if confidence >= 75:
-        return f"Considering {company_name}'s strong fundamentals, positive momentum indicators, and robust earnings trajectory, I recommend **accumulating a position** in {ticker}. The data suggests significant upside potential with manageable risk."
+        base = f"Considering {company_name}'s strong fundamentals, positive momentum indicators, and robust earnings trajectory, I recommend **accumulating a position** in {ticker}. The data suggests significant upside potential with manageable risk."
     elif confidence >= 60:
-        return f"Based on {company_name}'s favorable valuation metrics and positive technical indicators, I recommend **initiating or adding to a position** in {ticker}. Monitor for any changes in market conditions."
+        base = f"Based on {company_name}'s favorable valuation metrics and positive technical indicators, I recommend **initiating or adding to a position** in {ticker}. Monitor for any changes in market conditions."
     elif confidence >= 40:
-        return f"Given {company_name}'s mixed signals across valuation, momentum, and earnings metrics, I recommend **holding existing positions** in {ticker} and waiting for clearer directional signals before making additional moves."
+        base = f"Given {company_name}'s mixed signals across valuation, momentum, and earnings metrics, I recommend **holding existing positions** in {ticker} and waiting for clearer directional signals before making additional moves."
     elif confidence >= 25:
-        return f"Considering {company_name}'s deteriorating fundamentals and weak technical indicators, I recommend **reducing exposure** to {ticker}. Consider reallocating capital to stronger opportunities."
+        base = f"Considering {company_name}'s deteriorating fundamentals and weak technical indicators, I recommend **reducing exposure** to {ticker}. Consider reallocating capital to stronger opportunities."
     else:
-        return f"Given {company_name}'s significant headwinds across multiple analysis dimensions, I recommend **exiting positions** in {ticker}. The risk-reward profile is currently unfavorable."
+        base = f"Given {company_name}'s significant headwinds across multiple analysis dimensions, I recommend **exiting positions** in {ticker}. The risk-reward profile is currently unfavorable."
+    
+    # Detailed breakdown
+    analysis = f"\n\n**Detailed Analysis:**\n\n"
+    
+    # Valuation insights
+    analysis += f"**Valuation ({valuation_score+6}/12):** "
+    peg = info.get('pegRatio', None)
+    pe = info.get('trailingPE', None)
+    pb = info.get('priceToBook', None)
+    
+    if valuation_score >= 2:
+        analysis += f"The stock appears undervalued. "
+        if peg and peg < 1:
+            analysis += f"The PEG ratio of {peg:.2f} indicates the stock is trading below its growth rate, suggesting a compelling value opportunity. "
+        if pe and pe < 20:
+            analysis += f"With a P/E ratio of {pe:.1f}, the stock is reasonably priced relative to earnings. "
+    elif valuation_score <= -2:
+        analysis += f"Valuation metrics raise concerns. "
+        if peg and peg > 2:
+            analysis += f"The PEG ratio of {peg:.2f} suggests the stock is expensive relative to its growth prospects. "
+        if pe and pe > 30:
+            analysis += f"The elevated P/E ratio of {pe:.1f} indicates premium pricing that may not be justified. "
+    else:
+        analysis += f"Valuation appears fair. "
+    
+    # Momentum insights
+    analysis += f"\n\n**Momentum ({momentum_score+6}/12):** "
+    if momentum_score >= 2:
+        analysis += f"Strong bullish momentum is evident. "
+        for detail in momentum_details:
+            if "Golden Cross" in detail:
+                analysis += f"The stock has formed a golden cross pattern with the 50-day moving average crossing above the 200-day MA, a classically bullish technical signal. "
+        analysis += f"This suggests institutional accumulation and sustained buying pressure. "
+    elif momentum_score <= -2:
+        analysis += f"Momentum indicators are concerning. "
+        for detail in momentum_details:
+            if "Death Cross" in detail:
+                analysis += f"A death cross has formed, with the 50-day MA falling below the 200-day MA, signaling potential further downside. "
+        analysis += f"This pattern often precedes extended periods of underperformance. "
+    
+    # Earnings insights
+    analysis += f"\n\n**Earnings & Growth ({earnings_score+6}/12):** "
+    earnings_growth = info.get('earningsQuarterlyGrowth', None)
+    revenue_growth = info.get('revenueGrowth', None)
+    profit_margin = info.get('profitMargins', None)
+    
+    if earnings_score >= 2:
+        analysis += f"The company demonstrates strong fundamental health. "
+        if earnings_growth and earnings_growth > 0.15:
+            analysis += f"Quarterly earnings growth of {earnings_growth*100:.1f}% significantly exceeds market averages, indicating robust business performance. "
+        if profit_margin and profit_margin > 0.15:
+            analysis += f"Profit margins of {profit_margin*100:.1f}% suggest efficient operations and pricing power. "
+    elif earnings_score <= -2:
+        analysis += f"Fundamental performance is weak. "
+        if earnings_growth and earnings_growth < 0:
+            analysis += f"Negative earnings growth of {earnings_growth*100:.1f}% signals operational challenges or market headwinds. "
+    
+    # Technical insights
+    analysis += f"\n\n**Technical Analysis ({technical_score+6}/12):** "
+    for detail in technical_details:
+        if "Oversold" in detail:
+            analysis += f"The RSI indicator shows oversold conditions, which historically precede price reversals and present potential entry opportunities. "
+        elif "Overbought" in detail:
+            analysis += f"The RSI suggests overbought conditions, indicating the stock may be due for a pullback or consolidation period. "
+    
+    # Risk factors
+    beta = info.get('beta', None)
+    if beta:
+        if beta > 1.5:
+            analysis += f"\n\n**Risk Assessment:** High volatility (Beta: {beta:.2f}) suggests this stock experiences larger price swings than the broader market. Position sizing should reflect this elevated risk profile."
+        elif beta < 0.5:
+            analysis += f"\n\n**Risk Assessment:** Low volatility (Beta: {beta:.2f}) indicates relative stability, making this suitable for conservative portfolios."
+    
+    return base + analysis
 
 def calculate_rsi(data, period=14):
     delta = data['Close'].diff()
@@ -491,348 +776,201 @@ def get_stock_data(ticker, period):
     except Exception as e:
         return None, None, str(e)
 
-# Load and process data
-with st.spinner(f"🔍 Analyzing {ticker}..."):
-    data, info, error = get_stock_data(ticker, period)
-
-if error:
-    st.error(f"❌ Error: {error}")
-    st.stop()
-
-if data is None or data.empty:
-    st.error(f"❌ No data available for {ticker}")
-    st.stop()
-
-# Calculate indicators
-for ma_period in [20, 50, 100, 200]:
-    data[f'MA{ma_period}'] = data['Close'].rolling(window=ma_period).mean()
-
-data = calculate_ema(data, [8, 21, 50])
-data['RSI'] = calculate_rsi(data)
-data['MACD'], data['Signal'], data['Histogram'] = calculate_macd(data)
-
-# Run analyses
-valuation_score, valuation_details = analyze_valuation(info)
-momentum_score, momentum_details = analyze_momentum(data)
-earnings_score, earnings_details = analyze_earnings(info)
-technical_score, technical_details = analyze_technical(data)
-
-confidence = calculate_confidence_score(info, data, valuation_score, momentum_score, earnings_score, technical_score)
-recommendation, rec_class = get_recommendation_from_confidence(confidence)
-advice = generate_advice(confidence, recommendation, ticker, info)
-
-# Company Header
-st.markdown(f"""
-<div class='company-header'>
-    <div class='company-name'>{info.get('longName', ticker)}</div>
-    <div class='company-ticker'>{ticker} • {info.get('exchange', 'N/A')}</div>
-    <div class='company-description'>{info.get('longBusinessSummary', 'No description available.')[:300]}...</div>
-    <div style='margin-top: 1rem;'>
-        <span class='tag'>{info.get('sector', 'N/A')}</span>
-        <span class='tag'>{info.get('industry', 'N/A')}</span>
-        <span class='tag'>{info.get('country', 'N/A')}</span>
+# STOCK ANALYSIS PAGE
+if st.session_state.page == 'analysis':
+    st.markdown("""
+    <div class='brbas-header'>
+        <h1 class='brbas-title'>BRBAS</h1>
     </div>
-</div>
-""", unsafe_allow_html=True)
-
-# Key Metrics
-col1, col2, col3, col4, col5 = st.columns(5)
-
-current_price = data['Close'].iloc[-1]
-price_change = data['Close'].iloc[-1] - data['Close'].iloc[0]
-pct_change = (price_change / data['Close'].iloc[0]) * 100
-
-with col1:
-    st.metric("Current Price", f"${current_price:.2f}", f"{pct_change:+.2f}%")
-
-with col2:
-    market_cap = info.get('marketCap', 0)
-    cap_display = f"${market_cap/1e9:.1f}B" if market_cap > 1e9 else f"${market_cap/1e6:.1f}M"
-    st.metric("Market Cap", cap_display)
-
-with col3:
-    pe_ratio = info.get('trailingPE', 0)
-    st.metric("P/E Ratio", f"{pe_ratio:.2f}" if pe_ratio else "N/A")
-
-with col4:
-    volume = data['Volume'].iloc[-1]
-    avg_volume = data['Volume'].mean()
-    vol_change = ((volume / avg_volume) - 1) * 100
-    st.metric("Volume", f"{volume/1e6:.1f}M", f"{vol_change:+.1f}%")
-
-with col5:
-    high_52w = info.get('fiftyTwoWeekHigh', 0)
-    low_52w = info.get('fiftyTwoWeekLow', 0)
-    st.metric("52W Range", f"${low_52w:.0f} - ${high_52w:.0f}")
-
-# Confidence Card
-st.markdown(f"""
-<div class='confidence-card'>
-    <div style='display: grid; grid-template-columns: 1fr 2fr; gap: 2rem; align-items: center;'>
-        <div style='text-align: center;'>
-            <div class='confidence-score'>{confidence}%</div>
-            <div class='confidence-label'>Confidence Score</div>
-            <div class='recommendation-badge {rec_class}' style='margin-top: 1.5rem;'>{recommendation}</div>
+    """, unsafe_allow_html=True)
+    
+    # Search bar in white container
+    search_col1, search_col2, search_col3 = st.columns([4, 2, 2])
+    
+    with search_col1:
+        ticker_input = st.text_input("", value="AAPL", placeholder="Enter stock ticker or company name (e.g., AAPL or Apple)", label_visibility="collapsed", key="ticker_search")
+        ticker = search_ticker(ticker_input)
+    
+    with search_col2:
+        period = st.selectbox("Time Period", ["1mo", "3mo", "6mo", "1y", "2y", "5y"], index=3, key="period_select")
+    
+    with search_col3:
+        analysis_depth = st.selectbox("Analysis Depth", ["Standard", "Detailed", "Advanced"], index=1, key="depth_select")
+    
+    # Load and process data
+    with st.spinner(f"Analyzing {ticker}..."):
+        data, info, error = get_stock_data(ticker, period)
+    
+    if error:
+        st.error(f"Error: {error}")
+        st.stop()
+    
+    if data is None or data.empty:
+        st.error(f"No data available for {ticker}")
+        st.stop()
+    
+    # Calculate indicators
+    for ma_period in [20, 50, 100, 200]:
+        data[f'MA{ma_period}'] = data['Close'].rolling(window=ma_period).mean()
+    
+    data = calculate_ema(data, [8, 21, 50])
+    data['RSI'] = calculate_rsi(data)
+    data['MACD'], data['Signal'], data['Histogram'] = calculate_macd(data)
+    
+    # Run analyses
+    valuation_score, valuation_details = analyze_valuation(info)
+    momentum_score, momentum_details = analyze_momentum(data)
+    earnings_score, earnings_details = analyze_earnings(info)
+    technical_score, technical_details = analyze_technical(data)
+    
+    confidence = calculate_confidence_score(info, data, valuation_score, momentum_score, earnings_score, technical_score)
+    recommendation, rec_class = get_recommendation_from_confidence(confidence)
+    advice = generate_detailed_advice(confidence, recommendation, ticker, info, valuation_score, momentum_score, earnings_score, technical_score, valuation_details, momentum_details, earnings_details, technical_details)
+    
+    # Add to portfolio button
+    if ticker not in st.session_state.portfolio:
+        if st.button("⭐ Add to Portfolio"):
+            st.session_state.portfolio.append(ticker)
+            st.success(f"Added {ticker} to portfolio!")
+    
+    # Company Header - Full description
+    business_summary = info.get('longBusinessSummary', 'No description available.')
+    
+    st.markdown(f"""
+    <div class='company-header'>
+        <div class='company-name'>{info.get('longName', ticker)}</div>
+        <div style='font-size: 1.2rem; opacity: 0.9; font-weight: 600;'>{ticker} • {info.get('exchange', 'N/A')}</div>
+        <div class='company-description'>{business_summary}</div>
+        <div style='margin-top: 1rem;'>
+            <span class='tag'>{info.get('sector', 'N/A')}</span>
+            <span class='tag'>{info.get('industry', 'N/A')}</span>
+            <span class='tag'>{info.get('country', 'N/A')}</span>
         </div>
-        <div>
-            <div class='advice-text'>{advice}</div>
-            <div style='margin-top: 1rem; padding-top: 1rem; border-top: 1px solid #e2e8f0;'>
-                <small style='color: #64748b;'><strong>Analysis Breakdown:</strong> Valuation ({valuation_score+6}/12) • Momentum ({momentum_score+6}/12) • Earnings ({earnings_score+6}/12) • Technical ({technical_score+6}/12)</small>
+    </div>
+    """, unsafe_allow_html=True)
+    
+    # Key Metrics
+    col1, col2, col3, col4, col5 = st.columns(5)
+    
+    current_price = data['Close'].iloc[-1]
+    price_change = data['Close'].iloc[-1] - data['Close'].iloc[0]
+    pct_change = (price_change / data['Close'].iloc[0]) * 100
+    
+    with col1:
+        st.metric("Current Price", f"${current_price:.2f}", f"{pct_change:+.2f}%")
+    
+    with col2:
+        market_cap = info.get('marketCap', 0)
+        cap_display = f"${market_cap/1e9:.1f}B" if market_cap > 1e9 else f"${market_cap/1e6:.1f}M"
+        st.metric("Market Cap", cap_display)
+    
+    with col3:
+        pe_ratio = info.get('trailingPE', 0)
+        st.metric("P/E Ratio", f"{pe_ratio:.2f}" if pe_ratio else "N/A")
+    
+    with col4:
+        volume = data['Volume'].iloc[-1]
+        avg_volume = data['Volume'].mean()
+        vol_change = ((volume / avg_volume) - 1) * 100
+        st.metric("Volume", f"{volume/1e6:.1f}M", f"{vol_change:+.1f}%")
+    
+    with col5:
+        high_52w = info.get('fiftyTwoWeekHigh', 0)
+        low_52w = info.get('fiftyTwoWeekLow', 0)
+        st.metric("52W Range", f"${low_52w:.0f} - ${high_52w:.0f}")
+    
+    # Confidence Card with detailed advice
+    st.markdown(f"""
+    <div class='confidence-card'>
+        <div style='display: grid; grid-template-columns: 1fr 2fr; gap: 2rem; align-items: center;'>
+            <div style='text-align: center;'>
+                <div class='confidence-score'>{confidence}%</div>
+                <div class='confidence-label'>Confidence Score</div>
+                <div class='recommendation-badge {rec_class}' style='margin-top: 1.5rem;'>{recommendation}</div>
+            </div>
+            <div>
+                <div class='advice-text'>{advice}</div>
+                <div style='margin-top: 1rem; padding-top: 1rem; border-top: 1px solid #e2e8f0;'>
+                    <small style='color: #64748b;'><strong>Analysis Breakdown:</strong> Valuation ({valuation_score+6}/12) • Momentum ({momentum_score+6}/12) • Earnings ({earnings_score+6}/12) • Technical ({technical_score+6}/12)</small>
+                </div>
             </div>
         </div>
     </div>
-</div>
-""", unsafe_allow_html=True)
-
-# Price Chart
-st.markdown("<h2 class='section-header'>📈 Price Performance</h2>", unsafe_allow_html=True)
-
-fig = make_subplots(
-    rows=4, cols=1,
-    shared_xaxes=True,
-    vertical_spacing=0.05,
-    row_heights=[0.5, 0.15, 0.15, 0.15],
-    subplot_titles=['Price', 'Volume', 'RSI', 'MACD']
-)
-
-fig.add_trace(
-    go.Candlestick(
-        x=data.index,
-        open=data['Open'],
-        high=data['High'],
-        low=data['Low'],
-        close=data['Close'],
-        name='Price',
-        increasing_line_color='#10b981',
-        decreasing_line_color='#ef4444'
-    ),
-    row=1, col=1
-)
-
-colors = {'EMA8': '#3b82f6', 'EMA21': '#8b5cf6', 'EMA50': '#f59e0b'}
-for ema, color in colors.items():
-    if ema in data.columns:
-        fig.add_trace(
-            go.Scatter(x=data.index, y=data[ema], name=ema, line=dict(color=color, width=2)),
-            row=1, col=1
-        )
-
-colors_vol = ['#ef4444' if data['Close'].iloc[i] < data['Open'].iloc[i] else '#10b981' for i in range(len(data))]
-fig.add_trace(go.Bar(x=data.index, y=data['Volume'], name='Volume', marker_color=colors_vol, opacity=0.6), row=2, col=1)
-
-fig.add_trace(go.Scatter(x=data.index, y=data['RSI'], name='RSI', line=dict(color='#8b5cf6', width=2)), row=3, col=1)
-fig.add_hline(y=70, line_dash="dash", line_color="#ef4444", row=3, col=1, opacity=0.5)
-fig.add_hline(y=30, line_dash="dash", line_color="#10b981", row=3, col=1, opacity=0.5)
-
-fig.add_trace(go.Scatter(x=data.index, y=data['MACD'], name='MACD', line=dict(color='#3b82f6', width=2)), row=4, col=1)
-fig.add_trace(go.Scatter(x=data.index, y=data['Signal'], name='Signal', line=dict(color='#f59e0b', width=2)), row=4, col=1)
-colors_hist = ['#ef4444' if val < 0 else '#10b981' for val in data['Histogram']]
-fig.add_trace(go.Bar(x=data.index, y=data['Histogram'], name='Histogram', marker_color=colors_hist, opacity=0.5), row=4, col=1)
-
-fig.update_layout(
-    height=800,
-    showlegend=True,
-    xaxis_rangeslider_visible=False,
-    hovermode='x unified',
-    template='plotly_white',
-    paper_bgcolor='white',
-    plot_bgcolor='#f8fafc',
-    font=dict(color='#1e293b', size=11, family='Inter'),
-    legend=dict(bgcolor='white', bordercolor='#e2e8f0', borderwidth=1)
-)
-
-fig.update_xaxes(showgrid=True, gridwidth=1, gridcolor='#e2e8f0')
-fig.update_yaxes(showgrid=True, gridwidth=1, gridcolor='#e2e8f0')
-
-st.plotly_chart(fig, use_container_width=True)
-
-# Analysis Tabs
-st.markdown("<h2 class='section-header'>🔬 Detailed Analysis Models</h2>", unsafe_allow_html=True)
-
-tab1, tab2, tab3, tab4 = st.tabs(["📊 Valuation", "🚀 Momentum", "💰 Earnings", "⚡ Technical"])
-
-with tab1:
-    st.markdown(f"### Score: **{valuation_score+6}/12**")
-    for detail in valuation_details:
-        st.markdown(f"- {detail}")
+    """, unsafe_allow_html=True)
     
-    vcol1, vcol2, vcol3, vcol4 = st.columns(4)
-    with vcol1:
-        st.metric("P/E Ratio", f"{info.get('trailingPE', 0):.2f}" if info.get('trailingPE') else "N/A")
-    with vcol2:
-        st.metric("PEG Ratio", f"{info.get('pegRatio', 0):.2f}" if info.get('pegRatio') else "N/A")
-    with vcol3:
-        st.metric("P/B Ratio", f"{info.get('priceToBook', 0):.2f}" if info.get('priceToBook') else "N/A")
-    with vcol4:
-        st.metric("EV/EBITDA", f"{info.get('enterpriseToEbitda', 0):.2f}" if info.get('enterpriseToEbitda') else "N/A")
+    # Price Chart
+    st.markdown("<h2 class='section-header'>Price Performance</h2>", unsafe_allow_html=True)
+    
+    fig = make_subplots(
+        rows=4, cols=1,
+        shared_xaxes=True,
+        vertical_spacing=0.05,
+        row_heights=[0.5, 0.15, 0.15, 0.15],
+        subplot_titles=['Price', 'Volume', 'RSI', 'MACD']
+    )
+    
+    fig.add_trace(
+        go.Candlestick(
+            x=data.index,
+            open=data['Open'],
+            high=data['High'],
+            low=data['Low'],
+            close=data['Close'],
+            name='Price',
+            increasing_line_color='#10b981',
+            decreasing_line_color='#ef4444'
+        ),
+        row=1, col=1
+    )
+    
+    colors = {'EMA8': '#3b82f6', 'EMA21': '#8b5cf6', 'EMA50': '#f59e0b'}
+    for ema, color in colors.items():
+        if ema in data.columns:
+            fig.add_trace(
+                go.Scatter(x=data.index, y=data[ema], name=ema, line=dict(color=color, width=2)),
+                row=1, col=1
+            )
+    
+    colors_vol = ['#ef4444' if data['Close'].iloc[i] < data['Open'].iloc[i] else '#10b981' for i in range(len(data))]
+    fig.add_trace(go.Bar(x=data.index, y=data['Volume'], name='Volume', marker_color=colors_vol, opacity=0.6), row=2, col=1)
+    
+    fig.add_trace(go.Scatter(x=data.index, y=data['RSI'], name='RSI', line=dict(color='#8b5cf6', width=2)), row=3, col=1)
+    fig.add_hline(y=70, line_dash="dash", line_color="#ef4444", row=3, col=1, opacity=0.5)
+    fig.add_hline(y=30, line_dash="dash", line_color="#10b981", row=3, col=1, opacity=0.5)
+    
+    fig.add_trace(go.Scatter(x=data.index, y=data['MACD'], name='MACD', line=dict(color='#3b82f6', width=2)), row=4, col=1)
+    fig.add_trace(go.Scatter(x=data.index, y=data['Signal'], name='Signal', line=dict(color='#f59e0b', width=2)), row=4, col=1)
+    colors_hist = ['#ef4444' if val < 0 else '#10b981' for val in data['Histogram']]
+    fig.add_trace(go.Bar(x=data.index, y=data['Histogram'], name='Histogram', marker_color=colors_hist, opacity=0.5), row=4, col=1)
+    
+    fig.update_layout(
+        height=800,
+        showlegend=True,
+        xaxis_rangeslider_visible=False,
+        hovermode='x unified',
+        template='plotly_white',
+        paper_bgcolor='white',
+        plot_bgcolor='#f8fafc',
+        font=dict(color='#1e293b', size=11, family='Inter'),
+        legend=dict(bgcolor='white', bordercolor='#e2e8f0', borderwidth=1)
+    )
+    
+    fig.update_xaxes(showgrid=True, gridwidth=1, gridcolor='#e2e8f0')
+    fig.update_yaxes(showgrid=True, gridwidth=1, gridcolor='#e2e8f0')
+    
+    st.plotly_chart(fig, use_container_width=True)
 
-with tab2:
-    st.markdown(f"### Score: **{momentum_score+6}/12**")
-    for detail in momentum_details:
-        st.markdown(f"- {detail}")
-    
-    mcol1, mcol2, mcol3, mcol4 = st.columns(4)
-    with mcol1:
-        ema8 = data['EMA8'].iloc[-1] if 'EMA8' in data.columns and pd.notna(data['EMA8'].iloc[-1]) else None
-        st.metric("8-Day EMA", f"${ema8:.2f}" if ema8 else "N/A")
-    with mcol2:
-        ema21 = data['EMA21'].iloc[-1] if 'EMA21' in data.columns and pd.notna(data['EMA21'].iloc[-1]) else None
-        st.metric("21-Day EMA", f"${ema21:.2f}" if ema21 else "N/A")
-    with mcol3:
-        ma50 = data['MA50'].iloc[-1] if 'MA50' in data.columns and pd.notna(data['MA50'].iloc[-1]) else None
-        st.metric("50-Day MA", f"${ma50:.2f}" if ma50 else "N/A")
-    with mcol4:
-        ma200 = data['MA200'].iloc[-1] if 'MA200' in data.columns and pd.notna(data['MA200'].iloc[-1]) else None
-        st.metric("200-Day MA", f"${ma200:.2f}" if ma200 else "N/A")
-
-with tab3:
-    st.markdown(f"### Score: **{earnings_score+6}/12**")
-    for detail in earnings_details:
-        st.markdown(f"- {detail}")
-    
-    ecol1, ecol2, ecol3, ecol4 = st.columns(4)
-    with ecol1:
-        st.metric("EPS (TTM)", f"${info.get('trailingEps', 0):.2f}" if info.get('trailingEps') else "N/A")
-    with ecol2:
-        st.metric("Forward EPS", f"${info.get('forwardEps', 0):.2f}" if info.get('forwardEps') else "N/A")
-    with ecol3:
-        profit_margin = info.get('profitMargins', None)
-        st.metric("Profit Margin", f"{profit_margin*100:.1f}%" if profit_margin else "N/A")
-    with ecol4:
-        roe = info.get('returnOnEquity', None)
-        st.metric("ROE", f"{roe*100:.1f}%" if roe else "N/A")
-
-with tab4:
-    st.markdown(f"### Score: **{technical_score+6}/12**")
-    for detail in technical_details:
-        st.markdown(f"- {detail}")
-    
-    tcol1, tcol2, tcol3, tcol4 = st.columns(4)
-    with tcol1:
-        current_rsi = data['RSI'].iloc[-1] if 'RSI' in data.columns and pd.notna(data['RSI'].iloc[-1]) else None
-        st.metric("RSI (14)", f"{current_rsi:.1f}" if current_rsi else "N/A")
-    with tcol2:
-        current_macd = data['MACD'].iloc[-1] if 'MACD' in data.columns and pd.notna(data['MACD'].iloc[-1]) else None
-        st.metric("MACD", f"{current_macd:.2f}" if current_macd else "N/A")
-    with tcol3:
-        daily_vol = data['Close'].pct_change().std() * 100
-        st.metric("Daily Volatility", f"{daily_vol:.2f}%")
-    with tcol4:
-        beta = info.get('beta', None)
-        st.metric("Beta", f"{beta:.2f}" if beta else "N/A")
-
-# Statistics
-st.markdown("<h2 class='section-header'>📋 Detailed Statistics</h2>", unsafe_allow_html=True)
-
-with st.expander("📊 Price & Volume Statistics", expanded=False):
-    stat_col1, stat_col2, stat_col3 = st.columns(3)
-    
-    with stat_col1:
-        st.markdown("**Price Statistics**")
-        st.dataframe(pd.DataFrame({
-            'Metric': ['Mean', 'Median', 'Std Dev', 'Min', 'Max'],
-            'Value': [
-                f"${data['Close'].mean():.2f}",
-                f"${data['Close'].median():.2f}",
-                f"${data['Close'].std():.2f}",
-                f"${data['Close'].min():.2f}",
-                f"${data['Close'].max():.2f}"
-            ]
-        }), hide_index=True, use_container_width=True)
-    
-    with stat_col2:
-        st.markdown("**Volume Statistics**")
-        st.dataframe(pd.DataFrame({
-            'Metric': ['Mean', 'Median', 'Max', 'Min', 'Total'],
-            'Value': [
-                f"{data['Volume'].mean():,.0f}",
-                f"{data['Volume'].median():,.0f}",
-                f"{data['Volume'].max():,.0f}",
-                f"{data['Volume'].min():,.0f}",
-                f"{data['Volume'].sum():,.0f}"
-            ]
-        }), hide_index=True, use_container_width=True)
-    
-    with stat_col3:
-        st.markdown("**Volatility Metrics**")
-        daily_returns = data['Close'].pct_change()
-        st.dataframe(pd.DataFrame({
-            'Metric': ['Daily Vol', 'Annual Vol', 'Max Drawdown', 'Sharpe Ratio'],
-            'Value': [
-                f"{daily_returns.std()*100:.2f}%",
-                f"{daily_returns.std()*np.sqrt(252)*100:.2f}%",
-                f"{((data['Close'] / data['Close'].cummax() - 1).min()*100):.2f}%",
-                f"{(daily_returns.mean() / daily_returns.std() * np.sqrt(252)):.2f}" if daily_returns.std() != 0 else "N/A"
-            ]
-        }), hide_index=True, use_container_width=True)
-
-with st.expander("💼 Fundamental Data", expanded=False):
-    fund_col1, fund_col2 = st.columns(2)
-    
-    with fund_col1:
-        st.markdown("**Financial Metrics**")
-        st.markdown(f"- **Revenue (TTM):** ${info.get('totalRevenue', 0)/1e9:.2f}B")
-        st.markdown(f"- **Gross Profit:** ${info.get('grossProfits', 0)/1e9:.2f}B")
-        st.markdown(f"- **EBITDA:** ${info.get('ebitda', 0)/1e9:.2f}B")
-        st.markdown(f"- **Operating Cash Flow:** ${info.get('operatingCashflow', 0)/1e9:.2f}B")
-        st.markdown(f"- **Free Cash Flow:** ${info.get('freeCashflow', 0)/1e9:.2f}B")
-    
-    with fund_col2:
-        st.markdown("**Balance Sheet**")
-        st.markdown(f"- **Total Cash:** ${info.get('totalCash', 0)/1e9:.2f}B")
-        st.markdown(f"- **Total Debt:** ${info.get('totalDebt', 0)/1e9:.2f}B")
-        st.markdown(f"- **Debt to Equity:** {info.get('debtToEquity', 0):.2f}")
-        st.markdown(f"- **Current Ratio:** {info.get('currentRatio', 0):.2f}")
-        st.markdown(f"- **Quick Ratio:** {info.get('quickRatio', 0):.2f}")
-
-with st.expander("🎯 Analyst Ratings & Targets", expanded=False):
-    analyst_col1, analyst_col2, analyst_col3 = st.columns(3)
-    
-    with analyst_col1:
-        recommendation = info.get('recommendationKey', 'N/A')
-        st.metric("Analyst Rating", recommendation.replace('_', ' ').title() if recommendation != 'N/A' else 'N/A')
-    
-    with analyst_col2:
-        target_high = info.get('targetHighPrice', None)
-        st.metric("Target High", f"${target_high:.2f}" if target_high else "N/A")
-    
-    with analyst_col3:
-        target_low = info.get('targetLowPrice', None)
-        st.metric("Target Low", f"${target_low:.2f}" if target_low else "N/A")
-
-# Disclaimer
-st.markdown("""
-<div class='disclaimer'>
-    <div class='disclaimer-title'>⚠️ IMPORTANT LEGAL DISCLAIMER</div>
-    <div class='disclaimer-text'>
-        <strong>This platform is for educational and informational purposes only.</strong><br><br>
-        
-        The information provided by BRBAS does NOT constitute financial, investment, trading, or any other type of professional advice. All data, analysis, models, and recommendations are presented as hypothetical tools for learning purposes only.<br><br>
-        
-        <strong>You are solely responsible for your own investment decisions.</strong> Past performance does not guarantee future results. All investments carry risk, including the potential loss of principal. Market conditions can change rapidly, and no analysis or model can predict future performance with certainty.<br><br>
-        
-        Before making any investment decisions, you should:<br>
-        • Conduct your own independent research and due diligence<br>
-        • Consult with a qualified financial advisor<br>
-        • Consider your own financial situation, goals, and risk tolerance<br>
-        • Understand that you may lose some or all of your investment<br><br>
-        
-        <strong>Data Sources:</strong> This platform aggregates data from Yahoo Finance and other publicly available sources. While we strive for accuracy, we cannot guarantee the completeness, accuracy, or timeliness of any information presented. All data should be independently verified.<br><br>
-        
-        <strong>No Liability:</strong> The creators, operators, and contributors of BRBAS assume no liability for any trading losses, investment decisions, or financial outcomes resulting from the use of this platform.<br><br>
-        
-        By using this platform, you acknowledge that you understand and accept these terms and that you are using this tool entirely at your own risk.
+# COMPARE STOCKS PAGE
+elif st.session_state.page == 'compare':
+    st.markdown("""
+    <div class='brbas-header'>
+        <h1 class='brbas-title'>Compare Stocks</h1>
     </div>
-</div>
-""", unsafe_allow_html=True)
-
-st.markdown("---")
-st.markdown("<h2 class='section-header'>📊 Compare Stocks</h2>", unsafe_allow_html=True)
-
-with st.expander("🔍 Compare Multiple Stocks", expanded=False):
-    st.markdown("### Enter up to 3 stock tickers to compare")
+    """, unsafe_allow_html=True)
     
-    comp_col1, comp_col2, comp_col3 = st.columns(3)
+    st.markdown("### Enter 2-3 stock tickers to compare")
+    
+    comp_col1, comp_col2, comp_col3, comp_col4 = st.columns([3, 3, 3, 2])
     
     with comp_col1:
         ticker1 = st.text_input("Stock 1", value="AAPL", key="comp1").upper()
@@ -840,14 +978,14 @@ with st.expander("🔍 Compare Multiple Stocks", expanded=False):
         ticker2 = st.text_input("Stock 2", value="MSFT", key="comp2").upper()
     with comp_col3:
         ticker3 = st.text_input("Stock 3 (optional)", value="", key="comp3").upper()
-    
-    comp_period = st.selectbox("Comparison Period", ["1mo", "3mo", "6mo", "1y"], index=2, key="comp_period")
+    with comp_col4:
+        comp_period = st.selectbox("Period", ["1mo", "3mo", "6mo", "1y"], index=2)
     
     if st.button("Compare Stocks", type="primary"):
         tickers_to_compare = [t for t in [ticker1, ticker2, ticker3] if t]
         
         if len(tickers_to_compare) < 2:
-            st.warning("Please enter at least 2 stocks to compare")
+            st.warning("Please enter at least 2 stocks")
         else:
             comparison_data = []
             
@@ -856,10 +994,9 @@ with st.expander("🔍 Compare Multiple Stocks", expanded=False):
                     data_comp, info_comp, error_comp = get_stock_data(ticker_comp, comp_period)
                     
                     if error_comp or data_comp is None or data_comp.empty:
-                        st.error(f"Could not load data for {ticker_comp}")
+                        st.error(f"Could not load {ticker_comp}")
                         continue
                     
-                    # Calculate indicators
                     for ma_period in [20, 50, 100, 200]:
                         data_comp[f'MA{ma_period}'] = data_comp['Close'].rolling(window=ma_period).mean()
                     
@@ -867,7 +1004,6 @@ with st.expander("🔍 Compare Multiple Stocks", expanded=False):
                     data_comp['RSI'] = calculate_rsi(data_comp)
                     data_comp['MACD'], data_comp['Signal'], data_comp['Histogram'] = calculate_macd(data_comp)
                     
-                    # Run analyses
                     val_score, val_details = analyze_valuation(info_comp)
                     mom_score, mom_details = analyze_momentum(data_comp)
                     earn_score, earn_details = analyze_earnings(info_comp)
@@ -887,33 +1023,23 @@ with st.expander("🔍 Compare Multiple Stocks", expanded=False):
                         'Change': f"{pct_change_comp:+.2f}%",
                         'Confidence': f"{conf}%",
                         'Recommendation': rec,
-                        'Valuation Score': f"{val_score+6}/12",
-                        'Momentum Score': f"{mom_score+6}/12",
-                        'Earnings Score': f"{earn_score+6}/12",
-                        'Technical Score': f"{tech_score+6}/12",
-                        'Market Cap': f"${info_comp.get('marketCap', 0)/1e9:.1f}B" if info_comp.get('marketCap', 0) > 1e9 else f"${info_comp.get('marketCap', 0)/1e6:.1f}M",
-                        'P/E Ratio': f"{info_comp.get('trailingPE', 0):.2f}" if info_comp.get('trailingPE') else "N/A",
-                        'PEG Ratio': f"{info_comp.get('pegRatio', 0):.2f}" if info_comp.get('pegRatio') else "N/A",
-                        'Beta': f"{info_comp.get('beta', 0):.2f}" if info_comp.get('beta') else "N/A",
-                        'Sector': info_comp.get('sector', 'N/A'),
-                        'Industry': info_comp.get('industry', 'N/A')
+                        'Valuation': f"{val_score+6}/12",
+                        'Momentum': f"{mom_score+6}/12",
+                        'Earnings': f"{earn_score+6}/12",
+                        'Technical': f"{tech_score+6}/12",
+                        'Market Cap': f"${info_comp.get('marketCap', 0)/1e9:.1f}B" if info_comp.get('marketCap', 0) > 1e9 else "N/A",
+                        'P/E': f"{info_comp.get('trailingPE', 0):.2f}" if info_comp.get('trailingPE') else "N/A",
+                        'PEG': f"{info_comp.get('pegRatio', 0):.2f}" if info_comp.get('pegRatio') else "N/A",
+                        'Sector': info_comp.get('sector', 'N/A')
                     })
             
             if comparison_data:
                 st.markdown("### Comparison Results")
                 
-                # Create DataFrame
-                df_comparison = pd.DataFrame(comparison_data)
-                
-                # Highlight best values
-                st.markdown("#### Key Metrics Comparison")
-                
-                # Display side by side
                 cols = st.columns(len(comparison_data))
                 
                 for idx, stock_data in enumerate(comparison_data):
                     with cols[idx]:
-                        # Determine card color based on recommendation
                         rec = stock_data['Recommendation']
                         if 'BUY' in rec:
                             card_color = '#10b981'
@@ -926,56 +1052,87 @@ with st.expander("🔍 Compare Multiple Stocks", expanded=False):
                         <div style='background: white; padding: 1.5rem; border-radius: 12px; 
                                     border-left: 4px solid {card_color}; box-shadow: 0 2px 8px rgba(0,0,0,0.1);'>
                             <h3 style='margin: 0; color: #1e293b;'>{stock_data['Ticker']}</h3>
-                            <p style='color: #64748b; font-size: 0.9rem; margin: 0.5rem 0;'>{stock_data['Company']}</p>
+                            <p style='color: #64748b; font-size: 0.9rem;'>{stock_data['Company'][:30]}</p>
                             <div style='margin: 1rem 0;'>
-                                <div style='font-size: 1.5rem; font-weight: 700; color: #1e293b;'>{stock_data['Price']}</div>
+                                <div style='font-size: 1.5rem; font-weight: 700;'>{stock_data['Price']}</div>
                                 <div style='color: {"#10b981" if "+" in stock_data["Change"] else "#ef4444"}; font-weight: 600;'>{stock_data['Change']}</div>
                             </div>
                             <div style='background: {card_color}; color: white; padding: 0.5rem; 
-                                        border-radius: 8px; text-align: center; font-weight: 700; margin: 1rem 0;'>
+                                        border-radius: 8px; text-align: center; font-weight: 700;'>
                                 {stock_data['Recommendation']}
                             </div>
-                            <div style='font-size: 1.2rem; font-weight: 700; color: #1e293b; text-align: center;'>
-                                Confidence: {stock_data['Confidence']}
+                            <div style='font-size: 1.2rem; font-weight: 700; text-align: center; margin-top: 1rem;'>
+                                {stock_data['Confidence']}
                             </div>
                         </div>
                         """, unsafe_allow_html=True)
                         
                         st.markdown("**Scores:**")
-                        st.write(f"• Valuation: {stock_data['Valuation Score']}")
-                        st.write(f"• Momentum: {stock_data['Momentum Score']}")
-                        st.write(f"• Earnings: {stock_data['Earnings Score']}")
-                        st.write(f"• Technical: {stock_data['Technical Score']}")
-                        
-                        st.markdown("**Fundamentals:**")
-                        st.write(f"• Market Cap: {stock_data['Market Cap']}")
-                        st.write(f"• P/E: {stock_data['P/E Ratio']}")
-                        st.write(f"• PEG: {stock_data['PEG Ratio']}")
-                        st.write(f"• Beta: {stock_data['Beta']}")
+                        st.write(f"Valuation: {stock_data['Valuation']}")
+                        st.write(f"Momentum: {stock_data['Momentum']}")
+                        st.write(f"Earnings: {stock_data['Earnings']}")
+                        st.write(f"Technical: {stock_data['Technical']}")
                 
                 st.markdown("---")
-                st.markdown("#### Full Comparison Table")
-                st.dataframe(df_comparison, use_container_width=True, hide_index=True)
-                
-                # Winner analysis
-                st.markdown("### Analysis Summary")
-                
-                # Find highest confidence
-                confidences = [float(d['Confidence'].rstrip('%')) for d in comparison_data]
-                best_idx = confidences.index(max(confidences))
-                best_stock = comparison_data[best_idx]
-                
-                st.success(f"**Highest Confidence:** {best_stock['Ticker']} with {best_stock['Confidence']} confidence ({best_stock['Recommendation']})")
-                
-                # Compare sectors
-                sectors = list(set([d['Sector'] for d in comparison_data]))
-                if len(sectors) > 1:
-                    st.info(f"**Comparing across sectors:** {', '.join(sectors)}")
-                else:
-                    st.info(f"**All stocks in same sector:** {sectors[0]}")
+                st.dataframe(pd.DataFrame(comparison_data), use_container_width=True, hide_index=True)
 
-# Footer
-st.markdown("<div style='text-align: center; padding: 2rem; color: #64748b; font-size: 0.9rem;'>", unsafe_allow_html=True)
-st.markdown("**BRBAS** — Professional Stock Analysis Platform | Built with Python, Streamlit & yFinance")
-st.markdown(f"Last updated: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
-st.markdown("</div>", unsafe_allow_html=True)
+# PORTFOLIO PAGE
+elif st.session_state.page == 'portfolio':
+    st.markdown("""
+    <div class='brbas-header'>
+        <h1 class='brbas-title'>My Portfolio</h1>
+    </div>
+    """, unsafe_allow_html=True)
+    
+    if not st.session_state.portfolio:
+        st.info("Your portfolio is empty. Add stocks from the Stock Analysis page.")
+    else:
+        st.markdown(f"### Tracking {len(st.session_state.portfolio)} stocks")
+        
+        portfolio_data = []
+        
+        for ticker_port in st.session_state.portfolio:
+            data_port, info_port, error_port = get_stock_data(ticker_port, "1mo")
+            
+            if not error_port and data_port is not None and not data_port.empty:
+                current_price = data_port['Close'].iloc[-1]
+                price_change = data_port['Close'].iloc[-1] - data_port['Close'].iloc[0]
+                pct_change = (price_change / data_port['Close'].iloc[0]) * 100
+                
+                portfolio_data.append({
+                    'Ticker': ticker_port,
+                    'Company': info_port.get('longName', ticker_port),
+                    'Price': current_price,
+                    'Change': pct_change,
+                    'Market Cap': info_port.get('marketCap', 0),
+                    'P/E': info_port.get('trailingPE', 0)
+                })
+        
+        if portfolio_data:
+            cols = st.columns(min(3, len(portfolio_data)))
+            
+            for idx, stock in enumerate(portfolio_data):
+                with cols[idx % 3]:
+                    change_color = "#10b981" if stock['Change'] > 0 else "#ef4444"
+                    
+                    st.markdown(f"""
+                    <div style='background: white; padding: 1.5rem; border-radius: 12px; 
+                                box-shadow: 0 2px 8px rgba(0,0,0,0.1); margin-bottom: 1rem;'>
+                        <h3 style='margin: 0; color: #1e293b;'>{stock['Ticker']}</h3>
+                        <p style='color: #64748b; font-size: 0.9rem;'>{stock['Company'][:30]}</p>
+                        <div style='font-size: 1.8rem; font-weight: 700; color: #1e293b;'>${stock['Price']:.2f}</div>
+                        <div style='color: {change_color}; font-weight: 600; font-size: 1.1rem;'>{stock['Change']:+.2f}%</div>
+                    </div>
+                    """, unsafe_allow_html=True)
+                    
+                    if st.button(f"Analyze {stock['Ticker']}", key=f"analyze_{stock['Ticker']}"):
+                        st.session_state.page = 'analysis'
+                        st.rerun()
+                    
+                    if st.button(f"Remove {stock['Ticker']}", key=f"remove_{stock['Ticker']}"):
+                        st.session_state.portfolio.remove(stock['Ticker'])
+                        st.rerun()
+        
+        if st.button("Clear Portfolio"):
+            st.session_state.portfolio = []
+            st.rerun()
