@@ -883,12 +883,12 @@ elif st.session_state.page == 'compare':
                     <div style='background: white; padding: 2rem; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);'>
                         <h4 style='color: #1e293b; margin-bottom: 1.5rem;'>{ticker1}</h4>
                         <div style='display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;'>
-                            <div><span style='color: #64748b; font-size: 0.85rem;'>Price:</span><br><strong style='font-size: 1.3rem;'>${price1:.2f}</strong></div>
-                            <div><span style='color: #64748b; font-size: 0.85rem;'>Change:</span><br><strong style='font-size: 1.3rem; color: {"#10b981" if change1 >= 0 else "#ef4444"};'>{change1:+.2f}%</strong></div>
-                            <div><span style='color: #64748b; font-size: 0.85rem;'>Market Cap:</span><br><strong>${info1.get('marketCap', 0)/1e9:.1f}B</strong></div>
-                            <div><span style='color: #64748b; font-size: 0.85rem;'>P/E:</span><br><strong>{info1.get('trailingPE', 0):.2f}</strong></div>
-                            <div><span style='color: #64748b; font-size: 0.85rem;'>Volume:</span><br><strong>{data1['Volume'].iloc[-1]/1e6:.1f}M</strong></div>
-                            <div><span style='color: #64748b; font-size: 0.85rem;'>Profit Margin:</span><br><strong>{info1.get('profitMargins', 0)*100:.1f}%</strong></div>
+                            <div><span style='color: #1e293b; font-size: 0.85rem;'>Price:</span><br><strong style='font-size: 1.3rem;'>${price1:.2f}</strong></div>
+                            <div><span style='color: #1e293b; font-size: 0.85rem;'>Change:</span><br><strong style='font-size: 1.3rem; color: {"#10b981" if change1 >= 0 else "#ef4444"};'>{change1:+.2f}%</strong></div>
+                            <div><span style='color: #1e293b; font-size: 0.85rem;'>Market Cap:</span><br><strong>${info1.get('marketCap', 0)/1e9:.1f}B</strong></div>
+                            <div><span style='color: #1e293b; font-size: 0.85rem;'>P/E:</span><br><strong>{info1.get('trailingPE', 0):.2f}</strong></div>
+                            <div><span style='color: #1e293b; font-size: 0.85rem;'>Volume:</span><br><strong>{data1['Volume'].iloc[-1]/1e6:.1f}M</strong></div>
+                            <div><span style='color: #1e293b; font-size: 0.85rem;'>Profit Margin:</span><br><strong>{info1.get('profitMargins', 0)*100:.1f}%</strong></div>
                         </div>
                     </div>
                     """, unsafe_allow_html=True)
@@ -900,12 +900,12 @@ elif st.session_state.page == 'compare':
                     <div style='background: white; padding: 2rem; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);'>
                         <h4 style='color: #1e293b; margin-bottom: 1.5rem;'>{ticker2}</h4>
                         <div style='display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;'>
-                            <div><span style='color: #64748b; font-size: 0.85rem;'>Price:</span><br><strong style='font-size: 1.3rem;'>${price2:.2f}</strong></div>
-                            <div><span style='color: #64748b; font-size: 0.85rem;'>Change:</span><br><strong style='font-size: 1.3rem; color: {"#10b981" if change2 >= 0 else "#ef4444"};'>{change2:+.2f}%</strong></div>
-                            <div><span style='color: #64748b; font-size: 0.85rem;'>Market Cap:</span><br><strong>${info2.get('marketCap', 0)/1e9:.1f}B</strong></div>
-                            <div><span style='color: #64748b; font-size: 0.85rem;'>P/E:</span><br><strong>{info2.get('trailingPE', 0):.2f}</strong></div>
-                            <div><span style='color: #64748b; font-size: 0.85rem;'>Volume:</span><br><strong>{data2['Volume'].iloc[-1]/1e6:.1f}M</strong></div>
-                            <div><span style='color: #64748b; font-size: 0.85rem;'>Profit Margin:</span><br><strong>{info2.get('profitMargins', 0)*100:.1f}%</strong></div>
+                            <div><span style='color: #1e293b; font-size: 0.85rem;'>Price:</span><br><strong style='font-size: 1.3rem;'>${price2:.2f}</strong></div>
+                            <div><span style='color: #1e293b; font-size: 0.85rem;'>Change:</span><br><strong style='font-size: 1.3rem; color: {"#10b981" if change2 >= 0 else "#ef4444"};'>{change2:+.2f}%</strong></div>
+                            <div><span style='color: #1e293b; font-size: 0.85rem;'>Market Cap:</span><br><strong>${info2.get('marketCap', 0)/1e9:.1f}B</strong></div>
+                            <div><span style='color: #1e293b; font-size: 0.85rem;'>P/E:</span><br><strong>{info2.get('trailingPE', 0):.2f}</strong></div>
+                            <div><span style='color: #1e293b; font-size: 0.85rem;'>Volume:</span><br><strong>{data2['Volume'].iloc[-1]/1e6:.1f}M</strong></div>
+                            <div><span style='color: #1e293b; font-size: 0.85rem;'>Profit Margin:</span><br><strong>{info2.get('profitMargins', 0)*100:.1f}%</strong></div>
                         </div>
                     </div>
                     """, unsafe_allow_html=True)
