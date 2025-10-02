@@ -1,45 +1,4 @@
-def analyze_technical(data):
-    score = 0
-    details = []
-    
-    methodology = "The Technical Model employs momentum oscillators and price-action indicators to identify overbought and oversold conditions that often precede trend reversals or continuations. The Relative Strength Index (RSI) measures the magnitude of recent price changes to evaluate whether a stock has moved too far, too fast in either direction. RSI readings below 30 typically indicate oversold conditions where selling pressure has been exhausted, often creating buying opportunities. Readings above 70 suggest overbought conditions where a pullback becomes probable. We also analyze the MACD (Moving Average Convergence Divergence), which tracks the relationship between two exponential moving averages to identify changes in momentum. MACD crossovers above the signal line generate buy signals, while crossovers below generate sell signals."
-    
-    rsi = data['RSI'].iloc[-1] if 'RSI' in data.columns and pd.notna(data['RSI'].iloc[-1]) else None
-    if rsi:
-        if rsi < 30:
-            score += 2
-            details.append(f"RSI at {rsi:.1f} indicates oversold conditions. Historically, readings below 30 precede price reversals as selling pressure becomes exhausted.")
-        elif rsi > 70:
-            score -= 2
-            details.append(f"RSI at {rsi:.1f} signals overbought conditions. Readings above 70 typically lead to pullbacks as buyers become exhausted.")
-        else:
-            details.append(f"RSI at {rsi:.1f} is in neutral territory, indicating balanced buying and selling pressure.")
-    else:
-        details.append("RSI data unavailable.")
-    
-    if 'MACD' in data.columns and 'Signal' in data.columns:
-        macd = data['MACD'].iloc[-1]
-        signal = data['Signal'].iloc[-1]
-        if pd.notna(macd) and pd.notna(signal):
-            if macd > signal:
-                score += 1
-                details.append(f"MACD bullish at {macd:.2f} above signal line {signal:.2f}, indicating upward momentum.")
-            else:
-                score -= 1
-                details.append(f"MACD bearish at {macd:.2f} below signal line {signal:.2f}, suggesting downward pressure.")
-    
-    evaluation = f"This model scored {score+6}/12. "
-    if score >= 2:
-        evaluation += "The strong technical score suggests the stock is in oversold territory or showing strong momentum characteristics that typically precede upward moves. Technical buying signals are flashing, indicating favorable risk-reward for entries. These setups often attract momentum traders and can create self-fulfilling rallies."
-    elif score >= 0:
-        evaluation += "The neutral technical score indicates the stock is in balanced territory without extreme readings in either direction. Technical indicators are not providing strong directional signals, suggesting a wait-and-see approach may be prudent until clearer patterns emerge."
-    else:
-        evaluation += "The negative technical score warns of overbought conditions or deteriorating momentum that often precedes pullbacks. Technical indicators are flashing caution signals. Experienced traders typically avoid buying into overbought conditions, preferring to wait for healthier technical setups."
-    
-    details.insert(0, methodology)
-    details.append(evaluation)
-    
-    return score, detailsimport streamlit as st
+import streamlit as st
 import yfinance as yf
 import pandas as pd
 import numpy as np
@@ -476,6 +435,9 @@ def analyze_earnings(info):
 def analyze_technical(data):
     score = 0
     details = []
+    
+    methodology = "The Technical Model employs momentum oscillators and price-action indicators to identify overbought and oversold conditions that often precede trend reversals or continuations. The Relative Strength Index (RSI) measures the magnitude of recent price changes to evaluate whether a stock has moved too far, too fast in either direction. RSI readings below 30 typically indicate oversold conditions where selling pressure has been exhausted, often creating buying opportunities. Readings above 70 suggest overbought conditions where a pullback becomes probable. We also analyze the MACD (Moving Average Convergence Divergence), which tracks the relationship between two exponential moving averages to identify changes in momentum. MACD crossovers above the signal line generate buy signals, while crossovers below generate sell signals."
+    
     rsi = data['RSI'].iloc[-1] if 'RSI' in data.columns and pd.notna(data['RSI'].iloc[-1]) else None
     if rsi:
         if rsi < 30:
@@ -499,6 +461,17 @@ def analyze_technical(data):
             else:
                 score -= 1
                 details.append(f"MACD bearish at {macd:.2f} below signal line {signal:.2f}, suggesting downward pressure.")
+    
+    evaluation = f"This model scored {score+6}/12. "
+    if score >= 2:
+        evaluation += "The strong technical score suggests the stock is in oversold territory or showing strong momentum characteristics that typically precede upward moves. Technical buying signals are flashing, indicating favorable risk-reward for entries. These setups often attract momentum traders and can create self-fulfilling rallies."
+    elif score >= 0:
+        evaluation += "The neutral technical score indicates the stock is in balanced territory without extreme readings in either direction. Technical indicators are not providing strong directional signals, suggesting a wait-and-see approach may be prudent until clearer patterns emerge."
+    else:
+        evaluation += "The negative technical score warns of overbought conditions or deteriorating momentum that often precedes pullbacks. Technical indicators are flashing caution signals. Experienced traders typically avoid buying into overbought conditions, preferring to wait for healthier technical setups."
+    
+    details.insert(0, methodology)
+    details.append(evaluation)
     
     return score, details
 
