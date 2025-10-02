@@ -21,7 +21,7 @@ def get_stock_data(ticker, period):
 
 # PAGES
 if st.session_state.page == 'analysis':
-    st.markdown("<div class='brbas-header'><h1 class='brbas-title'>BARBAS</h1></div>", unsafe_allow_html=True)
+    st.markdown("<div class='brbas-header'><h1 class='brbas-title' style='color: #ffffff !important;'>BARBAS</h1></div>", unsafe_allow_html=True)
     
     col1, col2, col3 = st.columns([4, 2, 2])
     with col1:
@@ -70,11 +70,11 @@ if st.session_state.page == 'analysis':
     change = ((data['Close'].iloc[-1] / data['Close'].iloc[0]) - 1) * 100
     
     c1, c2, c3, c4, c5 = st.columns(5)
-    c1.metric("Price", f"${price:.2f}", f"{change:+.2f}%")
-    c2.metric("Market Cap", f"${info.get('marketCap', 0)/1e9:.1f}B")
-    c3.metric("P/E", f"{info.get('trailingPE', 0):.2f}")
-    c4.metric("Trading Volume", f"{format_number(data['Volume'].iloc[-1])}")
-    c5.metric("52W Range", f"${info.get('fiftyTwoWeekLow', 0):.0f}-{info.get('fiftyTwoWeekHigh', 0):.0f}")
+    c1.metric("Price", f"${price:,.2f}", f"{change:+.2f}%")
+    c2.metric("Market Cap", f"${info.get('marketCap', 0)/1e9:,.1f}B")
+    c3.metric("P/E", f"{info.get('trailingPE', 0):,.2f}")
+    c4.metric("Trading Volume", f"{int(data['Volume'].iloc[-1]):,}")
+    c5.metric("52W Range", f"${info.get('fiftyTwoWeekLow', 0):,.0f}-{info.get('fiftyTwoWeekHigh', 0):,.0f}")
     
     st.markdown(f"""
     <div class='confidence-card'>
@@ -141,7 +141,7 @@ if st.session_state.page == 'analysis':
     """, unsafe_allow_html=True)
 
 elif st.session_state.page == 'portfolio':
-    st.markdown("<div class='brbas-header'><h1 class='brbas-title'>BARBAS</h1></div>", unsafe_allow_html=True)
+    st.markdown("<div class='brbas-header'><h1 class='brbas-title' style='color: #ffffff !important;'>BARBAS</h1></div>", unsafe_allow_html=True)
     st.markdown("<h2 class='section-header'>Portfolio</h2>", unsafe_allow_html=True)
     
     if not st.session_state.portfolio:
@@ -178,7 +178,7 @@ elif st.session_state.page == 'portfolio':
                         </div>
                         <div>
                             <div style='font-size: 0.75rem; color: #6b7280; font-weight: 600;'>TRADING VOLUME</div>
-                            <div style='font-size: 1.1rem; font-weight: 700; color: #111827;'>{format_number(d['Volume'].iloc[-1])}</div>
+                            <div style='font-size: 1.1rem; font-weight: 700; color: #111827;'>{int(d['Volume'].iloc[-1]):,}</div>
                         </div>
                         <div>
                             <div style='font-size: 0.75rem; color: #6b7280; font-weight: 600;'>52W RANGE</div>
@@ -209,7 +209,7 @@ elif st.session_state.page == 'portfolio':
     """, unsafe_allow_html=True)
 
 elif st.session_state.page == 'top_stocks':
-    st.markdown("<div class='brbas-header'><h1 class='brbas-title'>BARBAS</h1></div>", unsafe_allow_html=True)
+    st.markdown("<div class='brbas-header'><h1 class='brbas-title' style='color: #ffffff !important;'>BARBAS</h1></div>", unsafe_allow_html=True)
     st.markdown("<h2 class='section-header'>Top Stocks by Sector</h2>", unsafe_allow_html=True)
     
     sectors = {
@@ -303,7 +303,7 @@ elif st.session_state.page == 'top_stocks':
     """, unsafe_allow_html=True)
 
 elif st.session_state.page == 'compare':
-    st.markdown("<div class='brbas-header'><h1 class='brbas-title'>BARBAS</h1></div>", unsafe_allow_html=True)
+    st.markdown("<div class='brbas-header'><h1 class='brbas-title' style='color: #ffffff !important;'>BARBAS</h1></div>", unsafe_allow_html=True)
     st.markdown("<h2 class='section-header'>Compare Stocks</h2>", unsafe_allow_html=True)
     
     col1, col2 = st.columns(2)
@@ -411,7 +411,7 @@ elif st.session_state.page == 'compare':
                             <div><span style='color: #6b7280; font-size: 0.85rem;'>Change:</span><br><strong style='font-size: 1.3rem; color: {"#10b981" if change1 >= 0 else "#ef4444"};'>{change1:+.2f}%</strong></div>
                             <div><span style='color: #6b7280; font-size: 0.85rem;'>Market Cap:</span><br><strong style='color: #111827;'>${info1.get('marketCap', 0)/1e9:.1f}B</strong></div>
                             <div><span style='color: #6b7280; font-size: 0.85rem;'>P/E:</span><br><strong style='color: #111827;'>{info1.get('trailingPE', 0):.2f}</strong></div>
-                            <div><span style='color: #6b7280; font-size: 0.85rem;'>Trading Volume:</span><br><strong style='color: #111827;'>{format_number(data1['Volume'].iloc[-1])}</strong></div>
+                            <div><span style='color: #6b7280; font-size: 0.85rem;'>Trading Volume:</span><br><strong style='color: #111827;'>{int(data1['Volume'].iloc[-1]):,}</strong></div>
                             <div><span style='color: #6b7280; font-size: 0.85rem;'>Profit Margin:</span><br><strong style='color: #111827;'>{info1.get('profitMargins', 0)*100:.1f}%</strong></div>
                         </div>
                     </div>
@@ -428,7 +428,7 @@ elif st.session_state.page == 'compare':
                             <div><span style='color: #6b7280; font-size: 0.85rem;'>Change:</span><br><strong style='font-size: 1.3rem; color: {"#10b981" if change2 >= 0 else "#ef4444"};'>{change2:+.2f}%</strong></div>
                             <div><span style='color: #6b7280; font-size: 0.85rem;'>Market Cap:</span><br><strong style='color: #111827;'>${info2.get('marketCap', 0)/1e9:.1f}B</strong></div>
                             <div><span style='color: #6b7280; font-size: 0.85rem;'>P/E:</span><br><strong style='color: #111827;'>{info2.get('trailingPE', 0):.2f}</strong></div>
-                            <div><span style='color: #6b7280; font-size: 0.85rem;'>Trading Volume:</span><br><strong style='color: #111827;'>{format_number(data2['Volume'].iloc[-1])}</strong></div>
+                            <div><span style='color: #6b7280; font-size: 0.85rem;'>Trading Volume:</span><br><strong style='color: #111827;'>{int(data2['Volume'].iloc[-1]):,}</strong></div>
                             <div><span style='color: #6b7280; font-size: 0.85rem;'>Profit Margin:</span><br><strong style='color: #111827;'>{info2.get('profitMargins', 0)*100:.1f}%</strong></div>
                         </div>
                     </div>
@@ -508,12 +508,16 @@ st.markdown("""
     }
     
     .brbas-title {
-        font-size: 8rem;
-        font-weight: 800;
-        color: white !important;
-        letter-spacing: 2rem;
-        margin: 0;
-        text-shadow: none;
+        font-size: 9rem !important;
+        font-weight: 800 !important;
+        color: #ffffff !important;
+        letter-spacing: 2.5rem !important;
+        margin: 0 !important;
+        text-shadow: none !important;
+    }
+    
+    .brbas-header h1 {
+        color: #ffffff !important;
     }
     
     .sidebar-title {
