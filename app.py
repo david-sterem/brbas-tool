@@ -73,7 +73,7 @@ if st.session_state.page == 'analysis':
     c1.metric("Price", f"${price:.2f}", f"{change:+.2f}%")
     c2.metric("Market Cap", f"${info.get('marketCap', 0)/1e9:.1f}B")
     c3.metric("P/E", f"{info.get('trailingPE', 0):.2f}")
-    c4.metric("Trading Volume", f"{data['Volume'].iloc[-1]/1e6:.1f}M")
+    c4.metric("Trading Volume", f"{format_number(data['Volume'].iloc[-1])}")
     c5.metric("52W Range", f"${info.get('fiftyTwoWeekLow', 0):.0f}-{info.get('fiftyTwoWeekHigh', 0):.0f}")
     
     st.markdown(f"""
@@ -178,7 +178,7 @@ elif st.session_state.page == 'portfolio':
                         </div>
                         <div>
                             <div style='font-size: 0.75rem; color: #6b7280; font-weight: 600;'>TRADING VOLUME</div>
-                            <div style='font-size: 1.1rem; font-weight: 700; color: #111827;'>{d['Volume'].iloc[-1]/1e6:.1f}M</div>
+                            <div style='font-size: 1.1rem; font-weight: 700; color: #111827;'>{format_number(d['Volume'].iloc[-1])}</div>
                         </div>
                         <div>
                             <div style='font-size: 0.75rem; color: #6b7280; font-weight: 600;'>52W RANGE</div>
@@ -411,7 +411,7 @@ elif st.session_state.page == 'compare':
                             <div><span style='color: #6b7280; font-size: 0.85rem;'>Change:</span><br><strong style='font-size: 1.3rem; color: {"#10b981" if change1 >= 0 else "#ef4444"};'>{change1:+.2f}%</strong></div>
                             <div><span style='color: #6b7280; font-size: 0.85rem;'>Market Cap:</span><br><strong style='color: #111827;'>${info1.get('marketCap', 0)/1e9:.1f}B</strong></div>
                             <div><span style='color: #6b7280; font-size: 0.85rem;'>P/E:</span><br><strong style='color: #111827;'>{info1.get('trailingPE', 0):.2f}</strong></div>
-                            <div><span style='color: #6b7280; font-size: 0.85rem;'>Trading Volume:</span><br><strong style='color: #111827;'>{data1['Volume'].iloc[-1]/1e6:.1f}M</strong></div>
+                            <div><span style='color: #6b7280; font-size: 0.85rem;'>Trading Volume:</span><br><strong style='color: #111827;'>{format_number(data1['Volume'].iloc[-1])}</strong></div>
                             <div><span style='color: #6b7280; font-size: 0.85rem;'>Profit Margin:</span><br><strong style='color: #111827;'>{info1.get('profitMargins', 0)*100:.1f}%</strong></div>
                         </div>
                     </div>
@@ -428,7 +428,7 @@ elif st.session_state.page == 'compare':
                             <div><span style='color: #6b7280; font-size: 0.85rem;'>Change:</span><br><strong style='font-size: 1.3rem; color: {"#10b981" if change2 >= 0 else "#ef4444"};'>{change2:+.2f}%</strong></div>
                             <div><span style='color: #6b7280; font-size: 0.85rem;'>Market Cap:</span><br><strong style='color: #111827;'>${info2.get('marketCap', 0)/1e9:.1f}B</strong></div>
                             <div><span style='color: #6b7280; font-size: 0.85rem;'>P/E:</span><br><strong style='color: #111827;'>{info2.get('trailingPE', 0):.2f}</strong></div>
-                            <div><span style='color: #6b7280; font-size: 0.85rem;'>Trading Volume:</span><br><strong style='color: #111827;'>{data2['Volume'].iloc[-1]/1e6:.1f}M</strong></div>
+                            <div><span style='color: #6b7280; font-size: 0.85rem;'>Trading Volume:</span><br><strong style='color: #111827;'>{format_number(data2['Volume'].iloc[-1])}</strong></div>
                             <div><span style='color: #6b7280; font-size: 0.85rem;'>Profit Margin:</span><br><strong style='color: #111827;'>{info2.get('profitMargins', 0)*100:.1f}%</strong></div>
                         </div>
                     </div>
@@ -508,7 +508,7 @@ st.markdown("""
     }
     
     .brbas-title {
-        font-size: 7rem;
+        font-size: 8rem;
         font-weight: 800;
         color: white !important;
         letter-spacing: 2rem;
@@ -742,6 +742,14 @@ def truncate_description(text, max_length=300):
     if last_period > max_length * 0.7:
         return truncated[:last_period + 1]
     return truncated[:truncated.rfind(' ')] + '.'
+
+def format_number(num):
+    """Format numbers with commas for thousands"""
+    if num is None or num == 0:
+        return "0"
+    if isinstance(num, (int, float)):
+        return f"{num:,.0f}" if num >= 1 else f"{num:.2f}"
+    return str(num)
 
 def calculate_confidence_score(info, data, val_score, mom_score, earn_score, tech_score):
     weights = {'valuation': 0.30, 'momentum': 0.25, 'earnings': 0.25, 'technical': 0.20}
