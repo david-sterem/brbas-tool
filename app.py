@@ -30,7 +30,7 @@ st.markdown("""
         max-width: 1600px;
     }
     
-    .brbas-header {
+    .barbas-header {
         text-align: center;
         padding: 3rem 0;
         background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%);
@@ -38,7 +38,7 @@ st.markdown("""
         box-shadow: 0 4px 20px rgba(30, 64, 175, 0.15);
     }
     
-    .brbas-title {
+    .barbas-title {
         font-size: 10rem;
         font-weight: 800;
         color: white;
@@ -510,7 +510,7 @@ def get_stock_data(ticker, period):
 
 # PAGES
 if st.session_state.page == 'analysis':
-    st.markdown("<div class='brbas-header'><h1 class='brbas-title'>BARBAS</h1></div>", unsafe_allow_html=True)
+    st.markdown("<div class='barbas-header'><h1 class='barbas-title'>BARBAS</h1></div>", unsafe_allow_html=True)
     
     col1, col2, col3 = st.columns([4, 2, 2])
     with col1:
@@ -630,7 +630,7 @@ if st.session_state.page == 'analysis':
     """, unsafe_allow_html=True)
 
 elif st.session_state.page == 'portfolio':
-    st.markdown("<div class='brbas-header'><h1 class='brbas-title'>BARBAS</h1></div>", unsafe_allow_html=True)
+    st.markdown("<div class='barbas-header'><h1 class='barbas-title'>BARBAS</h1></div>", unsafe_allow_html=True)
     st.markdown("<h2 class='section-header'>Portfolio</h2>", unsafe_allow_html=True)
     
     if not st.session_state.portfolio:
@@ -698,7 +698,7 @@ elif st.session_state.page == 'portfolio':
     """, unsafe_allow_html=True)
 
 elif st.session_state.page == 'top_stocks':
-    st.markdown("<div class='brbas-header'><h1 class='brbas-title'>BARBAS</h1></div>", unsafe_allow_html=True)
+    st.markdown("<div class='barbas-header'><h1 class='barbas-title'>BARBAS</h1></div>", unsafe_allow_html=True)
     st.markdown("<h2 class='section-header'>Top Stocks by Sector</h2>", unsafe_allow_html=True)
     
     sectors = {
@@ -779,7 +779,7 @@ elif st.session_state.page == 'top_stocks':
     st.markdown(summary_text, unsafe_allow_html=True)
 
 elif st.session_state.page == 'compare':
-    st.markdown("<div class='brbas-header'><h1 class='brbas-title'>BARBAS</h1></div>", unsafe_allow_html=True)
+    st.markdown("<div class='barbas-header'><h1 class='barbas-title'>BARBAS</h1></div>", unsafe_allow_html=True)
     st.markdown("<h2 class='section-header'>Compare Stocks</h2>", unsafe_allow_html=True)
     
     col1, col2 = st.columns(2)
