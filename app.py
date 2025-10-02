@@ -826,6 +826,154 @@ st.markdown("""
 </div>
 """, unsafe_allow_html=True)
 
+st.markdown("---")
+st.markdown("<h2 class='section-header'>📊 Compare Stocks</h2>", unsafe_allow_html=True)
+
+with st.expander("🔍 Compare Multiple Stocks", expanded=False):
+    st.markdown("### Enter up to 3 stock tickers to compare")
+    
+    comp_col1, comp_col2, comp_col3 = st.columns(3)
+    
+    with comp_col1:
+        ticker1 = st.text_input("Stock 1", value="AAPL", key="comp1").upper()
+    with comp_col2:
+        ticker2 = st.text_input("Stock 2", value="MSFT", key="comp2").upper()
+    with comp_col3:
+        ticker3 = st.text_input("Stock 3 (optional)", value="", key="comp3").upper()
+    
+    comp_period = st.selectbox("Comparison Period", ["1mo", "3mo", "6mo", "1y"], index=2, key="comp_period")
+    
+    if st.button("Compare Stocks", type="primary"):
+        tickers_to_compare = [t for t in [ticker1, ticker2, ticker3] if t]
+        
+        if len(tickers_to_compare) < 2:
+            st.warning("Please enter at least 2 stocks to compare")
+        else:
+            comparison_data = []
+            
+            for ticker_comp in tickers_to_compare:
+                with st.spinner(f"Analyzing {ticker_comp}..."):
+                    data_comp, info_comp, error_comp = get_stock_data(ticker_comp, comp_period)
+                    
+                    if error_comp or data_comp is None or data_comp.empty:
+                        st.error(f"Could not load data for {ticker_comp}")
+                        continue
+                    
+                    # Calculate indicators
+                    for ma_period in [20, 50, 100, 200]:
+                        data_comp[f'MA{ma_period}'] = data_comp['Close'].rolling(window=ma_period).mean()
+                    
+                    data_comp = calculate_ema(data_comp, [8, 21, 50])
+                    data_comp['RSI'] = calculate_rsi(data_comp)
+                    data_comp['MACD'], data_comp['Signal'], data_comp['Histogram'] = calculate_macd(data_comp)
+                    
+                    # Run analyses
+                    val_score, val_details = analyze_valuation(info_comp)
+                    mom_score, mom_details = analyze_momentum(data_comp)
+                    earn_score, earn_details = analyze_earnings(info_comp)
+                    tech_score, tech_details = analyze_technical(data_comp)
+                    
+                    conf = calculate_confidence_score(info_comp, data_comp, val_score, mom_score, earn_score, tech_score)
+                    rec, rec_class = get_recommendation_from_confidence(conf)
+                    
+                    current_price_comp = data_comp['Close'].iloc[-1]
+                    price_change_comp = data_comp['Close'].iloc[-1] - data_comp['Close'].iloc[0]
+                    pct_change_comp = (price_change_comp / data_comp['Close'].iloc[0]) * 100
+                    
+                    comparison_data.append({
+                        'Ticker': ticker_comp,
+                        'Company': info_comp.get('longName', ticker_comp),
+                        'Price': f"${current_price_comp:.2f}",
+                        'Change': f"{pct_change_comp:+.2f}%",
+                        'Confidence': f"{conf}%",
+                        'Recommendation': rec,
+                        'Valuation Score': f"{val_score+6}/12",
+                        'Momentum Score': f"{mom_score+6}/12",
+                        'Earnings Score': f"{earn_score+6}/12",
+                        'Technical Score': f"{tech_score+6}/12",
+                        'Market Cap': f"${info_comp.get('marketCap', 0)/1e9:.1f}B" if info_comp.get('marketCap', 0) > 1e9 else f"${info_comp.get('marketCap', 0)/1e6:.1f}M",
+                        'P/E Ratio': f"{info_comp.get('trailingPE', 0):.2f}" if info_comp.get('trailingPE') else "N/A",
+                        'PEG Ratio': f"{info_comp.get('pegRatio', 0):.2f}" if info_comp.get('pegRatio') else "N/A",
+                        'Beta': f"{info_comp.get('beta', 0):.2f}" if info_comp.get('beta') else "N/A",
+                        'Sector': info_comp.get('sector', 'N/A'),
+                        'Industry': info_comp.get('industry', 'N/A')
+                    })
+            
+            if comparison_data:
+                st.markdown("### Comparison Results")
+                
+                # Create DataFrame
+                df_comparison = pd.DataFrame(comparison_data)
+                
+                # Highlight best values
+                st.markdown("#### Key Metrics Comparison")
+                
+                # Display side by side
+                cols = st.columns(len(comparison_data))
+                
+                for idx, stock_data in enumerate(comparison_data):
+                    with cols[idx]:
+                        # Determine card color based on recommendation
+                        rec = stock_data['Recommendation']
+                        if 'BUY' in rec:
+                            card_color = '#10b981'
+                        elif 'SELL' in rec:
+                            card_color = '#ef4444'
+                        else:
+                            card_color = '#f59e0b'
+                        
+                        st.markdown(f"""
+                        <div style='background: white; padding: 1.5rem; border-radius: 12px; 
+                                    border-left: 4px solid {card_color}; box-shadow: 0 2px 8px rgba(0,0,0,0.1);'>
+                            <h3 style='margin: 0; color: #1e293b;'>{stock_data['Ticker']}</h3>
+                            <p style='color: #64748b; font-size: 0.9rem; margin: 0.5rem 0;'>{stock_data['Company']}</p>
+                            <div style='margin: 1rem 0;'>
+                                <div style='font-size: 1.5rem; font-weight: 700; color: #1e293b;'>{stock_data['Price']}</div>
+                                <div style='color: {"#10b981" if "+" in stock_data["Change"] else "#ef4444"}; font-weight: 600;'>{stock_data['Change']}</div>
+                            </div>
+                            <div style='background: {card_color}; color: white; padding: 0.5rem; 
+                                        border-radius: 8px; text-align: center; font-weight: 700; margin: 1rem 0;'>
+                                {stock_data['Recommendation']}
+                            </div>
+                            <div style='font-size: 1.2rem; font-weight: 700; color: #1e293b; text-align: center;'>
+                                Confidence: {stock_data['Confidence']}
+                            </div>
+                        </div>
+                        """, unsafe_allow_html=True)
+                        
+                        st.markdown("**Scores:**")
+                        st.write(f"• Valuation: {stock_data['Valuation Score']}")
+                        st.write(f"• Momentum: {stock_data['Momentum Score']}")
+                        st.write(f"• Earnings: {stock_data['Earnings Score']}")
+                        st.write(f"• Technical: {stock_data['Technical Score']}")
+                        
+                        st.markdown("**Fundamentals:**")
+                        st.write(f"• Market Cap: {stock_data['Market Cap']}")
+                        st.write(f"• P/E: {stock_data['P/E Ratio']}")
+                        st.write(f"• PEG: {stock_data['PEG Ratio']}")
+                        st.write(f"• Beta: {stock_data['Beta']}")
+                
+                st.markdown("---")
+                st.markdown("#### Full Comparison Table")
+                st.dataframe(df_comparison, use_container_width=True, hide_index=True)
+                
+                # Winner analysis
+                st.markdown("### Analysis Summary")
+                
+                # Find highest confidence
+                confidences = [float(d['Confidence'].rstrip('%')) for d in comparison_data]
+                best_idx = confidences.index(max(confidences))
+                best_stock = comparison_data[best_idx]
+                
+                st.success(f"**Highest Confidence:** {best_stock['Ticker']} with {best_stock['Confidence']} confidence ({best_stock['Recommendation']})")
+                
+                # Compare sectors
+                sectors = list(set([d['Sector'] for d in comparison_data]))
+                if len(sectors) > 1:
+                    st.info(f"**Comparing across sectors:** {', '.join(sectors)}")
+                else:
+                    st.info(f"**All stocks in same sector:** {sectors[0]}")
+
 # Footer
 st.markdown("<div style='text-align: center; padding: 2rem; color: #64748b; font-size: 0.9rem;'>", unsafe_allow_html=True)
 st.markdown("**BRBAS** — Professional Stock Analysis Platform | Built with Python, Streamlit & yFinance")
