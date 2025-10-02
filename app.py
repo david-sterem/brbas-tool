@@ -39,10 +39,10 @@ st.markdown("""
     }
     
     .brbas-title {
-        font-size: 5rem;
+        font-size: 6rem;
         font-weight: 800;
         color: white;
-        letter-spacing: 1rem;
+        letter-spacing: 1.5rem;
         margin: 0;
         text-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
     }
@@ -50,7 +50,7 @@ st.markdown("""
     .sidebar-title {
         font-size: 2.5rem !important;
         font-weight: 800;
-        letter-spacing: 0.5rem;
+        letter-spacing: 0.75rem;
         text-align: center;
         margin-bottom: 2rem !important;
         color: white !important;
@@ -182,6 +182,23 @@ st.markdown("""
         justify-content: space-between;
         align-items: center;
     }
+    
+    .disclaimer-footer {
+        background: #f8fafc;
+        padding: 2rem;
+        border-radius: 12px;
+        margin-top: 4rem;
+        border-top: 2px solid #e2e8f0;
+        text-align: center;
+    }
+    
+    .disclaimer-text {
+        font-size: 0.85rem;
+        color: #64748b;
+        line-height: 1.6;
+        max-width: 1200px;
+        margin: 0 auto;
+    }
 </style>
 """, unsafe_allow_html=True)
 
@@ -193,7 +210,7 @@ if 'portfolio' not in st.session_state:
 
 # Sidebar
 with st.sidebar:
-    st.markdown("<h1 class='sidebar-title'>BRBAS</h1>", unsafe_allow_html=True)
+    st.markdown("<h1 class='sidebar-title'>BARBAS</h1>", unsafe_allow_html=True)
     if st.button("Stock Analysis"):
         st.session_state.page = 'analysis'
     if st.button("Compare Stocks"):
@@ -300,7 +317,15 @@ def analyze_valuation(info):
     
     methodology = "The Valuation Model employs a multi-metric approach to determine whether a stock is trading at an attractive price relative to its intrinsic value and growth prospects. We primarily analyze the PEG (Price/Earnings-to-Growth) ratio, which compares the P/E ratio to the company's earnings growth rate, providing crucial context that raw P/E ratios miss. A PEG below 1.0 typically indicates undervaluation—you're paying less than $1 for every percentage point of growth. We also examine the trailing P/E ratio against historical averages and sector comparables to identify deviation from normal valuation ranges. The model accounts for sector-specific dynamics, as technology companies naturally command higher multiples than utilities due to growth differentials."
     
+    # Try multiple ways to get PEG ratio
     peg = info.get('pegRatio')
+    if peg is None or peg <= 0:
+        # Try to calculate PEG manually if we have P/E and growth rate
+        pe = info.get('trailingPE') or info.get('forwardPE')
+        growth = info.get('earningsQuarterlyGrowth') or info.get('earningsGrowth')
+        if pe and growth and pe > 0 and growth > 0:
+            peg = pe / (growth * 100)
+    
     if peg and peg > 0:
         if peg < 1:
             score += 2
@@ -485,7 +510,7 @@ def get_stock_data(ticker, period):
 
 # PAGES
 if st.session_state.page == 'analysis':
-    st.markdown("<div class='brbas-header'><h1 class='brbas-title'>BRBAS</h1></div>", unsafe_allow_html=True)
+    st.markdown("<div class='brbas-header'><h1 class='brbas-title'>BARBAS</h1></div>", unsafe_allow_html=True)
     
     col1, col2, col3 = st.columns([4, 2, 2])
     with col1:
@@ -590,9 +615,22 @@ if st.session_state.page == 'analysis':
             </div>
         </div>
         """, unsafe_allow_html=True)
+    
+    # Disclaimer Footer
+    st.markdown("""
+    <div class='disclaimer-footer'>
+        <div class='disclaimer-text'>
+            <strong>Disclaimer:</strong> The information provided by BARBAS is for informational and educational purposes only and should not be construed as financial, investment, or legal advice. 
+            All analysis, recommendations, and confidence scores are generated using automated models and historical data, which may not accurately predict future performance. 
+            Past performance is not indicative of future results. Investing in stocks and securities involves risk, including the potential loss of principal. 
+            You should consult with a qualified financial advisor, accountant, or other professional before making any investment decisions. 
+            BARBAS and its creators assume no responsibility or liability for any financial losses or damages resulting from the use of this tool or reliance on its outputs.
+        </div>
+    </div>
+    """, unsafe_allow_html=True)
 
 elif st.session_state.page == 'portfolio':
-    st.markdown("<div class='brbas-header'><h1 class='brbas-title'>BRBAS</h1></div>", unsafe_allow_html=True)
+    st.markdown("<div class='brbas-header'><h1 class='brbas-title'>BARBAS</h1></div>", unsafe_allow_html=True)
     st.markdown("<h2 class='section-header'>Portfolio</h2>", unsafe_allow_html=True)
     
     if not st.session_state.portfolio:
@@ -601,24 +639,66 @@ elif st.session_state.page == 'portfolio':
         for t in st.session_state.portfolio:
             d, i, _ = get_stock_data(t, "1mo")
             if d is not None and not d.empty:
-                col_info, col_button = st.columns([4, 1])
-                with col_info:
-                    st.markdown(f"""
-                    <div class='portfolio-card'>
+                price = d['Close'].iloc[-1]
+                change = ((d['Close'].iloc[-1] / d['Close'].iloc[0]) - 1) * 100
+                
+                st.markdown(f"""
+                <div class='portfolio-card' style='display: block;'>
+                    <div style='display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;'>
                         <div>
-                            <h3 style='margin: 0; color: #1e293b; font-size: 1.5rem;'>{t}</h3>
-                            <p style='margin: 0.25rem 0; color: #64748b;'>{i.get('longName', t)}</p>
-                            <p style='margin: 0.5rem 0; font-size: 1.3rem; font-weight: 700; color: #1e293b;'>${d['Close'].iloc[-1]:.2f}</p>
+                            <h3 style='margin: 0; color: #1e293b; font-size: 1.8rem;'>{t}</h3>
+                            <p style='margin: 0.25rem 0; color: #64748b; font-size: 0.95rem;'>{i.get('longName', t)}</p>
+                        </div>
+                        <div style='text-align: right;'>
+                            <div style='font-size: 2rem; font-weight: 800; color: #1e293b;'>${price:.2f}</div>
+                            <div style='font-size: 1rem; color: {"#10b981" if change >= 0 else "#ef4444"}; font-weight: 600;'>
+                                {change:+.2f}%
+                            </div>
                         </div>
                     </div>
-                    """, unsafe_allow_html=True)
-                with col_button:
-                    if st.button("Analyze", key=f"analyze_{t}"):
-                        st.session_state.page = 'analysis'
-                        st.rerun()
+                    <div style='display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; padding-top: 1rem; border-top: 1px solid #e2e8f0;'>
+                        <div>
+                            <div style='font-size: 0.75rem; color: #64748b; font-weight: 600;'>MARKET CAP</div>
+                            <div style='font-size: 1.1rem; font-weight: 700; color: #1e293b;'>${i.get('marketCap', 0)/1e9:.1f}B</div>
+                        </div>
+                        <div>
+                            <div style='font-size: 0.75rem; color: #64748b; font-weight: 600;'>P/E RATIO</div>
+                            <div style='font-size: 1.1rem; font-weight: 700; color: #1e293b;'>{i.get('trailingPE', 0):.2f}</div>
+                        </div>
+                        <div>
+                            <div style='font-size: 0.75rem; color: #64748b; font-weight: 600;'>VOLUME</div>
+                            <div style='font-size: 1.1rem; font-weight: 700; color: #1e293b;'>{d['Volume'].iloc[-1]/1e6:.1f}M</div>
+                        </div>
+                        <div>
+                            <div style='font-size: 0.75rem; color: #64748b; font-weight: 600;'>52W RANGE</div>
+                            <div style='font-size: 1.1rem; font-weight: 700; color: #1e293b;'>${i.get('fiftyTwoWeekLow', 0):.0f}-{i.get('fiftyTwoWeekHigh', 0):.0f}</div>
+                        </div>
+                    </div>
+                </div>
+                """, unsafe_allow_html=True)
+                
+                if st.button("Analyze Full Report", key=f"analyze_{t}", use_container_width=True):
+                    st.session_state.page = 'analysis'
+                    st.session_state.selected_ticker = t
+                    st.rerun()
+                
+                st.markdown("<div style='margin-bottom: 2rem;'></div>", unsafe_allow_html=True)
+    
+    # Disclaimer Footer
+    st.markdown("""
+    <div class='disclaimer-footer'>
+        <div class='disclaimer-text'>
+            <strong>Disclaimer:</strong> The information provided by BARBAS is for informational and educational purposes only and should not be construed as financial, investment, or legal advice. 
+            All analysis, recommendations, and confidence scores are generated using automated models and historical data, which may not accurately predict future performance. 
+            Past performance is not indicative of future results. Investing in stocks and securities involves risk, including the potential loss of principal. 
+            You should consult with a qualified financial advisor, accountant, or other professional before making any investment decisions. 
+            BARBAS and its creators assume no responsibility or liability for any financial losses or damages resulting from the use of this tool or reliance on its outputs.
+        </div>
+    </div>
+    """, unsafe_allow_html=True)
 
 elif st.session_state.page == 'top_stocks':
-    st.markdown("<div class='brbas-header'><h1 class='brbas-title'>BRBAS</h1></div>", unsafe_allow_html=True)
+    st.markdown("<div class='brbas-header'><h1 class='brbas-title'>BARBAS</h1></div>", unsafe_allow_html=True)
     st.markdown("<h2 class='section-header'>Top Stocks by Sector</h2>", unsafe_allow_html=True)
     
     sectors = {
@@ -697,3 +777,157 @@ elif st.session_state.page == 'top_stocks':
     """
     
     st.markdown(summary_text, unsafe_allow_html=True)
+
+elif st.session_state.page == 'compare':
+    st.markdown("<div class='brbas-header'><h1 class='brbas-title'>BARBAS</h1></div>", unsafe_allow_html=True)
+    st.markdown("<h2 class='section-header'>Compare Stocks</h2>", unsafe_allow_html=True)
+    
+    col1, col2 = st.columns(2)
+    with col1:
+        ticker1 = search_ticker(st.text_input("First Stock", "AAPL", key="compare1"))
+    with col2:
+        ticker2 = search_ticker(st.text_input("Second Stock", "MSFT", key="compare2"))
+    
+    period = st.selectbox("Comparison Period", ["1mo", "3mo", "6mo", "1y", "2y"], index=3, key="compare_period")
+    
+    if st.button("Compare Stocks", use_container_width=True):
+        with st.spinner("Analyzing stocks..."):
+            # Get data for both stocks
+            data1, info1, error1 = get_stock_data(ticker1, period)
+            data2, info2, error2 = get_stock_data(ticker2, period)
+            
+            if error1 or error2 or data1 is None or data2 is None or data1.empty or data2.empty:
+                st.error("Unable to fetch data for one or both stocks")
+            else:
+                # Calculate indicators for both
+                for data in [data1, data2]:
+                    for ma in [20, 50, 100, 200]:
+                        data[f'MA{ma}'] = data['Close'].rolling(window=ma).mean()
+                    data = calculate_ema(data)
+                    data['RSI'] = calculate_rsi(data)
+                    data['MACD'], data['Signal'], data['Histogram'] = calculate_macd(data)
+                
+                # Analyze both stocks
+                val_score1, val_details1 = analyze_valuation(info1)
+                mom_score1, mom_details1 = analyze_momentum(data1)
+                earn_score1, earn_details1 = analyze_earnings(info1)
+                tech_score1, tech_details1 = analyze_technical(data1)
+                conf1 = calculate_confidence_score(info1, data1, val_score1, mom_score1, earn_score1, tech_score1)
+                rec1, rec_class1 = get_recommendation_from_confidence(conf1)
+                
+                val_score2, val_details2 = analyze_valuation(info2)
+                mom_score2, mom_details2 = analyze_momentum(data2)
+                earn_score2, earn_details2 = analyze_earnings(info2)
+                tech_score2, tech_details2 = analyze_technical(data2)
+                conf2 = calculate_confidence_score(info2, data2, val_score2, mom_score2, earn_score2, tech_score2)
+                rec2, rec_class2 = get_recommendation_from_confidence(conf2)
+                
+                # Display comparison
+                st.markdown("<h3 style='margin-top: 2rem;'>Confidence Comparison</h3>", unsafe_allow_html=True)
+                
+                col_a, col_b = st.columns(2)
+                with col_a:
+                    st.markdown(f"""
+                    <div class='confidence-card'>
+                        <h3 style='color: #1e293b; margin-bottom: 1rem;'>{ticker1} - {info1.get('longName', ticker1)}</h3>
+                        <div style='text-align: center;'>
+                            <div style='font-size: 3.5rem; font-weight: 800; color: #3b82f6;'>{conf1}%</div>
+                            <div class='recommendation-badge {rec_class1}' style='margin-top: 1rem;'>{rec1}</div>
+                        </div>
+                    </div>
+                    """, unsafe_allow_html=True)
+                
+                with col_b:
+                    st.markdown(f"""
+                    <div class='confidence-card'>
+                        <h3 style='color: #1e293b; margin-bottom: 1rem;'>{ticker2} - {info2.get('longName', ticker2)}</h3>
+                        <div style='text-align: center;'>
+                            <div style='font-size: 3.5rem; font-weight: 800; color: #3b82f6;'>{conf2}%</div>
+                            <div class='recommendation-badge {rec_class2}' style='margin-top: 1rem;'>{rec2}</div>
+                        </div>
+                    </div>
+                    """, unsafe_allow_html=True)
+                
+                # Model score comparison
+                st.markdown("<h3 style='margin-top: 2rem;'>Model Score Comparison</h3>", unsafe_allow_html=True)
+                
+                comparison_data = {
+                    'Model': ['Valuation', 'Momentum', 'Earnings', 'Technical'],
+                    ticker1: [val_score1+6, mom_score1+6, earn_score1+6, tech_score1+6],
+                    ticker2: [val_score2+6, mom_score2+6, earn_score2+6, tech_score2+6]
+                }
+                
+                import plotly.graph_objects as go
+                fig = go.Figure(data=[
+                    go.Bar(name=ticker1, x=comparison_data['Model'], y=comparison_data[ticker1], marker_color='#3b82f6'),
+                    go.Bar(name=ticker2, x=comparison_data['Model'], y=comparison_data[ticker2], marker_color='#10b981')
+                ])
+                fig.update_layout(
+                    barmode='group',
+                    title='Model Scores (out of 12)',
+                    yaxis=dict(range=[0, 12]),
+                    height=400,
+                    plot_bgcolor='white',
+                    paper_bgcolor='white'
+                )
+                st.plotly_chart(fig, use_container_width=True)
+                
+                # Key metrics comparison
+                st.markdown("<h3 style='margin-top: 2rem;'>Key Metrics Comparison</h3>", unsafe_allow_html=True)
+                
+                col_c, col_d = st.columns(2)
+                with col_c:
+                    price1 = data1['Close'].iloc[-1]
+                    change1 = ((data1['Close'].iloc[-1] / data1['Close'].iloc[0]) - 1) * 100
+                    st.markdown(f"""
+                    <div style='background: white; padding: 2rem; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);'>
+                        <h4 style='color: #1e293b; margin-bottom: 1.5rem;'>{ticker1}</h4>
+                        <div style='display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;'>
+                            <div><span style='color: #64748b; font-size: 0.85rem;'>Price:</span><br><strong style='font-size: 1.3rem;'>${price1:.2f}</strong></div>
+                            <div><span style='color: #64748b; font-size: 0.85rem;'>Change:</span><br><strong style='font-size: 1.3rem; color: {"#10b981" if change1 >= 0 else "#ef4444"};'>{change1:+.2f}%</strong></div>
+                            <div><span style='color: #64748b; font-size: 0.85rem;'>Market Cap:</span><br><strong>${info1.get('marketCap', 0)/1e9:.1f}B</strong></div>
+                            <div><span style='color: #64748b; font-size: 0.85rem;'>P/E:</span><br><strong>{info1.get('trailingPE', 0):.2f}</strong></div>
+                            <div><span style='color: #64748b; font-size: 0.85rem;'>Volume:</span><br><strong>{data1['Volume'].iloc[-1]/1e6:.1f}M</strong></div>
+                            <div><span style='color: #64748b; font-size: 0.85rem;'>Profit Margin:</span><br><strong>{info1.get('profitMargins', 0)*100:.1f}%</strong></div>
+                        </div>
+                    </div>
+                    """, unsafe_allow_html=True)
+                
+                with col_d:
+                    price2 = data2['Close'].iloc[-1]
+                    change2 = ((data2['Close'].iloc[-1] / data2['Close'].iloc[0]) - 1) * 100
+                    st.markdown(f"""
+                    <div style='background: white; padding: 2rem; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);'>
+                        <h4 style='color: #1e293b; margin-bottom: 1.5rem;'>{ticker2}</h4>
+                        <div style='display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;'>
+                            <div><span style='color: #64748b; font-size: 0.85rem;'>Price:</span><br><strong style='font-size: 1.3rem;'>${price2:.2f}</strong></div>
+                            <div><span style='color: #64748b; font-size: 0.85rem;'>Change:</span><br><strong style='font-size: 1.3rem; color: {"#10b981" if change2 >= 0 else "#ef4444"};'>{change2:+.2f}%</strong></div>
+                            <div><span style='color: #64748b; font-size: 0.85rem;'>Market Cap:</span><br><strong>${info2.get('marketCap', 0)/1e9:.1f}B</strong></div>
+                            <div><span style='color: #64748b; font-size: 0.85rem;'>P/E:</span><br><strong>{info2.get('trailingPE', 0):.2f}</strong></div>
+                            <div><span style='color: #64748b; font-size: 0.85rem;'>Volume:</span><br><strong>{data2['Volume'].iloc[-1]/1e6:.1f}M</strong></div>
+                            <div><span style='color: #64748b; font-size: 0.85rem;'>Profit Margin:</span><br><strong>{info2.get('profitMargins', 0)*100:.1f}%</strong></div>
+                        </div>
+                    </div>
+                    """, unsafe_allow_html=True)
+                
+                # Comparison summary
+                st.markdown("<h3 style='margin-top: 2rem;'>Comparison Summary</h3>", unsafe_allow_html=True)
+                
+                winner = ticker1 if conf1 > conf2 else ticker2 if conf2 > conf1 else "Tie"
+                winner_conf = max(conf1, conf2)
+                
+                st.markdown(f"""
+                <div style='background: white; padding: 2.5rem; border-radius: 16px; box-shadow: 0 4px 16px rgba(0,0,0,0.1); 
+                            margin: 2rem 0; border-left: 6px solid #3b82f6;'>
+                    <h4 style='color: #1e293b; margin-bottom: 1rem;'>Investment Verdict</h4>
+                    <p style='font-size: 1.05rem; line-height: 1.8; color: #334155;'>
+                        Based on our comprehensive four-model analysis, <strong>{winner}</strong> emerges as the stronger investment opportunity with a confidence score of {winner_conf}%. 
+                        {ticker1} scored {conf1}% while {ticker2} scored {conf2}%, representing a {abs(conf1-conf2):.1f} percentage point difference.
+                    </p>
+                    <p style='font-size: 1.05rem; line-height: 1.8; color: #334155; margin-top: 1rem;'>
+                        {'Both stocks show strong characteristics and could be suitable for a diversified portfolio.' if abs(conf1-conf2) < 10 else 
+                         f'The {winner} demonstrates notably superior characteristics across multiple analytical dimensions.' if winner != "Tie" else
+                         'Both stocks are evenly matched in terms of investment attractiveness.'}
+                    </p>
+                </div>
+                """, unsafe_allow_html=True)
