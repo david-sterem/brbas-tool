@@ -9,7 +9,7 @@ from scipy import stats
 import warnings
 warnings.filterwarnings('ignore')
 
-st.set_page_config(page_title="BRBAS - Professional Stock Analysis", layout="wide", page-icon="📊")
+st.set_page_config(page_title="BRBAS - Professional Stock Analysis", layout="wide", page_icon="📊")
 
 # Professional Light Theme CSS
 st.markdown("""
