@@ -38,22 +38,22 @@ st.markdown("""
         box-shadow: 0 4px 20px rgba(30, 64, 175, 0.15);
     }
     
-    .brbas-title {
-        font-size: 8rem;
-        font-weight: 800;
-        color: white;
-        letter-spacing: 2rem;
-        margin: 0;
-        text-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
-    }
-    
-    .sidebar-title {
-        font-size: 2.5rem !important;
-        font-weight: 800;
-        letter-spacing: 0.75rem;
-        text-align: center;
-        margin-bottom: 2rem !important;
-        color: white !important;
+    .brbas-header {
+    text-align: center;
+    padding: 4rem 0;
+    background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%);
+    margin: -2rem -3rem 2rem -3rem;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.brbas-title {
+    font-size: 9rem !important;
+    font-weight: 800 !important;
+    color: #ffffff !important;
+    letter-spacing: 2.5rem !important;
+    margin: 0 !important;
+    text-shadow: none !important;
+
     }
     
     .model-card {
