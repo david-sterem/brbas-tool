@@ -141,7 +141,7 @@ if st.session_state.page == 'analysis':
     """, unsafe_allow_html=True)
 
 elif st.session_state.page == 'portfolio':
-    st.markdown("<div class='brbas-header'><h1 class='brbas-title' style='color: #ffffff !important;'>BARBAS</h1></div>", unsafe_allow_html=True)
+    st.markdown("<div class='-header'><h1 class='-title' style='color: #ffffff !important;'>BARBAS</h1></div>", unsafe_allow_html=True)
     st.markdown("<h2 class='section-header'>Portfolio</h2>", unsafe_allow_html=True)
     
     if not st.session_state.portfolio:
@@ -209,7 +209,7 @@ elif st.session_state.page == 'portfolio':
     """, unsafe_allow_html=True)
 
 elif st.session_state.page == 'top_stocks':
-    st.markdown("<div class='brbas-header'><h1 class='brbas-title' style='color: #ffffff !important;'>BARBAS</h1></div>", unsafe_allow_html=True)
+    st.markdown("<div class='-header'><h1 class='-title' style='color: #ffffff !important;'>BARBAS</h1></div>", unsafe_allow_html=True)
     st.markdown("<h2 class='section-header'>Top Stocks by Sector</h2>", unsafe_allow_html=True)
     
     sectors = {
@@ -303,7 +303,7 @@ elif st.session_state.page == 'top_stocks':
     """, unsafe_allow_html=True)
 
 elif st.session_state.page == 'compare':
-    st.markdown("<div class='brbas-header'><h1 class='brbas-title' style='color: #ffffff !important;'>BARBAS</h1></div>", unsafe_allow_html=True)
+    st.markdown("<div class='-header'><h1 class='-title' style='color: #ffffff !important;'>BARBAS</h1></div>", unsafe_allow_html=True)
     st.markdown("<h2 class='section-header'>Compare Stocks</h2>", unsafe_allow_html=True)
     
     col1, col2 = st.columns(2)
@@ -508,7 +508,7 @@ st.markdown("""
     }
     
     .brbas-title {
-        font-size: 9rem !important;
+        font-size: 8rem !important;
         font-weight: 800 !important;
         color: #ffffff !important;
         letter-spacing: 2.5rem !important;
