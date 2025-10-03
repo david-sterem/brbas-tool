@@ -39,10 +39,10 @@ st.markdown("""
     }
     
     .brbas-title {
-        font-size: 6rem;
+        font-size: 8rem;
         font-weight: 800;
         color: white;
-        letter-spacing: 1.5rem;
+        letter-spacing: 2rem;
         margin: 0;
         text-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
     }
