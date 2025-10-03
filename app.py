@@ -47,7 +47,7 @@ st.markdown("""
 }
 
 .brbas-title {
-    font-size: 9rem !important;
+    font-size: 7rem !important;
     font-weight: 800 !important;
     color: #ffffff !important;
     letter-spacing: 2.5rem !important;
