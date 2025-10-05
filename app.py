@@ -67,51 +67,73 @@ def analyze_multiple_stocks(tickers, period="1mo"):
     for ticker in tickers:
         try:
             data, info, error = get_stock_data(ticker, period)
-            if data is not None and not data.empty and len(data) >= 14:
-                k_period = 14
-                d_period = 3
-                data['STOCH_K'], data['STOCH_D'] = calculate_stochastic(
-                    data['High'], data['Low'], data['Close'], k_period, d_period
-                )
+            
+            if error or data is None or data.empty:
+                continue
                 
-                current_k = data['STOCH_K'].iloc[-1]
-                current_d = data['STOCH_D'].iloc[-1]
-                k_momentum = current_k - data['STOCH_K'].iloc[-5] if len(data) >= 5 else 0
-                recent_k = data['STOCH_K'].iloc[-10:] if len(data) >= 10 else data['STOCH_K']
-                trend = "bullish" if recent_k.is_monotonic_increasing else "bearish" if recent_k.is_monotonic_decreasing else "mixed"
+            if len(data) < 14:  # Need at least 14 days for stochastic
+                continue
                 
-                price = data['Close'].iloc[-1]
-                change = ((data['Close'].iloc[-1] / data['Close'].iloc[0]) - 1) * 100
-                
-                position = "OVERSOLD" if current_k < 20 else "OVERBOUGHT" if current_k > 80 else "NEUTRAL"
-                score = calculate_stochastic_score(current_k, current_d, k_momentum, trend)
-                
-                # Detect crossovers
-                if len(data) >= 2:
-                    prev_k = data['STOCH_K'].iloc[-2]
-                    prev_d = data['STOCH_D'].iloc[-2]
-                    bullish_cross = (prev_k <= prev_d) and (current_k > current_d)
-                    bearish_cross = (prev_k >= prev_d) and (current_k < current_d)
-                else:
+            k_period = 14
+            d_period = 3
+            
+            # Calculate stochastic
+            data['STOCH_K'], data['STOCH_D'] = calculate_stochastic(
+                data['High'], data['Low'], data['Close'], k_period, d_period
+            )
+            
+            # Skip if stochastic calculation failed
+            if data['STOCH_K'].isna().all() or data['STOCH_D'].isna().all():
+                continue
+            
+            current_k = data['STOCH_K'].iloc[-1]
+            current_d = data['STOCH_D'].iloc[-1]
+            
+            # Skip if values are NaN
+            if pd.isna(current_k) or pd.isna(current_d):
+                continue
+            
+            k_momentum = current_k - data['STOCH_K'].iloc[-5] if len(data) >= 5 else 0
+            recent_k = data['STOCH_K'].iloc[-10:] if len(data) >= 10 else data['STOCH_K']
+            trend = "bullish" if recent_k.is_monotonic_increasing else "bearish" if recent_k.is_monotonic_decreasing else "mixed"
+            
+            price = data['Close'].iloc[-1]
+            change = ((data['Close'].iloc[-1] / data['Close'].iloc[0]) - 1) * 100 if len(data) > 0 else 0
+            
+            position = "OVERSOLD" if current_k < 20 else "OVERBOUGHT" if current_k > 80 else "NEUTRAL"
+            score = calculate_stochastic_score(current_k, current_d, k_momentum, trend)
+            
+            # Detect crossovers
+            if len(data) >= 2:
+                prev_k = data['STOCH_K'].iloc[-2]
+                prev_d = data['STOCH_D'].iloc[-2]
+                if pd.isna(prev_k) or pd.isna(prev_d):
                     bullish_cross = False
                     bearish_cross = False
-                
-                results.append({
-                    'ticker': ticker,
-                    'name': info.get('longName', ticker),
-                    'price': price,
-                    'change': change,
-                    'stoch_k': current_k,
-                    'stoch_d': current_d,
-                    'momentum': k_momentum,
-                    'trend': trend,
-                    'position': position,
-                    'score': score,
-                    'bullish_cross': bullish_cross,
-                    'bearish_cross': bearish_cross,
-                    'volume': data['Volume'].iloc[-1]
-                })
-        except:
+                else:
+                    bullish_cross = (prev_k <= prev_d) and (current_k > current_d)
+                    bearish_cross = (prev_k >= prev_d) and (current_k < current_d)
+            else:
+                bullish_cross = False
+                bearish_cross = False
+            
+            results.append({
+                'ticker': ticker,
+                'name': info.get('longName', ticker) if info else ticker,
+                'price': price,
+                'change': change,
+                'stoch_k': current_k,
+                'stoch_d': current_d,
+                'momentum': k_momentum,
+                'trend': trend,
+                'position': position,
+                'score': score,
+                'bullish_cross': bullish_cross,
+                'bearish_cross': bearish_cross,
+                'volume': data['Volume'].iloc[-1] if 'Volume' in data.columns else 0
+            })
+        except Exception as e:
+            # Skip this ticker and continue
             continue
     
     return results
@@ -865,16 +887,91 @@ elif st.session_state.page == 'discover':
     st.markdown(f"**Analyzing {len(stock_categories[selected_sector])} stocks in {selected_sector}**")
     
     if st.button(f"🔍 Analyze {selected_sector} Sector", use_container_width=True, type="primary"):
-        with st.spinner(f"Analyzing {len(stock_categories[selected_sector])} stocks... This may take a moment..."):
-            results = analyze_multiple_stocks(stock_categories[selected_sector], analysis_period)
+        progress_bar = st.progress(0)
+        status_text = st.empty()
+        
+        tickers = stock_categories[selected_sector]
+        results = []
+        
+        for idx, ticker in enumerate(tickers):
+            status_text.text(f"Analyzing {ticker}... ({idx + 1}/{len(tickers)})")
+            progress_bar.progress((idx + 1) / len(tickers))
+            
+            try:
+                data, info, error = get_stock_data(ticker, analysis_period)
+                
+                if error or data is None or data.empty or len(data) < 14:
+                    continue
+                
+                k_period = 14
+                d_period = 3
+                
+                data['STOCH_K'], data['STOCH_D'] = calculate_stochastic(
+                    data['High'], data['Low'], data['Close'], k_period, d_period
+                )
+                
+                current_k = data['STOCH_K'].iloc[-1]
+                current_d = data['STOCH_D'].iloc[-1]
+                
+                if pd.isna(current_k) or pd.isna(current_d):
+                    continue
+                
+                k_momentum = current_k - data['STOCH_K'].iloc[-5] if len(data) >= 5 else 0
+                recent_k = data['STOCH_K'].iloc[-10:] if len(data) >= 10 else data['STOCH_K']
+                trend = "bullish" if recent_k.is_monotonic_increasing else "bearish" if recent_k.is_monotonic_decreasing else "mixed"
+                
+                price = data['Close'].iloc[-1]
+                change = ((data['Close'].iloc[-1] / data['Close'].iloc[0]) - 1) * 100 if len(data) > 0 else 0
+                
+                position = "OVERSOLD" if current_k < 20 else "OVERBOUGHT" if current_k > 80 else "NEUTRAL"
+                score = calculate_stochastic_score(current_k, current_d, k_momentum, trend)
+                
+                # Detect crossovers
+                if len(data) >= 2:
+                    prev_k = data['STOCH_K'].iloc[-2]
+                    prev_d = data['STOCH_D'].iloc[-2]
+                    if pd.isna(prev_k) or pd.isna(prev_d):
+                        bullish_cross = False
+                        bearish_cross = False
+                    else:
+                        bullish_cross = (prev_k <= prev_d) and (current_k > current_d)
+                        bearish_cross = (prev_k >= prev_d) and (current_k < current_d)
+                else:
+                    bullish_cross = False
+                    bearish_cross = False
+                
+                results.append({
+                    'ticker': ticker,
+                    'name': info.get('longName', ticker) if info else ticker,
+                    'price': price,
+                    'change': change,
+                    'stoch_k': current_k,
+                    'stoch_d': current_d,
+                    'momentum': k_momentum,
+                    'trend': trend,
+                    'position': position,
+                    'score': score,
+                    'bullish_cross': bullish_cross,
+                    'bearish_cross': bearish_cross,
+                    'volume': data['Volume'].iloc[-1] if 'Volume' in data.columns else 0
+                })
+            except Exception as e:
+                continue
+        
+        progress_bar.empty()
+        status_text.empty()
         
         if results:
-            # Store in session state
             st.session_state.discovery_results = results
             st.session_state.discovery_sector = selected_sector
-            st.success(f"✅ Analyzed {len(results)} stocks successfully!")
+            st.success(f"✅ Successfully analyzed {len(results)} out of {len(tickers)} stocks!")
+            st.rerun()
         else:
-            st.error("Unable to fetch data for these stocks. Please try again.")
+            st.error(f"❌ Unable to fetch data for stocks in {selected_sector}. This could be due to:")
+            st.write("- Network connectivity issues")
+            st.write("- Yahoo Finance API rate limiting")
+            st.write("- Invalid ticker symbols")
+            st.info("💡 Try again in a few moments, or select a different sector.")
     
     # Display results if they exist
     if 'discovery_results' in st.session_state and st.session_state.discovery_results:
