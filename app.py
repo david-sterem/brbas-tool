@@ -14,12 +14,83 @@ st.set_page_config(page_title="BRBAS", layout="wide", page_icon="📊")
 # Session state
 if 'page' not in st.session_state:
     st.session_state.page = 'analysis'
+if 'portfolio' not in st.session_state:
+    st.session_state.portfolio = []
+
+def add_to_portfolio(ticker, current_k, current_d, k_momentum, trend):
+    """Add stock to portfolio if not already there"""
+    # Check if already in portfolio
+    for stock in st.session_state.portfolio:
+        if stock['ticker'] == ticker:
+            # Update existing entry
+            stock['stoch_k'] = current_k
+            stock['stoch_d'] = current_d
+            stock['momentum'] = k_momentum
+            stock['trend'] = trend
+            stock['position'] = "OVERSOLD" if current_k < 20 else "OVERBOUGHT" if current_k > 80 else "NEUTRAL"
+            stock['last_updated'] = datetime.now().strftime("%Y-%m-%d %H:%M")
+            return False  # Already existed
+    
+    # Add new entry
+    st.session_state.portfolio.append({
+        'ticker': ticker,
+        'stoch_k': current_k,
+        'stoch_d': current_d,
+        'momentum': k_momentum,
+        'trend': trend,
+        'position': "OVERSOLD" if current_k < 20 else "OVERBOUGHT" if current_k > 80 else "NEUTRAL",
+        'last_updated': datetime.now().strftime("%Y-%m-%d %H:%M")
+    })
+    return True  # New addition
+
+def remove_from_portfolio(ticker):
+    """Remove stock from portfolio"""
+    st.session_state.portfolio = [s for s in st.session_state.portfolio if s['ticker'] != ticker]
+
+def calculate_stochastic_score(k, d, momentum, trend):
+    """Calculate a score from 0-100 based on stochastic signals"""
+    score = 50  # Start neutral
+    
+    # Position scoring
+    if k < 20:
+        score += 20  # Oversold is good for buying
+    elif k > 80:
+        score -= 20  # Overbought is risky
+    
+    # Crossover scoring
+    if k > d:
+        score += 10  # Bullish alignment
+    else:
+        score -= 10  # Bearish alignment
+    
+    # Momentum scoring
+    if momentum > 10:
+        score += 15
+    elif momentum > 0:
+        score += 5
+    elif momentum > -10:
+        score -= 5
+    else:
+        score -= 15
+    
+    # Trend scoring
+    if trend == "bullish":
+        score += 5
+    elif trend == "bearish":
+        score -= 5
+    
+    return max(0, min(100, score))  # Clamp between 0-100
 
 # Sidebar
 with st.sidebar:
     st.title("BARBAS")
-    if st.button("Stock Analysis"):
+    if st.button("📊 Stock Analysis"):
         st.session_state.page = 'analysis'
+    if st.button("📁 My Portfolio"):
+        st.session_state.page = 'portfolio'
+    
+    st.markdown("---")
+    st.caption(f"Stocks in Portfolio: {len(st.session_state.portfolio)}")
 
 def search_ticker(query):
     """Map company names to tickers"""
@@ -180,6 +251,27 @@ if st.session_state.page == 'analysis':
     # Determine trend strength
     recent_k = data['STOCH_K'].iloc[-10:]
     trend_direction = "bullish" if recent_k.is_monotonic_increasing else "bearish" if recent_k.is_monotonic_decreasing else "mixed"
+    
+    # Calculate stochastic score
+    stoch_score = calculate_stochastic_score(current_k, current_d, k_momentum, trend_direction)
+    
+    # Add to portfolio button
+    is_in_portfolio = any(s['ticker'] == ticker for s in st.session_state.portfolio)
+    
+    col_a, col_b, col_c = st.columns([1, 1, 3])
+    with col_a:
+        if st.button("⭐ Add to Portfolio" if not is_in_portfolio else "✓ In Portfolio", 
+                     disabled=is_in_portfolio,
+                     use_container_width=True):
+            if add_to_portfolio(ticker, current_k, current_d, k_momentum, trend_direction):
+                st.success(f"Added {ticker} to portfolio!")
+                st.rerun()
+    with col_b:
+        if is_in_portfolio:
+            if st.button("🗑️ Remove", use_container_width=True):
+                remove_from_portfolio(ticker)
+                st.success(f"Removed {ticker} from portfolio!")
+                st.rerun()
     
     # MARKET POSITION
     st.subheader("🎯 Current Market Position")
@@ -410,3 +502,301 @@ if st.session_state.page == 'analysis':
     
     st.markdown("---")
     st.caption("⚠️ This analysis is for educational purposes only and does not constitute financial advice. Always conduct your own research and consult with a licensed financial advisor before making investment decisions.")
+
+# PORTFOLIO PAGE
+elif st.session_state.page == 'portfolio':
+    st.title("📁 My Portfolio")
+    st.markdown("Track and monitor your watchlist stocks with real-time stochastic oscillator signals")
+    
+    if not st.session_state.portfolio:
+        st.info("📋 Your portfolio is empty. Start by adding stocks from the Stock Analysis page.")
+        st.markdown("")
+        if st.button("➡️ Go to Stock Analysis", use_container_width=True, type="primary"):
+            st.session_state.page = 'analysis'
+            st.rerun()
+        st.stop()
+    
+    # Summary metrics at the top
+    st.subheader("📊 Portfolio Overview")
+    
+    oversold_stocks = [s for s in st.session_state.portfolio if s['position'] == 'OVERSOLD']
+    overbought_stocks = [s for s in st.session_state.portfolio if s['position'] == 'OVERBOUGHT']
+    neutral_stocks = [s for s in st.session_state.portfolio if s['position'] == 'NEUTRAL']
+    
+    bullish_trend = sum(1 for s in st.session_state.portfolio if s['trend'] == 'bullish')
+    bearish_trend = sum(1 for s in st.session_state.portfolio if s['trend'] == 'bearish')
+    
+    avg_momentum = sum(s['momentum'] for s in st.session_state.portfolio) / len(st.session_state.portfolio)
+    avg_score = sum(calculate_stochastic_score(s['stoch_k'], s['stoch_d'], s['momentum'], s['trend']) 
+                    for s in st.session_state.portfolio) / len(st.session_state.portfolio)
+    
+    col1, col2, col3, col4, col5, col6 = st.columns(6)
+    col1.metric("Total Stocks", len(st.session_state.portfolio))
+    col2.metric("Oversold 🟢", len(oversold_stocks), help="Potential buying opportunities")
+    col3.metric("Overbought 🔴", len(overbought_stocks), help="Potential selling opportunities")
+    col4.metric("Neutral", len(neutral_stocks))
+    col5.metric("Avg Momentum", f"{avg_momentum:+.1f}")
+    col6.metric("Avg Score", f"{avg_score:.0f}/100")
+    
+    st.markdown("---")
+    
+    # Alerts section
+    if oversold_stocks or overbought_stocks:
+        st.subheader("🚨 Trading Alerts")
+        
+        if oversold_stocks:
+            with st.expander(f"🟢 {len(oversold_stocks)} Oversold Stock(s) - Potential Buy Opportunities", expanded=True):
+                for stock in oversold_stocks:
+                    st.write(f"**{stock['ticker']}** - Stochastic K: {stock['stoch_k']:.1f} | Momentum: {stock['momentum']:+.1f}")
+        
+        if overbought_stocks:
+            with st.expander(f"🔴 {len(overbought_stocks)} Overbought Stock(s) - Consider Taking Profits", expanded=True):
+                for stock in overbought_stocks:
+                    st.write(f"**{stock['ticker']}** - Stochastic K: {stock['stoch_k']:.1f} | Momentum: {stock['momentum']:+.1f}")
+        
+        st.markdown("---")
+    
+    # Filter and sort options
+    col1, col2, col3 = st.columns([2, 2, 2])
+    with col1:
+        filter_by = st.selectbox("Filter by Position", 
+                                ["All Positions", "Oversold Only", "Overbought Only", "Neutral Only"],
+                                index=0)
+    with col2:
+        sort_by = st.selectbox("Sort by", 
+                              ["Ticker", "Position", "Momentum", "Stochastic Score", "Last Updated"],
+                              index=3)
+    with col3:
+        sort_order = st.radio("Order", ["Ascending ↑", "Descending ↓"], horizontal=True, index=1)
+    
+    # Apply filters
+    filtered_portfolio = st.session_state.portfolio.copy()
+    
+    if filter_by == "Oversold Only":
+        filtered_portfolio = [s for s in filtered_portfolio if s['position'] == 'OVERSOLD']
+    elif filter_by == "Overbought Only":
+        filtered_portfolio = [s for s in filtered_portfolio if s['position'] == 'OVERBOUGHT']
+    elif filter_by == "Neutral Only":
+        filtered_portfolio = [s for s in filtered_portfolio if s['position'] == 'NEUTRAL']
+    
+    # Sort portfolio
+    sort_key_map = {
+        "Ticker": lambda x: x['ticker'],
+        "Position": lambda x: x['position'],
+        "Momentum": lambda x: x['momentum'],
+        "Stochastic Score": lambda x: calculate_stochastic_score(x['stoch_k'], x['stoch_d'], x['momentum'], x['trend']),
+        "Last Updated": lambda x: x['last_updated']
+    }
+    
+    sorted_portfolio = sorted(filtered_portfolio, 
+                             key=sort_key_map[sort_by],
+                             reverse=(sort_order == "Descending ↓"))
+    
+    st.markdown("---")
+    
+    # Display portfolio stocks
+    st.subheader(f"📈 Your Stocks ({len(sorted_portfolio)})")
+    
+    if not sorted_portfolio:
+        st.info("No stocks match your current filter.")
+    
+    for i, stock in enumerate(sorted_portfolio):
+        score = calculate_stochastic_score(stock['stoch_k'], stock['stoch_d'], 
+                                          stock['momentum'], stock['trend'])
+        
+        # Determine position styling
+        if stock['position'] == 'OVERSOLD':
+            position_color = "#10b981"
+            position_emoji = "🟢"
+            position_badge = "OVERSOLD - BUY SIGNAL"
+        elif stock['position'] == 'OVERBOUGHT':
+            position_color = "#ef4444"
+            position_emoji = "🔴"
+            position_badge = "OVERBOUGHT - SELL SIGNAL"
+        else:
+            position_color = "#6b7280"
+            position_emoji = "⚪"
+            position_badge = "NEUTRAL"
+        
+        # Trend styling
+        if stock['trend'] == 'bullish':
+            trend_emoji = "📈"
+            trend_color = "#10b981"
+        elif stock['trend'] == 'bearish':
+            trend_emoji = "📉"
+            trend_color = "#ef4444"
+        else:
+            trend_emoji = "➡️"
+            trend_color = "#6b7280"
+        
+        # Score styling
+        if score >= 70:
+            score_color = "#10b981"
+            score_label = "Strong Buy"
+        elif score >= 50:
+            score_color = "#3b82f6"
+            score_label = "Moderate Buy"
+        elif score >= 30:
+            score_color = "#f59e0b"
+            score_label = "Hold"
+        else:
+            score_color = "#ef4444"
+            score_label = "Consider Selling"
+        
+        # Momentum styling
+        momentum_color = "#10b981" if stock['momentum'] > 0 else "#ef4444"
+        momentum_direction = "↑" if stock['momentum'] > 0 else "↓"
+        
+        # Create expandable card for each stock
+        with st.expander(f"{position_emoji} **{stock['ticker']}** - {position_badge} | Score: {score}/100", expanded=False):
+            # Main metrics row
+            metric_col1, metric_col2, metric_col3, metric_col4, metric_col5 = st.columns(5)
+            
+            with metric_col1:
+                st.metric("Stochastic %K", f"{stock['stoch_k']:.1f}")
+            with metric_col2:
+                st.metric("Stochastic %D", f"{stock['stoch_d']:.1f}")
+            with metric_col3:
+                st.metric("5-Day Momentum", f"{stock['momentum']:+.1f}", 
+                         delta_color="normal" if stock['momentum'] > 0 else "inverse")
+            with metric_col4:
+                st.metric("10-Day Trend", f"{stock['trend'].title()}")
+            with metric_col5:
+                st.metric("Signal Score", f"{score}/100")
+            
+            # Signal interpretation
+            st.markdown("**Signal Interpretation:**")
+            
+            if stock['position'] == 'OVERSOLD':
+                st.success(f"✅ {stock['ticker']} is oversold and may be a good buying opportunity. The stock has experienced significant selling pressure.")
+            elif stock['position'] == 'OVERBOUGHT':
+                st.warning(f"⚠️ {stock['ticker']} is overbought and may be due for a pullback. Consider taking profits or waiting for a better entry.")
+            else:
+                st.info(f"ℹ️ {stock['ticker']} is in a neutral range. Wait for clearer signals before making trading decisions.")
+            
+            # Crossover status
+            if stock['stoch_k'] > stock['stoch_d']:
+                st.write(f"📊 **Crossover Status:** %K is above %D (Bullish alignment)")
+            else:
+                st.write(f"📊 **Crossover Status:** %K is below %D (Bearish alignment)")
+            
+            # Action buttons row
+            btn_col1, btn_col2, btn_col3, btn_col4 = st.columns(4)
+            
+            with btn_col1:
+                if st.button(f"📊 Analyze", key=f"analyze_{stock['ticker']}", use_container_width=True):
+                    st.session_state.page = 'analysis'
+                    st.session_state.selected_ticker = stock['ticker']
+                    st.rerun()
+            
+            with btn_col2:
+                if st.button(f"🔄 Refresh Data", key=f"refresh_{stock['ticker']}", use_container_width=True):
+                    with st.spinner(f"Updating {stock['ticker']}..."):
+                        data, info, error = get_stock_data(stock['ticker'], "1mo")
+                        if data is not None and not data.empty:
+                            k_period = 14
+                            d_period = 3
+                            data['STOCH_K'], data['STOCH_D'] = calculate_stochastic(
+                                data['High'], data['Low'], data['Close'], k_period, d_period
+                            )
+                            current_k = data['STOCH_K'].iloc[-1]
+                            current_d = data['STOCH_D'].iloc[-1]
+                            k_momentum = current_k - data['STOCH_K'].iloc[-5]
+                            recent_k = data['STOCH_K'].iloc[-10:]
+                            trend = "bullish" if recent_k.is_monotonic_increasing else "bearish" if recent_k.is_monotonic_decreasing else "mixed"
+                            
+                            add_to_portfolio(stock['ticker'], current_k, current_d, k_momentum, trend)
+                            st.success(f"✅ {stock['ticker']} updated!")
+                            st.rerun()
+            
+            with btn_col3:
+                st.caption(f"Last Updated: {stock['last_updated']}")
+            
+            with btn_col4:
+                if st.button(f"🗑️ Remove", key=f"remove_{stock['ticker']}", use_container_width=True):
+                    remove_from_portfolio(stock['ticker'])
+                    st.success(f"Removed {stock['ticker']}")
+                    st.rerun()
+    
+    st.markdown("---")
+    
+    # Bulk actions section
+    st.subheader("⚙️ Bulk Actions")
+    
+    bulk_col1, bulk_col2, bulk_col3 = st.columns(3)
+    
+    with bulk_col1:
+        if st.button("🔄 Refresh All Stocks", use_container_width=True, type="primary"):
+            progress_bar = st.progress(0)
+            status_text = st.empty()
+            
+            for idx, stock in enumerate(st.session_state.portfolio):
+                status_text.text(f"Updating {stock['ticker']}... ({idx + 1}/{len(st.session_state.portfolio)})")
+                
+                data, info, error = get_stock_data(stock['ticker'], "1mo")
+                if data is not None and not data.empty:
+                    k_period = 14
+                    d_period = 3
+                    data['STOCH_K'], data['STOCH_D'] = calculate_stochastic(
+                        data['High'], data['Low'], data['Close'], k_period, d_period
+                    )
+                    current_k = data['STOCH_K'].iloc[-1]
+                    current_d = data['STOCH_D'].iloc[-1]
+                    k_momentum = current_k - data['STOCH_K'].iloc[-5]
+                    recent_k = data['STOCH_K'].iloc[-10:]
+                    trend = "bullish" if recent_k.is_monotonic_increasing else "bearish" if recent_k.is_monotonic_decreasing else "mixed"
+                    add_to_portfolio(stock['ticker'], current_k, current_d, k_momentum, trend)
+                
+                progress_bar.progress((idx + 1) / len(st.session_state.portfolio))
+            
+            status_text.text("✅ All stocks updated!")
+            st.success(f"Successfully updated {len(st.session_state.portfolio)} stocks!")
+            st.rerun()
+    
+    with bulk_col2:
+        portfolio_df = pd.DataFrame(st.session_state.portfolio)
+        
+        # Add calculated score column
+        portfolio_df['score'] = portfolio_df.apply(
+            lambda row: calculate_stochastic_score(row['stoch_k'], row['stoch_d'], 
+                                                   row['momentum'], row['trend']), 
+            axis=1
+        )
+        
+        csv = portfolio_df.to_csv(index=False)
+        st.download_button(
+            label="📥 Export to CSV",
+            data=csv,
+            file_name=f"barbas_portfolio_{datetime.now().strftime('%Y%m%d_%H%M%S')}.csv",
+            mime="text/csv",
+            use_container_width=True
+        )
+    
+    with bulk_col3:
+        if st.button("🗑️ Clear Portfolio", use_container_width=True, type="secondary"):
+            if st.session_state.get('confirm_clear', False):
+                st.session_state.portfolio = []
+                st.session_state.confirm_clear = False
+                st.success("Portfolio cleared!")
+                st.rerun()
+            else:
+                st.session_state.confirm_clear = True
+                st.warning("⚠️ Click again to confirm")
+    
+    # Portfolio statistics
+    st.markdown("---")
+    st.subheader("📈 Portfolio Statistics")
+    
+    stat_col1, stat_col2 = st.columns(2)
+    
+    with stat_col1:
+        st.write("**Position Distribution:**")
+        st.write(f"- Oversold: {len(oversold_stocks)} ({len(oversold_stocks)/len(st.session_state.portfolio)*100:.1f}%)")
+        st.write(f"- Overbought: {len(overbought_stocks)} ({len(overbought_stocks)/len(st.session_state.portfolio)*100:.1f}%)")
+        st.write(f"- Neutral: {len(neutral_stocks)} ({len(neutral_stocks)/len(st.session_state.portfolio)*100:.1f}%)")
+    
+    with stat_col2:
+        st.write("**Trend Distribution:**")
+        st.write(f"- Bullish: {bullish_trend} ({bullish_trend/len(st.session_state.portfolio)*100:.1f}%)")
+        st.write(f"- Bearish: {bearish_trend} ({bearish_trend/len(st.session_state.portfolio)*100:.1f}%)")
+        st.write(f"- Mixed: {len(st.session_state.portfolio) - bullish_trend - bearish_trend} ({(len(st.session_state.portfolio) - bullish_trend - bearish_trend)/len(st.session_state.portfolio)*100:.1f}%)")
