@@ -177,6 +177,40 @@ def calculate_stochastic(high, low, close, k_period=14, d_period=3):
     
     return k_percent, d_percent
 
+def calculate_stochastic_score(k, d, momentum, trend):
+    """Calculate a score from 0-100 based on stochastic signals"""
+    score = 50  # Start neutral
+    
+    # Position scoring
+    if k < 20:
+        score += 20  # Oversold is good for buying
+    elif k > 80:
+        score -= 20  # Overbought is risky
+    
+    # Crossover scoring
+    if k > d:
+        score += 10  # Bullish alignment
+    else:
+        score -= 10  # Bearish alignment
+    
+    # Momentum scoring
+    if momentum > 10:
+        score += 15
+    elif momentum > 0:
+        score += 5
+    elif momentum > -10:
+        score -= 5
+    else:
+        score -= 15
+    
+    # Trend scoring
+    if trend == "bullish":
+        score += 5
+    elif trend == "bearish":
+        score -= 5
+    
+    return max(0, min(100, score))  # Clamp between 0-100
+
 @st.cache_data(ttl=300)
 def get_stock_data(ticker, period):
     """Fetch stock data from Yahoo Finance"""
@@ -890,10 +924,12 @@ elif st.session_state.page == 'discover':
     if st.button(f"🔍 Analyze {selected_sector} Sector", use_container_width=True, type="primary"):
         progress_bar = st.progress(0)
         status_text = st.empty()
+        debug_info = st.empty()
         
         tickers = stock_categories[selected_sector]
         results = []
         failed_tickers = []
+        error_messages = []
         
         for idx, ticker in enumerate(tickers):
             status_text.text(f"Analyzing {ticker}... ({idx + 1}/{len(tickers)})")
@@ -902,16 +938,25 @@ elif st.session_state.page == 'discover':
             try:
                 # Add small delay to avoid rate limiting
                 if idx > 0:
-                    time.sleep(0.5)
+                    time.sleep(0.8)
                 
                 # Fetch data directly without cache for discovery
                 stock = yf.Ticker(ticker)
                 data = stock.history(period=analysis_period)
-                info = stock.info
                 
-                if data is None or data.empty or len(data) < 14:
+                debug_info.text(f"Debug: {ticker} returned {len(data) if data is not None and not data.empty else 0} rows")
+                
+                if data is None or data.empty:
                     failed_tickers.append(ticker)
+                    error_messages.append(f"{ticker}: No data returned")
                     continue
+                
+                if len(data) < 14:
+                    failed_tickers.append(ticker)
+                    error_messages.append(f"{ticker}: Only {len(data)} days of data (need 14+)")
+                    continue
+                
+                info = stock.info
                 
                 k_period = 14
                 d_period = 3
@@ -930,6 +975,7 @@ elif st.session_state.page == 'discover':
                 
                 if pd.isna(current_k) or pd.isna(current_d):
                     failed_tickers.append(ticker)
+                    error_messages.append(f"{ticker}: Stochastic calculation resulted in NaN")
                     continue
                 
                 k_momentum = current_k - data['STOCH_K'].iloc[-5] if len(data) >= 5 else 0
@@ -971,30 +1017,40 @@ elif st.session_state.page == 'discover':
                     'bearish_cross': bearish_cross,
                     'volume': data['Volume'].iloc[-1] if 'Volume' in data.columns else 0
                 })
+                
+                error_messages.append(f"{ticker}: ✓ Success")
+                
             except Exception as e:
                 failed_tickers.append(ticker)
+                error_messages.append(f"{ticker}: Error - {str(e)}")
                 continue
         
         progress_bar.empty()
         status_text.empty()
+        debug_info.empty()
+        
+        # Show detailed error log
+        with st.expander("📋 View Detailed Analysis Log"):
+            for msg in error_messages:
+                st.text(msg)
         
         if results:
             st.session_state.discovery_results = results
             st.session_state.discovery_sector = selected_sector
             
             if failed_tickers:
-                st.warning(f"⚠️ Analyzed {len(results)} out of {len(tickers)} stocks successfully. Failed to fetch: {', '.join(failed_tickers)}")
+                st.warning(f"⚠️ Analyzed {len(results)} out of {len(tickers)} stocks successfully. Failed: {', '.join(failed_tickers)}")
             else:
                 st.success(f"✅ Successfully analyzed all {len(results)} stocks in {selected_sector}!")
             st.rerun()
         else:
-            st.error(f"❌ Unable to fetch data for any stocks in {selected_sector}. This could be due to:")
-            st.write("- Network connectivity issues")
-            st.write("- Yahoo Finance API rate limiting (try waiting 1-2 minutes)")
-            st.write("- Invalid ticker symbols")
-            if failed_tickers:
-                st.write(f"- Failed tickers: {', '.join(failed_tickers)}")
-            st.info("💡 Try selecting a different sector or wait a moment before retrying.")
+            st.error(f"❌ Unable to fetch data for any stocks in {selected_sector}.")
+            st.write("**Possible reasons:**")
+            st.write("- 🚫 Yahoo Finance API is rate limiting your requests")
+            st.write("- 🌐 Network connectivity issues")
+            st.write("- ❌ All ticker symbols are invalid or delisted")
+            st.write("- 📊 No data available for the selected time period")
+            st.info("💡 **Try this:** Wait 2-3 minutes and try a different sector, or try the 'Tech Giants' sector which usually has reliable data.")
     
     # Display results if they exist
     if 'discovery_results' in st.session_state and st.session_state.discovery_results:
@@ -1314,37 +1370,3 @@ elif st.session_state.page == 'discover':
         
         **Remember:** Use this as a screening tool. Always perform full analysis before investing!
         """)
-
-def calculate_stochastic_score(k, d, momentum, trend):
-    """Calculate a score from 0-100 based on stochastic signals"""
-    score = 50  # Start neutral
-    
-    # Position scoring
-    if k < 20:
-        score += 20  # Oversold is good for buying
-    elif k > 80:
-        score -= 20  # Overbought is risky
-    
-    # Crossover scoring
-    if k > d:
-        score += 10  # Bullish alignment
-    else:
-        score -= 10  # Bearish alignment
-    
-    # Momentum scoring
-    if momentum > 10:
-        score += 15
-    elif momentum > 0:
-        score += 5
-    elif momentum > -10:
-        score -= 5
-    else:
-        score -= 15
-    
-    # Trend scoring
-    if trend == "bullish":
-        score += 5
-    elif trend == "bearish":
-        score -= 5
-    
-    return max(0, min(100, score))  # Clamp between 0-100
