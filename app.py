@@ -7,6 +7,7 @@ from plotly.subplots import make_subplots
 from datetime import datetime, timedelta
 from scipy import stats
 import warnings
+import time
 warnings.filterwarnings('ignore')
 
 st.set_page_config(page_title="BRBAS", layout="wide", page_icon="📊")
@@ -892,28 +893,43 @@ elif st.session_state.page == 'discover':
         
         tickers = stock_categories[selected_sector]
         results = []
+        failed_tickers = []
         
         for idx, ticker in enumerate(tickers):
             status_text.text(f"Analyzing {ticker}... ({idx + 1}/{len(tickers)})")
             progress_bar.progress((idx + 1) / len(tickers))
             
             try:
-                data, info, error = get_stock_data(ticker, analysis_period)
+                # Add small delay to avoid rate limiting
+                if idx > 0:
+                    time.sleep(0.5)
                 
-                if error or data is None or data.empty or len(data) < 14:
+                # Fetch data directly without cache for discovery
+                stock = yf.Ticker(ticker)
+                data = stock.history(period=analysis_period)
+                info = stock.info
+                
+                if data is None or data.empty or len(data) < 14:
+                    failed_tickers.append(ticker)
                     continue
                 
                 k_period = 14
                 d_period = 3
                 
-                data['STOCH_K'], data['STOCH_D'] = calculate_stochastic(
-                    data['High'], data['Low'], data['Close'], k_period, d_period
-                )
+                # Calculate stochastic
+                lowest_low = data['Low'].rolling(window=k_period).min()
+                highest_high = data['High'].rolling(window=k_period).max()
+                k_percent = ((data['Close'] - lowest_low) / (highest_high - lowest_low)) * 100
+                d_percent = k_percent.rolling(window=d_period).mean()
+                
+                data['STOCH_K'] = k_percent
+                data['STOCH_D'] = d_percent
                 
                 current_k = data['STOCH_K'].iloc[-1]
                 current_d = data['STOCH_D'].iloc[-1]
                 
                 if pd.isna(current_k) or pd.isna(current_d):
+                    failed_tickers.append(ticker)
                     continue
                 
                 k_momentum = current_k - data['STOCH_K'].iloc[-5] if len(data) >= 5 else 0
@@ -956,6 +972,7 @@ elif st.session_state.page == 'discover':
                     'volume': data['Volume'].iloc[-1] if 'Volume' in data.columns else 0
                 })
             except Exception as e:
+                failed_tickers.append(ticker)
                 continue
         
         progress_bar.empty()
@@ -964,14 +981,20 @@ elif st.session_state.page == 'discover':
         if results:
             st.session_state.discovery_results = results
             st.session_state.discovery_sector = selected_sector
-            st.success(f"✅ Successfully analyzed {len(results)} out of {len(tickers)} stocks!")
+            
+            if failed_tickers:
+                st.warning(f"⚠️ Analyzed {len(results)} out of {len(tickers)} stocks successfully. Failed to fetch: {', '.join(failed_tickers)}")
+            else:
+                st.success(f"✅ Successfully analyzed all {len(results)} stocks in {selected_sector}!")
             st.rerun()
         else:
-            st.error(f"❌ Unable to fetch data for stocks in {selected_sector}. This could be due to:")
+            st.error(f"❌ Unable to fetch data for any stocks in {selected_sector}. This could be due to:")
             st.write("- Network connectivity issues")
-            st.write("- Yahoo Finance API rate limiting")
+            st.write("- Yahoo Finance API rate limiting (try waiting 1-2 minutes)")
             st.write("- Invalid ticker symbols")
-            st.info("💡 Try again in a few moments, or select a different sector.")
+            if failed_tickers:
+                st.write(f"- Failed tickers: {', '.join(failed_tickers)}")
+            st.info("💡 Try selecting a different sector or wait a moment before retrying.")
     
     # Display results if they exist
     if 'discovery_results' in st.session_state and st.session_state.discovery_results:
