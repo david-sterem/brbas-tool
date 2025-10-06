@@ -282,8 +282,8 @@ if st.session_state.page == 'analysis':
     fig = make_subplots(rows=2, cols=1, row_heights=[0.7, 0.3], vertical_spacing=0.03,
                         subplot_titles=(f'{ticker} Price', 'Stochastic Oscillator'))
     
-    fig.add_trace(go.Candlestick(x=data.index, Open=data['Open'], High=data['High'],
-                                  Low=data['Low'], Close=data['Close'], name='Price'), row=1, col=1)
+    fig.add_trace(go.Candlestick(x=data.index, open=data['Open'], high=data['High'],
+                                  low=data['Low'], close=data['Close'], name='Price'), row=1, col=1)
     
     fig.add_trace(go.Scatter(x=data.index, y=data['STOCH_K'], line=dict(color='orange', width=2),
                             name='%K'), row=2, col=1)
