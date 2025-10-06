@@ -909,7 +909,7 @@ elif st.session_state.page == 'discover':
         with sort_col1:
             sort_by = st.selectbox("Sort by", ["Score (High to Low)", "Score (Low to High)", "Momentum", "Position"], index=0)
         with sort_col2:
-            position_filter = st.multiselect("Filter by Position", ["OVERSOLD", "NEUTRAL", "Overbought"], default=["OVERSOLD", "NEUTRAL", "Overbought"])
+            position_filter = st.multiselect("Filter by Position", ["Oversold", "Neutral", "Overbought"], default=["Oversold", "Neutral", "Overbought"])
         
         filtered_results = [r for r in results if r['position'] in position_filter]
         
@@ -923,7 +923,7 @@ elif st.session_state.page == 'discover':
             filtered_results = sorted(filtered_results, key=lambda x: x['position'])
         
         for stock in filtered_results:
-            position_emoji = "🟢" if stock['position'] == 'OVERSOLD' else "🔴" if stock['position'] == 'Overbought' else "⚪"
+            position_emoji = "🟢" if stock['position'] == 'Oversold' else "🔴" if stock['position'] == 'Overbought' else "⚪"
             
             with st.expander(f"{position_emoji} **{stock['ticker']}** - {stock['position']} | Score: {stock['score']}/100"):
                 col1, col2, col3, col4 = st.columns(4)
@@ -932,7 +932,7 @@ elif st.session_state.page == 'discover':
                 col3.metric("Momentum", f"{stock['momentum']:+.1f}")
                 col4.metric("Trend", stock['trend'].title())
                 
-                if stock['position'] == 'OVERSOLD':
+                if stock['position'] == 'Oversold':
                     st.success(f"💡 **Potential Buy:** {stock['ticker']} is oversold.")
                 elif stock['position'] == 'Overbought':
                     st.warning(f"⚠️ **Caution:** {stock['ticker']} is overbought.")
