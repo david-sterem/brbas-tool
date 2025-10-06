@@ -540,10 +540,8 @@ if st.session_state.page == 'analysis':
         
         if position == "OVERSOLD":
             st.error("**OVERSOLD TERRITORY - HIGH PRIORITY SIGNAL**")
-            st.write(f"""
-            **What This Means:** {ticker} is trading in oversold territory with a %K reading of {current_k:.1f}. 
-            This suggests the stock has experienced significant selling pressure and may be approaching a technical bottom.
-            
+            st.write(f"**What This Means:** {ticker} is trading in oversold territory with a %K reading of {current_k:.1f}. This suggests the stock has experienced significant selling pressure and may be approaching a technical bottom.")
+            st.write("""
             **Investment Implications:**
             - The stock is potentially undervalued on a short-term technical basis
             - Historical patterns suggest oversold conditions often precede rebounds
@@ -559,10 +557,8 @@ if st.session_state.page == 'analysis':
             
         elif position == "OVERBOUGHT":
             st.warning("**OVERBOUGHT TERRITORY - CAUTION ADVISED**")
-            st.write(f"""
-            **What This Means:** {ticker} is trading in overbought territory with a %K reading of {current_k:.1f}. 
-            This indicates strong buying pressure but also suggests limited upside in the near term.
-            
+            st.write(f"**What This Means:** {ticker} is trading in overbought territory with a %K reading of {current_k:.1f}. This indicates strong buying pressure but also suggests limited upside in the near term.")
+            st.write("""
             **Investment Implications:**
             - The rally may be overextended and due for consolidation or pullback
             - Momentum is strong, but price may have run ahead of fundamentals
@@ -578,10 +574,8 @@ if st.session_state.page == 'analysis':
             
         else:
             st.info("**NEUTRAL RANGE - BALANCED MARKET CONDITIONS**")
-            st.write(f"""
-            **What This Means:** {ticker} is trading in neutral territory with a %K reading of {current_k:.1f}. 
-            The stock is neither oversold nor overbought, suggesting balanced supply and demand.
-            
+            st.write(f"**What This Means:** {ticker} is trading in neutral territory with a %K reading of {current_k:.1f}. The stock is neither oversold nor overbought, suggesting balanced supply and demand.")
+            st.write("""
             **Investment Implications:**
             - No extreme technical signals at this time
             - Market is in equilibrium - wait for clearer directional signals
