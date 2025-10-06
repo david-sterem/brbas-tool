@@ -11,7 +11,7 @@ import time
 
 warnings.filterwarnings('ignore')
 
-st.set_page_config(page_title="STERN", layout="wide", page_icon="📊")
+st.set_page_config(page_title="SternCurve", layout="wide", page_icon="📊")
 
 if 'page' not in st.session_state:
     st.session_state.page = 'analysis'
@@ -229,10 +229,10 @@ def get_prospective_stocks():
     }
 
 with st.sidebar:
-    st.title("STERN")
+    st.title("SternCurve")
     if st.button("Stock Analyzer"):
         st.session_state.page = 'analysis'
-    if st.button("STERN Portfolio"):
+    if st.button("SternCurve Portfolio"):
         st.session_state.page = 'portfolio'
     if st.button("Discover Stocks"):
         st.session_state.page = 'discover'
@@ -241,7 +241,7 @@ with st.sidebar:
     st.caption(f"Stocks in Portfolio: {len(st.session_state.portfolio)}")
 
 if st.session_state.page == 'analysis':
-    st.title("STERN Stock Analyzer")
+    st.title("SternCurve Stock Analyzer")
     
     col1, col2 = st.columns([4, 2])
     with col1:
