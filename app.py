@@ -546,7 +546,7 @@ if st.session_state.page == 'analysis':
             - The stock is potentially undervalued on a short-term technical basis
             - Historical patterns suggest oversold conditions often precede rebounds
             - Risk/reward ratio may favor buyers at this level
-            - **However:** Oversold can remain oversold - don't catch a falling knife
+            - **However:** Oversold can remain oversold - dont catch a falling knife
             
             **Action Considerations:**
             - For aggressive traders: Consider scaling into a position
