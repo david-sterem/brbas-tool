@@ -453,24 +453,24 @@ if st.session_state.page == 'analysis':
         risk_score = 0
         
         if current_k > 80:
-            risk_factors.append("Overbought condition increases pullback risk")
+            risk_factors.append("Overbought Condition Increases Pullback Risk")
             risk_score += 2
         if current_k < 20:
-            risk_factors.append("Oversold condition suggests potential reversal")
+            risk_factors.append("Oversold Condition Suggests Potential Reversal")
             risk_score -= 1
         if bearish_cross:
-            risk_factors.append("Recent bearish crossover signals downside")
+            risk_factors.append("Recent Bearish Crossover Signals Downside")
             risk_score += 2
         if bullish_cross:
-            risk_factors.append("Recent bullish crossover signals upside")
+            risk_factors.append("Recent Bullish Crossover Signals Upside")
             risk_score -= 1
         
         if risk_score >= 3:
-            st.error("High Risk - Multiple warning signals present")
+            st.error("High Risk - Multiple Warning Signals Present")
         elif risk_score >= 1:
-            st.warning("Moderate Risk - Some caution warranted")
+            st.warning("Moderate Risk - Some Caution Warranted")
         else:
-            st.success("Lower Risk - Technical picture appears favorable")
+            st.success("Lower Risk - Technical Picture Appears Favorable")
         
         if risk_factors:
             st.write("Key Risk Factors:")
