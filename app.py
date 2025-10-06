@@ -978,6 +978,145 @@ if st.session_state.page == 'analysis':
         
         if current_k < 20:
             st.error("**OVERSOLD TERRITORY - HIGH PRIORITY SIGNAL**")
+            st.write(f"""
+            **What This Means:** {ticker} is trading in oversold territory with a %K reading of {current_k:.1f}. 
+            This suggests the stock has experienced significant selling pressure and may be approaching a technical bottom.
+            
+            **Investment Implications:**
+            - The stock is potentially undervalued on a short-term technical basis
+            - Historical patterns suggest oversold conditions often precede rebounds
+            - Risk/reward ratio may favor buyers at this level
+            - **However:** Oversold can remain oversold - don't catch a falling knife
+            
+            **Action Considerations:**
+            - For aggressive traders: Consider scaling into a position
+            - For conservative investors: Wait for confirmation of reversal (watch for %K crossing above %D)
+            - Set tight stop-losses if entering, as the stock could continue lower
+            - Monitor volume for signs of capitulation or accumulation
+            """)
+            
+        elif current_k > 80:
+            st.warning("**OVERBOUGHT TERRITORY - CAUTION ADVISED**")
+            st.write(f"""
+            **What This Means:** {ticker} is trading in overbought territory with a %K reading of {current_k:.1f}. 
+            This indicates strong buying pressure but also suggests limited upside in the near term.
+            
+            **Investment Implications:**
+            - The rally may be overextended and due for consolidation or pullback
+            - Momentum is strong, but price may have run ahead of fundamentals
+            - Risk/reward ratio currently favors taking profits rather than initiating new positions
+            - **However:** Strong trends can remain overbought for extended periods
+            
+            **Action Considerations:**
+            - For current holders: Consider taking partial profits or tightening stop-losses
+            - For potential buyers: Wait for a pullback to more favorable entry levels
+            - Watch for bearish divergence (price making new highs while %K fails to)
+            - Overbought + bearish crossover = strong sell signal
+            """)
+            
+        else:
+            st.info("**NEUTRAL RANGE - BALANCED MARKET CONDITIONS**")
+            st.write(f"""
+            **What This Means:** {ticker} is trading in neutral territory with a %K reading of {current_k:.1f}. 
+            The stock is neither oversold nor overbought, suggesting balanced supply and demand.
+            
+            **Investment Implications:**
+            - No extreme technical signals at this time
+            - Market is in equilibrium - wait for clearer directional signals
+            - Risk/reward is unclear without additional confirmation
+            
+            **Action Considerations:**
+            - Wait for the stock to enter oversold (<20) or overbought (>80) territory
+            - Focus on crossover signals and momentum shifts
+            - Use this time to monitor fundamentals and build a watchlist
+            - Consider other technical indicators to supplement stochastic analysis
+            """)
+        
+        st.markdown("---")
+        
+        # Momentum & Trend
+        st.write("**📈 Momentum & Trend Analysis:**")
+        
+        col1, col2 = st.columns(2)
+        
+        with col1:
+            st.write("**5-Day Momentum:**")
+            if k_momentum > 10:
+                st.success(f"+{k_momentum:.1f} - Strong upward momentum")
+            elif k_momentum > 0:
+                st.info(f"+{k_momentum:.1f} - Positive momentum")
+            elif k_momentum > -10:
+                st.warning(f"{k_momentum:.1f} - Negative momentum")
+            else:
+                st.error(f"{k_momentum:.1f} - Strong downward momentum")
+        
+        with col2:
+            st.write("**10-Day Trend:**")
+            if trend_direction == "bullish":
+                st.success("Consistently rising - strong uptrend")
+            elif trend_direction == "bearish":
+                st.error("Consistently falling - strong downtrend")
+            else:
+                st.info("Mixed signals - choppy/sideways action")
+        
+        st.markdown("---")
+        
+        # Trading strategies
+        st.write("**💡 Strategic Recommendations:**")
+        
+        st.write("""
+        **For Day Traders:**
+        - Use stochastic crossovers as entry/exit signals
+        - Best signals occur in oversold (<20) and overbought (>80) zones
+        - Combine with volume analysis for confirmation
+        - Set tight stops (2-3%) to limit downside
+        
+        **For Swing Traders:**
+        - Enter on bullish crossovers in oversold territory
+        - Exit on bearish crossovers in overbought territory
+        - Hold through neutral zone unless crossover signals change
+        - Target 5-10% moves over 1-3 week timeframes
+        
+        **For Long-Term Investors:**
+        - Use extreme oversold readings (<20) to add to positions
+        - Don't panic sell on overbought readings in strong uptrends
+        - Focus more on monthly stochastic readings for major trend changes
+        - Combine with fundamental analysis - technicals alone are insufficient
+        
+        **Important Caveats:**
+        - Stochastic oscillator works best in ranging markets, less reliable in strong trends
+        - False signals are common - always use stop-losses
+        - No single indicator should drive investment decisions
+        - Consider market conditions, fundamentals, and overall trend
+        """)
+        
+        # EDUCATIONAL CONTEXT
+        with st.expander("📚 Understanding the Stochastic Oscillator (Click to Expand)"):
+            st.write("""
+            **What It Measures:**
+            The Stochastic Oscillator compares a stock's closing price to its price range over a specific period (default: 14 days). 
+            It answers: "Where is the current price relative to the recent high-low range?"
+            
+            **The Two Lines:**
+            - **%K (Fast Line):** Raw calculation = (Current Close - 14-day Low) / (14-day High - 14-day Low) × 100
+            - **%D (Slow Line):** 3-day moving average of %K, smooths out noise
+            
+            **Key Zones:**
+            - **Below 20:** Oversold - stock has fallen significantly, potential bounce
+            - **Above 80:** Overbought - stock has risen significantly, potential pullback
+            - **20-80:** Neutral zone - no extreme signals
+            
+            **Why It Works:**
+            Markets move in cycles of buying and selling pressure. When a stock closes near its recent lows repeatedly, 
+            it's often oversold and due for a bounce. When it closes near recent highs, it's often overbought and due for a rest.
+            
+            **Limitations:**
+            - Can stay overbought/oversold for extended periods in strong trends
+            - Generates false signals in choppy, directionless markets
+            - Lagging indicator - signals come after moves have started
+            - Should never be used in isolation
+            """)
+    
         st.write(f"""
         **What This Means:** {ticker} is trading in oversold territory with a %K reading of {current_k:.1f}. 
         This suggests the stock has experienced significant selling pressure and may be approaching a technical bottom.
