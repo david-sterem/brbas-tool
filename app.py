@@ -748,7 +748,7 @@ elif st.session_state.page == 'discover':
                 price = data['Close'].iloc[-1]
                 change = ((data['Close'].iloc[-1] / data['Close'].iloc[0]) - 1) * 100 if len(data) > 0 else 0
                 
-                position = "OVERSOLD" if current_k < 20 else "Overbought" if current_k > 80 else "NEUTRAL"
+                position = "Oversold" if current_k < 20 else "Overbought" if current_k > 80 else "Neutral"
                 score = calculate_stochastic_score(current_k, current_d, k_momentum, trend)
                 
                 if len(data) >= 2:
@@ -817,7 +817,7 @@ elif st.session_state.page == 'discover':
         
         st.markdown("---")
         
-        st.success("🌟 TOP 3 OPPORTUNITIES IN THIS SECTOR")
+        st.success("🌟 Top 3 Opportunities In This Sector")
         st.write("Ranked by highest stochastic score and momentum - these are the strongest signals!")
         
         top_opportunities = sorted(results, key=lambda x: (x['score'], x['momentum']), reverse=True)[:3]
