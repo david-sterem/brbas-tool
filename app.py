@@ -369,7 +369,7 @@ if st.session_state.page == 'analysis':
             st.write("- Monitor volume for signs of capitulation or accumulation")
             
         elif position == "Overbought":
-            st.warning("Overbought TERRITORY - CAUTION ADVISED")
+            st.warning("Overbought Territory - Caution Advised")
             st.write(f"What This Means: {ticker} is trading in overbought territory with a %K reading of {current_k:.1f}. This indicates strong buying pressure but also suggests limited upside in the near term.")
             st.write("")
             st.write("Investment Implications:")
@@ -594,21 +594,21 @@ if st.session_state.page == 'analysis':
                 st.write("Dual Weakness Identified:")
                 st.write(f"Both technical and fundamental analysis raise concerns about {ticker}.")
                 st.write("")
-                st.write("Recommendation: AVOID new positions. Better opportunities exist elsewhere.")
+                st.write("Recommendation: Avoid new positions. Better opportunities exist elsewhere.")
                 
             elif stoch_score < 45:
                 st.write("Technical Weakness Despite Strong Fundamentals:")
                 st.write("")
                 st.write(f"{ticker} presents a puzzle - good business, poor price action.")
                 st.write("")
-                st.write("Recommendation: WAIT for technical confirmation before entering.")
+                st.write("Recommendation: Wait for technical confirmation before entering.")
                 
             else:
                 st.write("Fundamental Weakness Despite Technical Strength:")
                 st.write("")
                 st.write(f"{ticker} shows favorable technical setup but concerning fundamentals.")
                 st.write("")
-                st.write("Recommendation: AVOID unless experienced short-term trader.")
+                st.write("Recommendation: Avoid unless experienced short-term trader.")
         
         else:
             st.info("Neutral / Hold")
