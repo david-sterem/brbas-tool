@@ -25,7 +25,7 @@ def add_to_portfolio(ticker, current_k, current_d, k_momentum, trend):
             stock['stoch_d'] = current_d
             stock['momentum'] = k_momentum
             stock['trend'] = trend
-            stock['position'] = "OVERSOLD" if current_k < 20 else "OVERBOUGHT" if current_k > 80 else "NEUTRAL"
+            stock['position'] = "OVERSOLD" if current_k < 20 else "Overbought" if current_k > 80 else "NEUTRAL"
             stock['last_updated'] = datetime.now().strftime("%Y-%m-%d %H:%M")
             return False
     
@@ -35,7 +35,7 @@ def add_to_portfolio(ticker, current_k, current_d, k_momentum, trend):
         'stoch_d': current_d,
         'momentum': k_momentum,
         'trend': trend,
-        'position': "OVERSOLD" if current_k < 20 else "OVERBOUGHT" if current_k > 80 else "NEUTRAL",
+        'position': "OVERSOLD" if current_k < 20 else "Overbought" if current_k > 80 else "NEUTRAL",
         'last_updated': datetime.now().strftime("%Y-%m-%d %H:%M")
     })
     return True
@@ -319,7 +319,7 @@ if st.session_state.page == 'analysis':
     sector = get_sector_from_info(info)
     fundamental_analysis = analyze_fundamentals(info, sector)
     combined_score = (stoch_score + fundamental_analysis['rating']) / 2
-    position = "OVERSOLD" if current_k < 20 else "OVERBOUGHT" if current_k > 80 else "NEUTRAL"
+    position = "OVERSOLD" if current_k < 20 else "Overbought" if current_k > 80 else "NEUTRAL"
     
     is_in_portfolio = any(s['ticker'] == ticker for s in st.session_state.portfolio)
     
@@ -368,8 +368,8 @@ if st.session_state.page == 'analysis':
             st.write("- Set tight stop-losses if entering")
             st.write("- Monitor volume for signs of capitulation or accumulation")
             
-        elif position == "OVERBOUGHT":
-            st.warning("OVERBOUGHT TERRITORY - CAUTION ADVISED")
+        elif position == "Overbought":
+            st.warning("Overbought TERRITORY - CAUTION ADVISED")
             st.write(f"What This Means: {ticker} is trading in overbought territory with a %K reading of {current_k:.1f}. This indicates strong buying pressure but also suggests limited upside in the near term.")
             st.write("")
             st.write("Investment Implications:")
@@ -662,8 +662,8 @@ elif st.session_state.page == 'portfolio':
             st.session_state.page = 'analysis'
             st.rerun()
     else:
-        oversold = sum(1 for s in st.session_state.portfolio if s['position'] == 'OVERSOLD')
-        overbought = sum(1 for s in st.session_state.portfolio if s['position'] == 'OVERBOUGHT')
+        oversold = sum(1 for s in st.session_state.portfolio if s['position'] == 'Oversold')
+        overbought = sum(1 for s in st.session_state.portfolio if s['position'] == 'Overbought')
         
         col1, col2, col3 = st.columns(3)
         col1.metric("Total", len(st.session_state.portfolio))
@@ -748,7 +748,7 @@ elif st.session_state.page == 'discover':
                 price = data['Close'].iloc[-1]
                 change = ((data['Close'].iloc[-1] / data['Close'].iloc[0]) - 1) * 100 if len(data) > 0 else 0
                 
-                position = "OVERSOLD" if current_k < 20 else "OVERBOUGHT" if current_k > 80 else "NEUTRAL"
+                position = "OVERSOLD" if current_k < 20 else "Overbought" if current_k > 80 else "NEUTRAL"
                 score = calculate_stochastic_score(current_k, current_d, k_momentum, trend)
                 
                 if len(data) >= 2:
@@ -802,7 +802,7 @@ elif st.session_state.page == 'discover':
         st.subheader(f"📊 {sector_name} Sector Overview")
         
         oversold_count = sum(1 for r in results if r['position'] == 'OVERSOLD')
-        overbought_count = sum(1 for r in results if r['position'] == 'OVERBOUGHT')
+        overbought_count = sum(1 for r in results if r['position'] == 'Overbought')
         bullish_cross_count = sum(1 for r in results if r['bullish_cross'])
         
         avg_score = sum(r['score'] for r in results) / len(results)
@@ -848,7 +848,7 @@ elif st.session_state.page == 'discover':
                 
                 if stock['position'] == 'OVERSOLD':
                     reasons.append("✅ **Oversold Position** - Potential buying opportunity")
-                elif stock['position'] == 'OVERBOUGHT':
+                elif stock['position'] == 'Overbought':
                     reasons.append("⚠️ **Overbought Position** - Caution advised")
                 else:
                     reasons.append("ℹ️ **Neutral Position** - No extreme signals")
@@ -909,7 +909,7 @@ elif st.session_state.page == 'discover':
         with sort_col1:
             sort_by = st.selectbox("Sort by", ["Score (High to Low)", "Score (Low to High)", "Momentum", "Position"], index=0)
         with sort_col2:
-            position_filter = st.multiselect("Filter by Position", ["OVERSOLD", "NEUTRAL", "OVERBOUGHT"], default=["OVERSOLD", "NEUTRAL", "OVERBOUGHT"])
+            position_filter = st.multiselect("Filter by Position", ["OVERSOLD", "NEUTRAL", "Overbought"], default=["OVERSOLD", "NEUTRAL", "Overbought"])
         
         filtered_results = [r for r in results if r['position'] in position_filter]
         
@@ -923,7 +923,7 @@ elif st.session_state.page == 'discover':
             filtered_results = sorted(filtered_results, key=lambda x: x['position'])
         
         for stock in filtered_results:
-            position_emoji = "🟢" if stock['position'] == 'OVERSOLD' else "🔴" if stock['position'] == 'OVERBOUGHT' else "⚪"
+            position_emoji = "🟢" if stock['position'] == 'OVERSOLD' else "🔴" if stock['position'] == 'Overbought' else "⚪"
             
             with st.expander(f"{position_emoji} **{stock['ticker']}** - {stock['position']} | Score: {stock['score']}/100"):
                 col1, col2, col3, col4 = st.columns(4)
@@ -934,7 +934,7 @@ elif st.session_state.page == 'discover':
                 
                 if stock['position'] == 'OVERSOLD':
                     st.success(f"💡 **Potential Buy:** {stock['ticker']} is oversold.")
-                elif stock['position'] == 'OVERBOUGHT':
+                elif stock['position'] == 'Overbought':
                     st.warning(f"⚠️ **Caution:** {stock['ticker']} is overbought.")
                 else:
                     st.info(f"ℹ️ {stock['ticker']} is in neutral territory.")
