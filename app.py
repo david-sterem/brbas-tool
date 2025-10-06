@@ -438,12 +438,12 @@ if st.session_state.page == 'analysis':
         
         with col2:
             st.write("10-Day Trend:")
-            if trend_direction == "bullish":
-                st.success("Consistently rising - strong uptrend")
-            elif trend_direction == "bearish":
-                st.error("Consistently falling - strong downtrend")
+            if trend_direction == "Bullish":
+                st.success("Consistently Rising - Strong Uptrend")
+            elif trend_direction == "Bearish":
+                st.error("Consistently Falling - Strong Downtrend")
             else:
-                st.info("Mixed signals - choppy action")
+                st.info("Mixed Signals - Choppy Action")
         
         st.markdown("---")
         
