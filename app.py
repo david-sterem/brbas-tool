@@ -1,4 +1,330 @@
-import streamlit as st
+st.write("""
+        **For Day Traders:**
+        - Use stochastic crossovers as entry/exit signals
+        - Best signals occur in oversold (<20) and overbought (>80) zones
+        - Combine with volume analysis for confirmation
+        - Set tight stops (2-3%) to limit downside
+        
+        **For Swing Traders:**
+        - Enter on bullish crossovers in oversold territory
+        - Exit on bearish crossovers in overbought territory
+        - Hold through neutral zone unless crossover signals change
+        - Target 5-10% moves over 1-3 week timeframes
+        
+        **For Long-Term Investors:**
+        - Use extreme oversold readings (<20) to add to positions
+        - Don't panic sell on overbought readings in strong uptrends
+        - Focus more on monthly stochastic readings for major trend changes
+        - Combine with fundamental analysis - technicals alone are insufficient
+        
+        **Important Caveats:**
+        - Stochastic oscillator works best in ranging markets, less reliable in strong trends
+        - False signals are common - always use stop-losses
+        - No single indicator should drive investment decisions
+        - Consider market conditions, fundamentals, and overall trend
+        """)
+        
+        # EDUCATIONAL CONTEXT
+        with st.expander("📚 Understanding the Stochastic Oscillator (Click to Expand)"):
+            st.write("""
+            **What It Measures:**
+            The Stochastic Oscillator compares a stock's closing price to its price range over a specific period (default: 14 days). 
+            It answers: "Where is the current price relative to the recent high-low range?"
+            
+            **The Two Lines:**
+            - **%K (Fast Line):** Raw calculation = (Current Close - 14-day Low) / (14-day High - 14-day Low) × 100
+            - **%D (Slow Line):** 3-day moving average of %K, smooths out noise
+            
+            **Key Zones:**
+            - **Below 20:** Oversold - stock has fallen significantly, potential bounce
+            - **Above 80:** Overbought - stock has risen significantly, potential pullback
+            - **20-80:** Neutral zone - no extreme signals
+            
+            **Why It Works:**
+            Markets move in cycles of buying and selling pressure. When a stock closes near its recent lows repeatedly, 
+            it's often oversold and due for a bounce. When it closes near recent highs, it's often overbought and due for a rest.
+            
+            **Limitations:**
+            - Can stay overbought/oversold for extended periods in strong trends
+            - Generates false signals in choppy, directionless markets
+            - Lagging indicator - signals come after moves have started
+            - Should never be used in isolation
+            """)
+    
+    with tab2:
+        st.subheader("💼 Fundamental Valuation Analysis")
+        
+        # Display sector
+        st.info(f"**Sector:** {fundamental_analysis['sector']}")
+        
+        # Key metrics
+        st.write("**Key Financial Metrics:**")
+        metrics_cols = st.columns(len(fundamental_analysis['metrics']))
+        for idx, (metric, value) in enumerate(fundamental_analysis['metrics'].items()):
+            with metrics_cols[idx]:
+                st.metric(metric, value)
+        
+        st.markdown("---")
+        
+        # Fundamental rating
+        fund_score = fundamental_analysis['rating']
+        col1, col2 = st.columns([1, 2])
+        with col1:
+            st.metric("Fundamental Score", f"{fund_score:.0f}/100")
+            st.metric("Recommendation", fundamental_analysis['recommendation'])
+        
+        with col2:
+            # Score interpretation
+            if fund_score >= 70:
+                st.success("**STRONG FUNDAMENTALS** - Company shows excellent financial health")
+            elif fund_score >= 60:
+                st.success("**SOLID FUNDAMENTALS** - Company has good financial metrics")
+            elif fund_score >= 50:
+                st.info("**FAIR FUNDAMENTALS** - Company is adequately valued")
+            elif fund_score >= 40:
+                st.warning("**WEAK FUNDAMENTALS** - Some financial concerns present")
+            else:
+                st.error("**POOR FUNDAMENTALS** - Significant financial weaknesses")
+        
+        st.markdown("---")
+        
+        # Strengths
+        if fundamental_analysis['strengths']:
+            st.write("**✅ Fundamental Strengths:**")
+            for strength in fundamental_analysis['strengths']:
+                st.success(f"• {strength}")
+        
+        # Weaknesses
+        if fundamental_analysis['weaknesses']:
+            st.write("**⚠️ Fundamental Concerns:**")
+            for weakness in fundamental_analysis['weaknesses']:
+                st.warning(f"• {weakness}")
+        
+        st.markdown("---")
+        
+        # Sector-specific guidance
+        st.write("**📖 Sector-Specific Investment Considerations:**")
+        
+        if fundamental_analysis['sector'] == 'Financial Services':
+            st.write("""
+            **What Drives Financial Stocks:**
+            - Interest rate environment (higher rates = better margins)
+            - Loan growth and credit quality
+            - Regulatory changes and capital requirements
+            - Economic growth and consumer confidence
+            
+            **What to Look For:**
+            - ROE > 15% indicates efficient capital deployment
+            - P/B ratio < 1.5 may signal undervaluation
+            - Growing deposits and stable loan portfolio
+            - Strong risk management and diversified revenue
+            
+            **Technical Correlation:**
+            Financial stocks often show strong technical patterns during rate hike cycles. If fundamentals 
+            are strong (high ROE, good P/B) AND technicals show oversold conditions, this creates a 
+            compelling "value + timing" opportunity.
+            """)
+            
+        elif fundamental_analysis['sector'] == 'Technology':
+            st.write("""
+            **What Drives Technology Stocks:**
+            - Innovation cycles and product launches
+            - Cloud adoption and AI growth trends
+            - Market share gains and competitive positioning
+            - Regulatory scrutiny and antitrust concerns
+            
+            **What to Look For:**
+            - Revenue growth > 15% YoY shows market leadership
+            - Gross margins > 60% indicate pricing power and moats
+            - Positive and growing free cash flow
+            - Scalable business models with high customer retention
+            
+            **Technical Correlation:**
+            Tech stocks can remain overbought for extended periods during bull markets. However, when 
+            fundamentals weaken (slowing growth, margin compression) AND technical indicators turn 
+            bearish, this signals a high-probability exit point.
+            """)
+            
+        elif fundamental_analysis['sector'] == 'Industrial':
+            st.write("""
+            **What Drives Industrial Stocks:**
+            - Economic growth and GDP expansion
+            - Infrastructure spending and government contracts
+            - Supply chain health and commodity prices
+            - Global trade dynamics
+            
+            **What to Look For:**
+            - Operating margins > 12% show operational efficiency
+            - Debt-to-Equity < 100% indicates financial flexibility
+            - Growing order backlogs signal future revenue
+            - Diversified customer base reduces concentration risk
+            
+            **Technical Correlation:**
+            Industrial stocks are cyclical and respond to economic data. Strong fundamentals (high margins, 
+            low debt) combined with oversold technical readings often mark excellent entry points before 
+            economic recovery accelerates.
+            """)
+            
+        elif fundamental_analysis['sector'] == 'Energy':
+            st.write("""
+            **What Drives Energy Stocks:**
+            - Crude oil and natural gas prices
+            - OPEC+ production decisions
+            - Geopolitical tensions and supply disruptions
+            - Transition to renewable energy sources
+            
+            **What to Look For:**
+            - P/B ratio and EV/EBITDA for better valuation gauges
+            - Low production costs and break-even points
+            - Strong reserves and diversification strategies
+            - Balance sheet strength to weather commodity volatility
+            
+            **Technical Correlation:**
+            Energy stocks are highly volatile and commodity-driven. When oil prices stabilize and technical 
+            indicators show oversold conditions while fundamentals remain solid (low debt, good reserves), 
+            this creates asymmetric risk/reward setups.
+            """)
+            
+        elif fundamental_analysis['sector'] == 'Consumer Cyclical':
+            st.write("""
+            **What Drives Consumer Cyclical Stocks:**
+            - Consumer confidence and discretionary spending
+            - Employment levels and wage growth
+            - Inflation and purchasing power
+            - Seasonal trends and shopping patterns
+            
+            **What to Look For:**
+            - Same-store sales growth > 5%
+            - Strong brand recognition and pricing power
+            - Healthy gross margins (> 35%)
+            - Global diversification reduces single-market risk
+            
+            **Technical Correlation:**
+            Consumer cyclicals lead economic recoveries. When fundamentals improve (rising sales, margins) 
+            and technicals show bullish crossovers from oversold levels, this often precedes significant 
+            multi-month rallies.
+            """)
+            
+        elif fundamental_analysis['sector'] == 'Consumer Defensive':
+            st.write("""
+            **What Drives Consumer Defensive Stocks:**
+            - Steady demand regardless of economic conditions
+            - Inflation's impact on input costs vs. pricing power
+            - Brand loyalty and market share stability
+            - Dividend sustainability and growth
+            
+            **What to Look For:**
+            - Consistent earnings and revenue (low volatility)
+            - Dividend yield > 2.5% with sustainable payout ratios
+            - Operating margins > 15% show pricing resilience
+            - Strong balance sheets for dividend security
+            
+            **Technical Correlation:**
+            Defensive stocks often become overbought during market fear. However, if fundamentals remain 
+            rock-solid (stable earnings, safe dividend) and technicals show extreme oversold readings during 
+            market panic, this creates rare value opportunities in quality names.
+            """)
+        
+        else:
+            st.write("""
+            **General Investment Considerations:**
+            - Understand the company's business model and competitive positioning
+            - Analyze revenue and earnings trends over multiple quarters
+            - Assess balance sheet health and debt levels
+            - Consider industry tailwinds and headwinds
+            - Evaluate management quality and capital allocation
+            """)
+    
+    with tab3:
+        st.subheader("🎯 Combined Investment Recommendation")
+        
+        # Display combined score prominently
+        score_col1, score_col2, score_col3 = st.columns(3)
+        with score_col1:
+            st.metric("Technical Score", f"{stoch_score:.0f}/100", 
+                     help="Based on stochastic oscillator analysis")
+        with score_col2:
+            st.metric("Fundamental Score", f"{fund_score:.0f}/100",
+                     help="Based on sector-specific financial metrics")
+        with score_col3:
+            st.metric("Combined Score", f"{combined_score:.0f}/100",
+                     help="Equal weight of technical and fundamental scores")
+        
+        st.markdown("---")
+        
+        # Generate integrated recommendation
+        st.write("**🎯 Integrated Investment Thesis:**")
+        
+        # Best case: Both strong
+        if stoch_score >= 60 and fund_score >= 60:
+            st.success("**🌟 HIGH CONVICTION BUY**")
+            st.write(f"""
+            **Why This Is Compelling:**
+            
+            {ticker} presents a rare alignment of both technical and fundamental factors:
+            
+            **Technical Perspective:** The stochastic oscillator shows {position.lower()} conditions with 
+            {'strong bullish momentum' if k_momentum > 0 else 'potential reversal setup'}. This suggests 
+            favorable entry timing from a price action standpoint.
+            
+            **Fundamental Perspective:** The company demonstrates {fundamental_analysis['recommendation'].lower()} 
+            fundamentals with a score of {fund_score:.0f}/100. Key financial metrics support the valuation, 
+            indicating the business quality justifies current or higher prices.
+            
+            **Combined View:** When strong fundamentals align with favorable technical entry points, 
+            historical data shows these setups produce above-average risk-adjusted returns. The technical 
+            timing reduces drawdown risk while fundamentals support medium-term upside.
+            
+            **Action:** Consider this a high-probability opportunity for {"aggressive" if combined_score >= 75 else "moderate"} 
+            position sizing. The dual confirmation reduces false signal risk.
+            """)
+            
+        # Good case: One strong, one moderate
+        elif (stoch_score >= 60 and fund_score >= 45) or (stoch_score >= 45 and fund_score >= 60):
+            st.info("**✅ QUALIFIED BUY**")
+            
+            if stoch_score > fund_score:
+                st.write(f"""
+                **Mixed Signals - Technical Leading:**
+                
+                The technical setup is stronger than fundamentals, creating a "trade vs. invest" decision point:
+                
+                **Technical Strength:** {ticker} shows favorable stochastic readings that historically 
+                precede short to medium-term rallies. Entry timing appears opportune.
+                
+                **Fundamental Caution:** While not alarming, the fundamental score of {fund_score:.0f}/100 
+                suggests the company faces some financial headwinds or valuation concerns that limit 
+                long-term conviction.
+                
+                **Recommendation:** Suitable for swing traders and tactical investors (1-3 month holding period). 
+                Consider smaller position sizes and have clear exit targets. The technical setup may produce 
+                profits, but weak fundamentals mean you're timing a trade, not buying a business.
+                """)
+            else:
+                st.write(f"""
+                **Mixed Signals - Fundamental Leading:**
+                
+                The company quality exceeds the current technical setup, suggesting a "buy the dip" opportunity:
+                
+                **Fundamental Strength:** {ticker} demonstrates solid financial health (score: {fund_score:.0f}/100) 
+                that should support long-term value creation. The business quality is evident.
+                
+                **Technical Caution:** Current stochastic readings of {current_k:.1f} suggest {position.lower()} 
+                conditions. {"This may indicate the stock needs more time to consolidate" if current_k > 50 else "While oversold, momentum hasn't confirmed yet"}.
+                
+                **Recommendation:** Appropriate for patient, fundamental investors willing to dollar-cost average. 
+                Consider building positions in tranches as technical confirmation emerges. Strong fundamentals 
+                reduce downside risk, but timing may require patience.
+                """)
+                
+        # Weak case: One weak
+        elif stoch_score < 45 or fund_score < 45:
+            st.warning("**⚠️ HOLD / AVOID**")
+            
+            if stoch_score < 45 and fund_score < 45:
+                st.write(f"""
+                **Dual Weakness Identified:**
+                import streamlit as st
 import yfinance as yf
 import pandas as pd
 import numpy as np
@@ -177,7 +503,259 @@ def calculate_stochastic(high, low, close, k_period=14, d_period=3):
     
     return k_percent, d_percent
 
-def calculate_stochastic_score(k, d, momentum, trend):
+def get_sector_from_info(info):
+    """Determine sector from stock info"""
+    sector = info.get('sector', '').lower()
+    industry = info.get('industry', '').lower()
+    
+    # Map to our analysis categories
+    if 'financial' in sector or 'bank' in industry or 'insurance' in industry:
+        return 'Financial Services'
+    elif 'technology' in sector or 'software' in industry or 'semiconductor' in industry:
+        return 'Technology'
+    elif 'industrial' in sector or 'aerospace' in industry or 'defense' in industry:
+        return 'Industrial'
+    elif 'energy' in sector or 'oil' in industry or 'gas' in industry:
+        return 'Energy'
+    elif 'real estate' in sector or 'reit' in industry:
+        return 'Real Estate'
+    elif 'consumer' in sector or 'retail' in industry or 'automotive' in industry:
+        return 'Consumer Cyclical'
+    elif 'consumer defensive' in sector or 'consumer staples' in sector:
+        return 'Consumer Defensive'
+    elif 'communication' in sector or 'media' in industry or 'telecom' in industry:
+        return 'Communication Services'
+    elif 'basic materials' in sector or 'materials' in sector:
+        return 'Basic Materials'
+    elif 'utilities' in sector or 'utility' in industry:
+        return 'Utilities'
+    else:
+        return 'Other'
+
+def analyze_fundamentals(info, sector):
+    """Comprehensive fundamental analysis based on sector"""
+    analysis = {
+        'sector': sector,
+        'metrics': {},
+        'strengths': [],
+        'weaknesses': [],
+        'rating': 0,  # Out of 100
+        'recommendation': ''
+    }
+    
+    # Common metrics for all sectors
+    market_cap = info.get('marketCap', 0)
+    pe_ratio = info.get('trailingPE', info.get('forwardPE'))
+    revenue = info.get('totalRevenue', 0)
+    
+    if sector == 'Financial Services':
+        # Financial-specific metrics
+        roe = info.get('returnOnEquity', 0) * 100 if info.get('returnOnEquity') else None
+        book_value = info.get('bookValue')
+        pb_ratio = info.get('priceToBook')
+        
+        analysis['metrics'] = {
+            'P/E Ratio': pe_ratio,
+            'ROE': f"{roe:.1f}%" if roe else 'N/A',
+            'Price-to-Book': pb_ratio,
+            'Book Value': f"${book_value:.2f}" if book_value else 'N/A'
+        }
+        
+        # Rating logic
+        score = 50
+        if roe and roe > 15:
+            analysis['strengths'].append(f"Strong ROE of {roe:.1f}% indicates efficient capital use")
+            score += 15
+        elif roe and roe < 8:
+            analysis['weaknesses'].append(f"Low ROE of {roe:.1f}% suggests inefficient operations")
+            score -= 10
+        
+        if pb_ratio and pb_ratio < 1.5:
+            analysis['strengths'].append(f"P/B ratio of {pb_ratio:.2f} suggests undervaluation")
+            score += 10
+        elif pb_ratio and pb_ratio > 3:
+            analysis['weaknesses'].append(f"High P/B ratio of {pb_ratio:.2f} may indicate overvaluation")
+            score -= 10
+        
+        analysis['rating'] = max(0, min(100, score))
+        
+    elif sector == 'Technology':
+        # Tech-specific metrics
+        revenue_growth = info.get('revenueGrowth', 0) * 100 if info.get('revenueGrowth') else None
+        gross_margin = info.get('grossMargins', 0) * 100 if info.get('grossMargins') else None
+        free_cash_flow = info.get('freeCashflow', 0)
+        
+        analysis['metrics'] = {
+            'P/E Ratio': pe_ratio,
+            'Revenue Growth': f"{revenue_growth:.1f}%" if revenue_growth else 'N/A',
+            'Gross Margin': f"{gross_margin:.1f}%" if gross_margin else 'N/A',
+            'Free Cash Flow': f"${free_cash_flow/1e9:.2f}B" if free_cash_flow else 'N/A'
+        }
+        
+        score = 50
+        if revenue_growth and revenue_growth > 15:
+            analysis['strengths'].append(f"Exceptional revenue growth of {revenue_growth:.1f}% YoY")
+            score += 20
+        elif revenue_growth and revenue_growth < 5:
+            analysis['weaknesses'].append(f"Sluggish revenue growth of {revenue_growth:.1f}%")
+            score -= 15
+        
+        if gross_margin and gross_margin > 60:
+            analysis['strengths'].append(f"High gross margin of {gross_margin:.1f}% indicates strong competitive moat")
+            score += 15
+        elif gross_margin and gross_margin < 40:
+            analysis['weaknesses'].append(f"Lower gross margin of {gross_margin:.1f}% suggests pricing pressure")
+            score -= 10
+        
+        if free_cash_flow and free_cash_flow > 0:
+            analysis['strengths'].append("Positive free cash flow supports growth investments")
+            score += 10
+        
+        analysis['rating'] = max(0, min(100, score))
+        
+    elif sector == 'Industrial':
+        # Industrial-specific metrics
+        operating_margin = info.get('operatingMargins', 0) * 100 if info.get('operatingMargins') else None
+        debt_to_equity = info.get('debtToEquity')
+        
+        analysis['metrics'] = {
+            'P/E Ratio': pe_ratio,
+            'Operating Margin': f"{operating_margin:.1f}%" if operating_margin else 'N/A',
+            'Debt-to-Equity': f"{debt_to_equity:.2f}" if debt_to_equity else 'N/A'
+        }
+        
+        score = 50
+        if operating_margin and operating_margin > 12:
+            analysis['strengths'].append(f"Strong operating margin of {operating_margin:.1f}% shows efficiency")
+            score += 15
+        elif operating_margin and operating_margin < 6:
+            analysis['weaknesses'].append(f"Low operating margin of {operating_margin:.1f}%")
+            score -= 10
+        
+        if debt_to_equity and debt_to_equity < 100:
+            analysis['strengths'].append(f"Healthy D/E ratio of {debt_to_equity:.0f}% indicates manageable debt")
+            score += 10
+        elif debt_to_equity and debt_to_equity > 200:
+            analysis['weaknesses'].append(f"High D/E ratio of {debt_to_equity:.0f}% raises leverage concerns")
+            score -= 15
+        
+        analysis['rating'] = max(0, min(100, score))
+        
+    elif sector == 'Energy':
+        # Energy-specific metrics
+        pb_ratio = info.get('priceToBook')
+        ebitda = info.get('ebitda', 0)
+        debt_to_equity = info.get('debtToEquity')
+        
+        analysis['metrics'] = {
+            'P/B Ratio': pb_ratio,
+            'EBITDA': f"${ebitda/1e9:.2f}B" if ebitda else 'N/A',
+            'Debt-to-Equity': f"{debt_to_equity:.2f}" if debt_to_equity else 'N/A'
+        }
+        
+        score = 50
+        if pb_ratio and pb_ratio < 1.5:
+            analysis['strengths'].append(f"Attractive P/B of {pb_ratio:.2f} relative to asset base")
+            score += 15
+        
+        if ebitda and ebitda > 0:
+            analysis['strengths'].append("Positive EBITDA demonstrates operational profitability")
+            score += 10
+        
+        if debt_to_equity and debt_to_equity < 80:
+            analysis['strengths'].append("Conservative leverage supports commodity price volatility")
+            score += 15
+        elif debt_to_equity and debt_to_equity > 150:
+            analysis['weaknesses'].append(f"High debt-to-equity of {debt_to_equity:.0f}% is risky in cyclical sector")
+            score -= 15
+        
+        analysis['rating'] = max(0, min(100, score))
+        
+    elif sector == 'Consumer Cyclical':
+        # Consumer cyclical metrics
+        revenue_growth = info.get('revenueGrowth', 0) * 100 if info.get('revenueGrowth') else None
+        gross_margin = info.get('grossMargins', 0) * 100 if info.get('grossMargins') else None
+        
+        analysis['metrics'] = {
+            'P/E Ratio': pe_ratio,
+            'Revenue Growth': f"{revenue_growth:.1f}%" if revenue_growth else 'N/A',
+            'Gross Margin': f"{gross_margin:.1f}%" if gross_margin else 'N/A'
+        }
+        
+        score = 50
+        if revenue_growth and revenue_growth > 10:
+            analysis['strengths'].append(f"Strong revenue growth of {revenue_growth:.1f}% indicates market share gains")
+            score += 15
+        
+        if gross_margin and gross_margin > 35:
+            analysis['strengths'].append(f"Solid gross margin of {gross_margin:.1f}% reflects pricing power")
+            score += 10
+        elif gross_margin and gross_margin < 20:
+            analysis['weaknesses'].append(f"Thin gross margin of {gross_margin:.1f}% limits profitability")
+            score -= 10
+        
+        analysis['rating'] = max(0, min(100, score))
+        
+    elif sector == 'Consumer Defensive':
+        # Defensive consumer metrics
+        dividend_yield = info.get('dividendYield', 0) * 100 if info.get('dividendYield') else None
+        payout_ratio = info.get('payoutRatio', 0) * 100 if info.get('payoutRatio') else None
+        operating_margin = info.get('operatingMargins', 0) * 100 if info.get('operatingMargins') else None
+        
+        analysis['metrics'] = {
+            'P/E Ratio': pe_ratio,
+            'Dividend Yield': f"{dividend_yield:.2f}%" if dividend_yield else 'N/A',
+            'Payout Ratio': f"{payout_ratio:.1f}%" if payout_ratio else 'N/A',
+            'Operating Margin': f"{operating_margin:.1f}%" if operating_margin else 'N/A'
+        }
+        
+        score = 50
+        if dividend_yield and dividend_yield > 2.5:
+            analysis['strengths'].append(f"Attractive dividend yield of {dividend_yield:.2f}%")
+            score += 15
+        
+        if payout_ratio and 40 < payout_ratio < 70:
+            analysis['strengths'].append(f"Sustainable payout ratio of {payout_ratio:.0f}%")
+            score += 10
+        elif payout_ratio and payout_ratio > 90:
+            analysis['weaknesses'].append(f"High payout ratio of {payout_ratio:.0f}% may be unsustainable")
+            score -= 10
+        
+        if operating_margin and operating_margin > 15:
+            analysis['strengths'].append("Strong operating margin demonstrates pricing resilience")
+            score += 10
+        
+        analysis['rating'] = max(0, min(100, score))
+        
+    else:
+        # Generic analysis for other sectors
+        profit_margin = info.get('profitMargins', 0) * 100 if info.get('profitMargins') else None
+        
+        analysis['metrics'] = {
+            'P/E Ratio': pe_ratio,
+            'Profit Margin': f"{profit_margin:.1f}%" if profit_margin else 'N/A'
+        }
+        
+        score = 50
+        if profit_margin and profit_margin > 10:
+            analysis['strengths'].append(f"Healthy profit margin of {profit_margin:.1f}%")
+            score += 10
+        
+        analysis['rating'] = max(0, min(100, score))
+    
+    # Generate recommendation
+    if analysis['rating'] >= 70:
+        analysis['recommendation'] = "STRONG BUY"
+    elif analysis['rating'] >= 60:
+        analysis['recommendation'] = "BUY"
+    elif analysis['rating'] >= 50:
+        analysis['recommendation'] = "HOLD"
+    elif analysis['rating'] >= 40:
+        analysis['recommendation'] = "UNDERPERFORM"
+    else:
+        analysis['recommendation'] = "SELL"
+    
+    return analysis
     """Calculate a score from 0-100 based on stochastic signals"""
     score = 50  # Start neutral
     
@@ -349,6 +927,13 @@ if st.session_state.page == 'analysis':
     # Calculate stochastic score
     stoch_score = calculate_stochastic_score(current_k, current_d, k_momentum, trend_direction)
     
+    # Get sector and fundamental analysis
+    sector = get_sector_from_info(info)
+    fundamental_analysis = analyze_fundamentals(info, sector)
+    
+    # Combined investment score (50% technical, 50% fundamental)
+    combined_score = (stoch_score + fundamental_analysis['rating']) / 2
+    
     # Add to portfolio button
     is_in_portfolio = any(s['ticker'] == ticker for s in st.session_state.portfolio)
     
@@ -369,7 +954,7 @@ if st.session_state.page == 'analysis':
     
     # MARKET POSITION
     st.subheader("🎯 Current Market Position")
-    col1, col2, col3 = st.columns(3)
+    col1, col2, col3, col4 = st.columns(4)
     with col1:
         st.metric("Stochastic %K", f"{current_k:.1f}", f"{k_momentum:+.1f} (5-day)")
     with col2:
@@ -377,12 +962,22 @@ if st.session_state.page == 'analysis':
     with col3:
         position = "OVERSOLD" if current_k < 20 else "OVERBOUGHT" if current_k > 80 else "NEUTRAL"
         st.metric("Position", position)
+    with col4:
+        st.metric("Combined Score", f"{combined_score:.0f}/100", help="Weighted average of technical and fundamental analysis")
     
-    # CRITICAL SIGNAL ANALYSIS
-    st.subheader("⚠️ Critical Signal Analysis")
+    st.markdown("---")
     
-    if current_k < 20:
-        st.error("**OVERSOLD TERRITORY - HIGH PRIORITY SIGNAL**")
+    # DUAL ANALYSIS FRAMEWORK
+    st.header("📊 COMPREHENSIVE INVESTMENT ANALYSIS")
+    st.markdown("*Combining technical signals with fundamental valuation for complete market insight*")
+    
+    tab1, tab2, tab3 = st.tabs(["🔬 Technical Analysis", "💼 Fundamental Analysis", "🎯 Combined Recommendation"])
+    
+    with tab1:
+        st.subheader("⚠️ Technical Signal Analysis")
+        
+        if current_k < 20:
+            st.error("**OVERSOLD TERRITORY - HIGH PRIORITY SIGNAL**")
         st.write(f"""
         **What This Means:** {ticker} is trading in oversold territory with a %K reading of {current_k:.1f}. 
         This suggests the stock has experienced significant selling pressure and may be approaching a technical bottom.
