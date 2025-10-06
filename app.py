@@ -115,7 +115,8 @@ def analyze_fundamentals(info, sector):
         'strengths': [],
         'weaknesses': [],
         'rating': 0,
-        'recommendation': ''
+        'recommendation': '',
+        'detailed_analysis': []
     }
     
     pe_ratio = info.get('trailingPE', info.get('forwardPE'))
@@ -124,28 +125,53 @@ def analyze_fundamentals(info, sector):
         roe = info.get('returnOnEquity', 0) * 100 if info.get('returnOnEquity') else None
         book_value = info.get('bookValue')
         pb_ratio = info.get('priceToBook')
+        net_margin = info.get('profitMargins', 0) * 100 if info.get('profitMargins') else None
         
         analysis['metrics'] = {
             'P/E Ratio': f"{pe_ratio:.2f}" if pe_ratio else 'N/A',
             'ROE': f"{roe:.1f}%" if roe else 'N/A',
             'Price-to-Book': f"{pb_ratio:.2f}" if pb_ratio else 'N/A',
-            'Book Value': f"${book_value:.2f}" if book_value else 'N/A'
+            'Net Margin': f"{net_margin:.1f}%" if net_margin else 'N/A'
         }
         
         score = 50
-        if roe and roe > 15:
-            analysis['strengths'].append(f"Strong ROE of {roe:.1f}%")
-            score += 15
-        elif roe and roe < 8:
-            analysis['weaknesses'].append(f"Low ROE of {roe:.1f}%")
-            score -= 10
         
-        if pb_ratio and pb_ratio < 1.5:
-            analysis['strengths'].append(f"Attractive P/B of {pb_ratio:.2f}")
-            score += 10
-        elif pb_ratio and pb_ratio > 3:
-            analysis['weaknesses'].append(f"High P/B of {pb_ratio:.2f}")
-            score -= 10
+        if roe:
+            if roe > 20:
+                analysis['strengths'].append(f"Exceptional ROE of {roe:.1f}% demonstrates outstanding capital efficiency")
+                analysis['detailed_analysis'].append(f"ROE above 20% places this firm in the top tier of financial institutions, indicating superior management and competitive advantages")
+                score += 20
+            elif roe > 15:
+                analysis['strengths'].append(f"Strong ROE of {roe:.1f}% indicates efficient capital use")
+                score += 15
+            elif roe > 10:
+                analysis['detailed_analysis'].append(f"ROE of {roe:.1f}% is adequate but below industry leaders")
+                score += 5
+            elif roe < 8:
+                analysis['weaknesses'].append(f"Low ROE of {roe:.1f}% suggests inefficient operations")
+                analysis['detailed_analysis'].append(f"ROE below 8% is concerning for financials and may indicate poor lending decisions or excessive costs")
+                score -= 10
+        
+        if pb_ratio:
+            if pb_ratio < 1.0:
+                analysis['strengths'].append(f"P/B ratio of {pb_ratio:.2f} suggests significant undervaluation")
+                analysis['detailed_analysis'].append(f"Trading below book value indicates market pessimism - potential deep value opportunity if fundamentals are solid")
+                score += 15
+            elif pb_ratio < 1.5:
+                analysis['strengths'].append(f"Attractive P/B of {pb_ratio:.2f}")
+                score += 10
+            elif pb_ratio > 3:
+                analysis['weaknesses'].append(f"High P/B of {pb_ratio:.2f} may indicate overvaluation")
+                analysis['detailed_analysis'].append(f"P/B above 3x suggests premium valuation - growth expectations must be strong to justify")
+                score -= 10
+        
+        if net_margin:
+            if net_margin > 25:
+                analysis['strengths'].append(f"Excellent net margin of {net_margin:.1f}%")
+                score += 10
+            elif net_margin < 15:
+                analysis['weaknesses'].append(f"Thin net margin of {net_margin:.1f}%")
+                score -= 5
         
         analysis['rating'] = max(0, min(100, score))
         
@@ -153,46 +179,167 @@ def analyze_fundamentals(info, sector):
         revenue_growth = info.get('revenueGrowth', 0) * 100 if info.get('revenueGrowth') else None
         gross_margin = info.get('grossMargins', 0) * 100 if info.get('grossMargins') else None
         free_cash_flow = info.get('freeCashflow', 0)
+        operating_margin = info.get('operatingMargins', 0) * 100 if info.get('operatingMargins') else None
         
         analysis['metrics'] = {
             'P/E Ratio': f"{pe_ratio:.2f}" if pe_ratio else 'N/A',
             'Revenue Growth': f"{revenue_growth:.1f}%" if revenue_growth else 'N/A',
             'Gross Margin': f"{gross_margin:.1f}%" if gross_margin else 'N/A',
-            'Free Cash Flow': f"${free_cash_flow/1e9:.2f}B" if free_cash_flow else 'N/A'
+            'Operating Margin': f"{operating_margin:.1f}%" if operating_margin else 'N/A'
         }
         
         score = 50
-        if revenue_growth and revenue_growth > 15:
-            analysis['strengths'].append(f"Strong revenue growth of {revenue_growth:.1f}%")
-            score += 20
-        elif revenue_growth and revenue_growth < 5:
-            analysis['weaknesses'].append(f"Slow revenue growth of {revenue_growth:.1f}%")
-            score -= 15
         
-        if gross_margin and gross_margin > 60:
-            analysis['strengths'].append(f"High gross margin of {gross_margin:.1f}%")
-            score += 15
-        elif gross_margin and gross_margin < 40:
-            analysis['weaknesses'].append(f"Low gross margin of {gross_margin:.1f}%")
-            score -= 10
+        if revenue_growth:
+            if revenue_growth > 30:
+                analysis['strengths'].append(f"Explosive revenue growth of {revenue_growth:.1f}% YoY")
+                analysis['detailed_analysis'].append(f"Growth above 30% indicates hypergrowth phase - company is capturing significant market share")
+                score += 25
+            elif revenue_growth > 15:
+                analysis['strengths'].append(f"Strong revenue growth of {revenue_growth:.1f}% YoY")
+                analysis['detailed_analysis'].append(f"Double-digit growth demonstrates competitive strength and market demand")
+                score += 20
+            elif revenue_growth > 5:
+                analysis['detailed_analysis'].append(f"Growth of {revenue_growth:.1f}% is modest - may indicate market maturity")
+                score += 5
+            elif revenue_growth < 0:
+                analysis['weaknesses'].append(f"Revenue declining at {revenue_growth:.1f}%")
+                analysis['detailed_analysis'].append(f"Negative revenue growth is a major red flag - losing market share or facing headwinds")
+                score -= 20
+            elif revenue_growth < 5:
+                analysis['weaknesses'].append(f"Slow revenue growth of {revenue_growth:.1f}%")
+                score -= 15
         
-        if free_cash_flow and free_cash_flow > 0:
-            analysis['strengths'].append("Positive free cash flow")
+        if gross_margin:
+            if gross_margin > 70:
+                analysis['strengths'].append(f"Exceptional gross margin of {gross_margin:.1f}% indicates dominant competitive moat")
+                analysis['detailed_analysis'].append(f"Margins above 70% suggest software/SaaS model with strong pricing power")
+                score += 20
+            elif gross_margin > 60:
+                analysis['strengths'].append(f"High gross margin of {gross_margin:.1f}%")
+                score += 15
+            elif gross_margin > 40:
+                analysis['detailed_analysis'].append(f"Gross margin of {gross_margin:.1f}% is adequate but faces competitive pressure")
+                score += 5
+            elif gross_margin < 40:
+                analysis['weaknesses'].append(f"Low gross margin of {gross_margin:.1f}% suggests commoditization")
+                analysis['detailed_analysis'].append(f"Margins below 40% in tech indicate lack of differentiation or hardware exposure")
+                score -= 10
+        
+        if free_cash_flow:
+            if free_cash_flow > 1e9:
+                analysis['strengths'].append(f"Strong free cash flow of ${free_cash_flow/1e9:.2f}B supports growth")
+                score += 10
+            elif free_cash_flow > 0:
+                analysis['strengths'].append("Positive free cash flow")
+                score += 5
+            else:
+                analysis['weaknesses'].append("Negative free cash flow - burning cash")
+                analysis['detailed_analysis'].append("Cash burn requires monitoring - growth must justify the spend")
+                score -= 10
+        
+        if operating_margin:
+            if operating_margin > 25:
+                analysis['strengths'].append(f"Excellent operating efficiency at {operating_margin:.1f}%")
+                score += 10
+            elif operating_margin < 10:
+                analysis['weaknesses'].append(f"Low operating margin of {operating_margin:.1f}%")
+                score -= 5
+        
+        analysis['rating'] = max(0, min(100, score))
+        
+    elif sector == 'Industrial':
+        operating_margin = info.get('operatingMargins', 0) * 100 if info.get('operatingMargins') else None
+        debt_to_equity = info.get('debtToEquity')
+        revenue_growth = info.get('revenueGrowth', 0) * 100 if info.get('revenueGrowth') else None
+        
+        analysis['metrics'] = {
+            'P/E Ratio': f"{pe_ratio:.2f}" if pe_ratio else 'N/A',
+            'Operating Margin': f"{operating_margin:.1f}%" if operating_margin else 'N/A',
+            'Debt-to-Equity': f"{debt_to_equity:.1f}%" if debt_to_equity else 'N/A',
+            'Revenue Growth': f"{revenue_growth:.1f}%" if revenue_growth else 'N/A'
+        }
+        
+        score = 50
+        
+        if operating_margin:
+            if operating_margin > 15:
+                analysis['strengths'].append(f"Strong operating margin of {operating_margin:.1f}% shows efficiency")
+                score += 15
+            elif operating_margin > 12:
+                analysis['strengths'].append(f"Solid operating margin of {operating_margin:.1f}%")
+                score += 10
+            elif operating_margin < 6:
+                analysis['weaknesses'].append(f"Low operating margin of {operating_margin:.1f}%")
+                score -= 10
+        
+        if debt_to_equity:
+            if debt_to_equity < 50:
+                analysis['strengths'].append(f"Conservative D/E of {debt_to_equity:.0f}% provides flexibility")
+                score += 15
+            elif debt_to_equity < 100:
+                analysis['strengths'].append(f"Healthy D/E of {debt_to_equity:.0f}%")
+                score += 10
+            elif debt_to_equity > 200:
+                analysis['weaknesses'].append(f"High D/E of {debt_to_equity:.0f}% raises leverage concerns")
+                analysis['detailed_analysis'].append("High debt is risky in cyclical industrial sector")
+                score -= 15
+        
+        analysis['rating'] = max(0, min(100, score))
+        
+    elif sector == 'Energy':
+        pb_ratio = info.get('priceToBook')
+        ebitda = info.get('ebitda', 0)
+        debt_to_equity = info.get('debtToEquity')
+        operating_margin = info.get('operatingMargins', 0) * 100 if info.get('operatingMargins') else None
+        
+        analysis['metrics'] = {
+            'P/B Ratio': f"{pb_ratio:.2f}" if pb_ratio else 'N/A',
+            'EBITDA': f"${ebitda/1e9:.2f}B" if ebitda else 'N/A',
+            'Debt-to-Equity': f"{debt_to_equity:.1f}%" if debt_to_equity else 'N/A',
+            'Operating Margin': f"{operating_margin:.1f}%" if operating_margin else 'N/A'
+        }
+        
+        score = 50
+        
+        if pb_ratio:
+            if pb_ratio < 1.0:
+                analysis['strengths'].append(f"Deep value P/B of {pb_ratio:.2f}")
+                score += 20
+            elif pb_ratio < 1.5:
+                analysis['strengths'].append(f"Attractive P/B of {pb_ratio:.2f}")
+                score += 15
+        
+        if ebitda and ebitda > 0:
+            analysis['strengths'].append("Positive EBITDA demonstrates profitability")
             score += 10
+        
+        if debt_to_equity:
+            if debt_to_equity < 80:
+                analysis['strengths'].append("Conservative leverage supports volatility")
+                score += 15
+            elif debt_to_equity > 150:
+                analysis['weaknesses'].append(f"High debt of {debt_to_equity:.0f}% in cyclical sector")
+                score -= 15
         
         analysis['rating'] = max(0, min(100, score))
         
     else:
         profit_margin = info.get('profitMargins', 0) * 100 if info.get('profitMargins') else None
+        revenue_growth = info.get('revenueGrowth', 0) * 100 if info.get('revenueGrowth') else None
         
         analysis['metrics'] = {
             'P/E Ratio': f"{pe_ratio:.2f}" if pe_ratio else 'N/A',
-            'Profit Margin': f"{profit_margin:.1f}%" if profit_margin else 'N/A'
+            'Profit Margin': f"{profit_margin:.1f}%" if profit_margin else 'N/A',
+            'Revenue Growth': f"{revenue_growth:.1f}%" if revenue_growth else 'N/A'
         }
         
         score = 50
         if profit_margin and profit_margin > 10:
             analysis['strengths'].append(f"Healthy profit margin of {profit_margin:.1f}%")
+            score += 10
+        if revenue_growth and revenue_growth > 10:
+            analysis['strengths'].append(f"Strong growth of {revenue_growth:.1f}%")
             score += 10
         
         analysis['rating'] = max(0, min(100, score))
@@ -540,6 +687,12 @@ if st.session_state.page == 'analysis':
             st.write("**⚠️ Fundamental Concerns:**")
             for w in fundamental_analysis['weaknesses']:
                 st.warning(f"• {w}")
+        
+        if fundamental_analysis.get('detailed_analysis'):
+            st.markdown("---")
+            st.write("**🔬 Detailed Analysis:**")
+            for detail in fundamental_analysis['detailed_analysis']:
+                st.info(f"• {detail}")
         
         st.markdown("---")
         
