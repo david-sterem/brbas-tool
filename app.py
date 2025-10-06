@@ -241,7 +241,7 @@ with st.sidebar:
     st.caption(f"Stocks in Portfolio: {len(st.session_state.portfolio)}")
 
 if st.session_state.page == 'analysis':
-    st.title("BARBAS Stock Analysis")
+    st.title("BARBAS Stock Analyzer")
     
     col1, col2 = st.columns([4, 2])
     with col1:
