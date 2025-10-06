@@ -693,11 +693,266 @@ elif st.session_state.page == 'portfolio':
                         st.rerun()
 
 elif st.session_state.page == 'discover':
-    st.title("Discover Stocks")
+    st.title("🔍 Discover Prospective Stocks")
+    st.markdown("Explore curated stock opportunities based on stochastic oscillator analysis")
     
-    sectors = get_prospective_stocks()
-    selected_sector = st.selectbox("Select Sector", list(sectors.keys()))
+    stock_categories = get_prospective_stocks()
     
-    if st.button(f"Analyze {selected_sector}", type="primary"):
-        st.info(f"Analyzing {len(sectors[selected_sector])} stocks...")
-        st.write("Feature ready for expansion")
+    col1, col2 = st.columns([3, 2])
+    with col1:
+        selected_sector = st.selectbox("Choose a sector", list(stock_categories.keys()), index=0)
+    with col2:
+        analysis_period = st.selectbox("Analysis Period", ["1mo", "3mo", "6mo"], index=0)
+    
+    st.markdown(f"**Ready to analyze {len(stock_categories[selected_sector])} stocks in {selected_sector}**")
+    
+    if st.button(f"🔍 Analyze {selected_sector} Sector", use_container_width=True, type="primary"):
+        progress_bar = st.progress(0)
+        status_text = st.empty()
+        
+        tickers = stock_categories[selected_sector]
+        results = []
+        
+        for idx, ticker in enumerate(tickers):
+            status_text.text(f"Analyzing {ticker}... ({idx + 1}/{len(tickers)})")
+            progress_bar.progress((idx + 1) / len(tickers))
+            
+            try:
+                time.sleep(0.3)
+                
+                stock = yf.Ticker(ticker)
+                data = stock.history(period=analysis_period)
+                
+                if data is None or data.empty or len(data) < 14:
+                    continue
+                
+                info = stock.info
+                
+                k_period = 14
+                d_period = 3
+                
+                data['STOCH_K'], data['STOCH_D'] = calculate_stochastic(
+                    data['High'], data['Low'], data['Close'], k_period, d_period
+                )
+                
+                current_k = data['STOCH_K'].iloc[-1]
+                current_d = data['STOCH_D'].iloc[-1]
+                
+                if pd.isna(current_k) or pd.isna(current_d):
+                    continue
+                
+                k_momentum = current_k - data['STOCH_K'].iloc[-5] if len(data) >= 5 else 0
+                recent_k = data['STOCH_K'].iloc[-10:] if len(data) >= 10 else data['STOCH_K']
+                trend = "bullish" if recent_k.is_monotonic_increasing else "bearish" if recent_k.is_monotonic_decreasing else "mixed"
+                
+                price = data['Close'].iloc[-1]
+                change = ((data['Close'].iloc[-1] / data['Close'].iloc[0]) - 1) * 100 if len(data) > 0 else 0
+                
+                position = "OVERSOLD" if current_k < 20 else "OVERBOUGHT" if current_k > 80 else "NEUTRAL"
+                score = calculate_stochastic_score(current_k, current_d, k_momentum, trend)
+                
+                if len(data) >= 2:
+                    prev_k = data['STOCH_K'].iloc[-2]
+                    prev_d = data['STOCH_D'].iloc[-2]
+                    if pd.isna(prev_k) or pd.isna(prev_d):
+                        bullish_cross = False
+                        bearish_cross = False
+                    else:
+                        bullish_cross = (prev_k <= prev_d) and (current_k > current_d)
+                        bearish_cross = (prev_k >= prev_d) and (current_k < current_d)
+                else:
+                    bullish_cross = False
+                    bearish_cross = False
+                
+                results.append({
+                    'ticker': ticker,
+                    'name': info.get('longName', ticker) if info else ticker,
+                    'price': price,
+                    'change': change,
+                    'stoch_k': current_k,
+                    'stoch_d': current_d,
+                    'momentum': k_momentum,
+                    'trend': trend,
+                    'position': position,
+                    'score': score,
+                    'bullish_cross': bullish_cross,
+                    'bearish_cross': bearish_cross
+                })
+            except Exception as e:
+                continue
+        
+        progress_bar.empty()
+        status_text.empty()
+        
+        if results:
+            st.session_state.discovery_results = results
+            st.session_state.discovery_sector = selected_sector
+            st.success(f"✅ Successfully analyzed {len(results)} out of {len(tickers)} stocks!")
+            st.rerun()
+        else:
+            st.error(f"❌ Unable to fetch data for stocks in {selected_sector}.")
+            st.write("Try waiting a moment and selecting a different sector.")
+    
+    if 'discovery_results' in st.session_state and st.session_state.discovery_results:
+        results = st.session_state.discovery_results
+        sector_name = st.session_state.get('discovery_sector', 'Selected Sector')
+        
+        st.markdown("---")
+        
+        st.subheader(f"📊 {sector_name} Sector Overview")
+        
+        oversold_count = sum(1 for r in results if r['position'] == 'OVERSOLD')
+        overbought_count = sum(1 for r in results if r['position'] == 'OVERBOUGHT')
+        bullish_cross_count = sum(1 for r in results if r['bullish_cross'])
+        
+        avg_score = sum(r['score'] for r in results) / len(results)
+        avg_momentum = sum(r['momentum'] for r in results) / len(results)
+        
+        col1, col2, col3, col4, col5 = st.columns(5)
+        col1.metric("Stocks Analyzed", len(results))
+        col2.metric("Oversold 🟢", oversold_count)
+        col3.metric("Overbought 🔴", overbought_count)
+        col4.metric("Bullish Crosses", bullish_cross_count)
+        col5.metric("Avg Score", f"{avg_score:.0f}/100")
+        
+        st.markdown("---")
+        
+        st.success("🌟 TOP 3 OPPORTUNITIES IN THIS SECTOR")
+        st.write("Ranked by highest stochastic score and momentum - these are the strongest signals!")
+        
+        top_opportunities = sorted(results, key=lambda x: (x['score'], x['momentum']), reverse=True)[:3]
+        
+        rank_emojis = ["🥇", "🥈", "🥉"]
+        
+        for idx, stock in enumerate(top_opportunities):
+            strength = "STRONG BUY" if stock['score'] >= 70 else "BUY" if stock['score'] >= 60 else "MODERATE BUY" if stock['score'] >= 50 else "HOLD"
+            
+            with st.expander(f"{rank_emojis[idx]} **#{idx+1} - {stock['ticker']}** ({stock['name']}) | Score: **{stock['score']}/100** | {strength}", expanded=True):
+                col1, col2, col3, col4, col5 = st.columns(5)
+                col1.metric("Price", f"${stock['price']:.2f}", f"{stock['change']:+.2f}%")
+                col2.metric("Position", stock['position'])
+                col3.metric("Stochastic %K", f"{stock['stoch_k']:.1f}")
+                col4.metric("Momentum", f"{stock['momentum']:+.1f}")
+                col5.metric("Trend", stock['trend'].title())
+                
+                st.markdown(f"**Why #{idx+1}:**")
+                
+                reasons = []
+                
+                if stock['score'] >= 70:
+                    reasons.append(f"✅ **Exceptional Score ({stock['score']}/100)** - Among the highest in sector")
+                elif stock['score'] >= 60:
+                    reasons.append(f"✅ **Strong Score ({stock['score']}/100)** - Above average signals")
+                else:
+                    reasons.append(f"⚠️ **Moderate Score ({stock['score']}/100)** - Decent but not exceptional")
+                
+                if stock['position'] == 'OVERSOLD':
+                    reasons.append("✅ **Oversold Position** - Potential buying opportunity")
+                elif stock['position'] == 'OVERBOUGHT':
+                    reasons.append("⚠️ **Overbought Position** - Caution advised")
+                else:
+                    reasons.append("ℹ️ **Neutral Position** - No extreme signals")
+                
+                if stock['momentum'] > 10:
+                    reasons.append(f"✅ **Strong Positive Momentum (+{stock['momentum']:.1f})** - Accelerating upward")
+                elif stock['momentum'] > 0:
+                    reasons.append(f"✅ **Positive Momentum (+{stock['momentum']:.1f})**")
+                else:
+                    reasons.append(f"⚠️ **Negative Momentum ({stock['momentum']:.1f})**")
+                
+                if stock['trend'] == 'bullish':
+                    reasons.append("✅ **Bullish Trend** - Consistently rising")
+                elif stock['trend'] == 'bearish':
+                    reasons.append("⚠️ **Bearish Trend** - Consistently falling")
+                
+                if stock['bullish_cross']:
+                    reasons.append("🚀 **BULLISH CROSSOVER** - %K crossed above %D (buy signal!)")
+                
+                for reason in reasons:
+                    st.markdown(f"- {reason}")
+                
+                st.markdown("**Investment Recommendation:**")
+                
+                if stock['score'] >= 70 and stock['position'] == 'OVERSOLD':
+                    st.success(f"🎯 **STRONG BUY CANDIDATE** - {stock['ticker']} shows exceptional technical strength with oversold positioning.")
+                elif stock['score'] >= 60 and stock['position'] == 'OVERSOLD':
+                    st.success(f"✅ **BUY CANDIDATE** - {stock['ticker']} has strong signals and is oversold.")
+                elif stock['score'] >= 60:
+                    st.info(f"📊 **SOLID CHOICE** - {stock['ticker']} has good technical signals.")
+                else:
+                    st.info(f"⚖️ **MODERATE OPPORTUNITY** - {stock['ticker']} shows decent signals.")
+                
+                btn_col1, btn_col2 = st.columns(2)
+                
+                with btn_col1:
+                    if st.button(f"📊 Full Analysis", key=f"analyze_top_{stock['ticker']}", use_container_width=True, type="primary"):
+                        st.session_state.page = 'analysis'
+                        st.session_state.selected_ticker = stock['ticker']
+                        st.rerun()
+                
+                with btn_col2:
+                    is_in_portfolio = any(s['ticker'] == stock['ticker'] for s in st.session_state.portfolio)
+                    if not is_in_portfolio:
+                        if st.button(f"⭐ Add to Portfolio", key=f"add_top_{stock['ticker']}", use_container_width=True):
+                            add_to_portfolio(stock['ticker'], stock['stoch_k'], stock['stoch_d'], 
+                                           stock['momentum'], stock['trend'])
+                            st.success(f"Added {stock['ticker']}!")
+                            st.rerun()
+                    else:
+                        st.success("✓ In Portfolio")
+        
+        st.markdown("---")
+        
+        st.subheader(f"📋 All Results ({len(results)} stocks)")
+        
+        sort_col1, sort_col2 = st.columns([2, 2])
+        with sort_col1:
+            sort_by = st.selectbox("Sort by", ["Score (High to Low)", "Score (Low to High)", "Momentum", "Position"], index=0)
+        with sort_col2:
+            position_filter = st.multiselect("Filter by Position", ["OVERSOLD", "NEUTRAL", "OVERBOUGHT"], default=["OVERSOLD", "NEUTRAL", "OVERBOUGHT"])
+        
+        filtered_results = [r for r in results if r['position'] in position_filter]
+        
+        if sort_by == "Score (High to Low)":
+            filtered_results = sorted(filtered_results, key=lambda x: x['score'], reverse=True)
+        elif sort_by == "Score (Low to High)":
+            filtered_results = sorted(filtered_results, key=lambda x: x['score'])
+        elif sort_by == "Momentum":
+            filtered_results = sorted(filtered_results, key=lambda x: x['momentum'], reverse=True)
+        elif sort_by == "Position":
+            filtered_results = sorted(filtered_results, key=lambda x: x['position'])
+        
+        for stock in filtered_results:
+            position_emoji = "🟢" if stock['position'] == 'OVERSOLD' else "🔴" if stock['position'] == 'OVERBOUGHT' else "⚪"
+            
+            with st.expander(f"{position_emoji} **{stock['ticker']}** - {stock['position']} | Score: {stock['score']}/100"):
+                col1, col2, col3, col4 = st.columns(4)
+                col1.metric("Price", f"${stock['price']:.2f}", f"{stock['change']:+.2f}%")
+                col2.metric("%K", f"{stock['stoch_k']:.1f}")
+                col3.metric("Momentum", f"{stock['momentum']:+.1f}")
+                col4.metric("Trend", stock['trend'].title())
+                
+                if stock['position'] == 'OVERSOLD':
+                    st.success(f"💡 **Potential Buy:** {stock['ticker']} is oversold.")
+                elif stock['position'] == 'OVERBOUGHT':
+                    st.warning(f"⚠️ **Caution:** {stock['ticker']} is overbought.")
+                else:
+                    st.info(f"ℹ️ {stock['ticker']} is in neutral territory.")
+                
+                action_col1, action_col2 = st.columns(2)
+                with action_col1:
+                    if st.button(f"📊 Full Analysis", key=f"analyze_{stock['ticker']}", use_container_width=True):
+                        st.session_state.page = 'analysis'
+                        st.session_state.selected_ticker = stock['ticker']
+                        st.rerun()
+                
+                with action_col2:
+                    is_in_portfolio = any(s['ticker'] == stock['ticker'] for s in st.session_state.portfolio)
+                    if not is_in_portfolio:
+                        if st.button(f"⭐ Add to Portfolio", key=f"add_{stock['ticker']}", use_container_width=True):
+                            add_to_portfolio(stock['ticker'], stock['stoch_k'], stock['stoch_d'], 
+                                           stock['momentum'], stock['trend'])
+                            st.success(f"Added {stock['ticker']}!")
+                            st.rerun()
+                    else:
+                        st.success("✓ In Portfolio")
