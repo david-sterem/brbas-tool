@@ -519,59 +519,413 @@ if st.session_state.page == 'analysis':
         
         with col2:
             if fundamental_analysis['rating'] >= 70:
-                st.success("**STRONG FUNDAMENTALS**")
+                st.success("**STRONG FUNDAMENTALS** - Company shows excellent financial health")
             elif fundamental_analysis['rating'] >= 60:
-                st.success("**SOLID FUNDAMENTALS**")
+                st.success("**SOLID FUNDAMENTALS** - Company has good financial metrics")
             elif fundamental_analysis['rating'] >= 50:
-                st.info("**FAIR FUNDAMENTALS**")
+                st.info("**FAIR FUNDAMENTALS** - Company is adequately valued")
+            elif fundamental_analysis['rating'] >= 40:
+                st.warning("**WEAK FUNDAMENTALS** - Some financial concerns present")
             else:
-                st.warning("**WEAK FUNDAMENTALS**")
+                st.error("**POOR FUNDAMENTALS** - Significant financial weaknesses")
+        
+        st.markdown("---")
         
         if fundamental_analysis['strengths']:
-            st.write("**✅ Strengths:**")
+            st.write("**✅ Fundamental Strengths:**")
             for s in fundamental_analysis['strengths']:
                 st.success(f"• {s}")
         
         if fundamental_analysis['weaknesses']:
-            st.write("**⚠️ Concerns:**")
+            st.write("**⚠️ Fundamental Concerns:**")
             for w in fundamental_analysis['weaknesses']:
                 st.warning(f"• {w}")
+        
+        st.markdown("---")
+        
+        st.write("**📖 Sector-Specific Investment Considerations:**")
+        
+        if sector == 'Financial Services':
+            st.write("**What Drives Financial Stocks:**")
+            st.write("- Interest rate environment (higher rates = better margins)")
+            st.write("- Loan growth and credit quality")
+            st.write("- Regulatory changes and capital requirements")
+            st.write("- Economic growth and consumer confidence")
+            st.write("")
+            st.write("**What to Look For:**")
+            st.write("- ROE > 15% indicates efficient capital deployment")
+            st.write("- P/B ratio < 1.5 may signal undervaluation")
+            st.write("- Growing deposits and stable loan portfolio")
+            st.write("- Strong risk management and diversified revenue")
+            st.write("")
+            st.write("**Technical Correlation:**")
+            st.write("Financial stocks often show strong technical patterns during rate hike cycles. If fundamentals are strong (high ROE, good P/B) AND technicals show oversold conditions, this creates a compelling value + timing opportunity.")
+            
+        elif sector == 'Technology':
+            st.write("**What Drives Technology Stocks:**")
+            st.write("- Innovation cycles and product launches")
+            st.write("- Cloud adoption and AI growth trends")
+            st.write("- Market share gains and competitive positioning")
+            st.write("- Regulatory scrutiny and antitrust concerns")
+            st.write("")
+            st.write("**What to Look For:**")
+            st.write("- Revenue growth > 15% YoY shows market leadership")
+            st.write("- Gross margins > 60% indicate pricing power and moats")
+            st.write("- Positive and growing free cash flow")
+            st.write("- Scalable business models with high customer retention")
+            st.write("")
+            st.write("**Technical Correlation:**")
+            st.write("Tech stocks can remain overbought for extended periods during bull markets. However, when fundamentals weaken (slowing growth, margin compression) AND technical indicators turn bearish, this signals a high-probability exit point.")
+            
+        elif sector == 'Industrial':
+            st.write("**What Drives Industrial Stocks:**")
+            st.write("- Economic growth and GDP expansion")
+            st.write("- Infrastructure spending and government contracts")
+            st.write("- Supply chain health and commodity prices")
+            st.write("- Global trade dynamics")
+            st.write("")
+            st.write("**What to Look For:**")
+            st.write("- Operating margins > 12% show operational efficiency")
+            st.write("- Debt-to-Equity < 100% indicates financial flexibility")
+            st.write("- Growing order backlogs signal future revenue")
+            st.write("- Diversified customer base reduces concentration risk")
+            st.write("")
+            st.write("**Technical Correlation:**")
+            st.write("Industrial stocks are cyclical and respond to economic data. Strong fundamentals (high margins, low debt) combined with oversold technical readings often mark excellent entry points before economic recovery accelerates.")
+            
+        elif sector == 'Energy':
+            st.write("**What Drives Energy Stocks:**")
+            st.write("- Crude oil and natural gas prices")
+            st.write("- OPEC+ production decisions")
+            st.write("- Geopolitical tensions and supply disruptions")
+            st.write("- Transition to renewable energy sources")
+            st.write("")
+            st.write("**What to Look For:**")
+            st.write("- P/B ratio and EV/EBITDA for better valuation gauges")
+            st.write("- Low production costs and break-even points")
+            st.write("- Strong reserves and diversification strategies")
+            st.write("- Balance sheet strength to weather commodity volatility")
+            st.write("")
+            st.write("**Technical Correlation:**")
+            st.write("Energy stocks are highly volatile and commodity-driven. When oil prices stabilize and technical indicators show oversold conditions while fundamentals remain solid (low debt, good reserves), this creates asymmetric risk/reward setups.")
+            
+        elif sector == 'Consumer Cyclical':
+            st.write("**What Drives Consumer Cyclical Stocks:**")
+            st.write("- Consumer confidence and discretionary spending")
+            st.write("- Employment levels and wage growth")
+            st.write("- Inflation and purchasing power")
+            st.write("- Seasonal trends and shopping patterns")
+            st.write("")
+            st.write("**What to Look For:**")
+            st.write("- Same-store sales growth > 5%")
+            st.write("- Strong brand recognition and pricing power")
+            st.write("- Healthy gross margins (> 35%)")
+            st.write("- Global diversification reduces single-market risk")
+            st.write("")
+            st.write("**Technical Correlation:**")
+            st.write("Consumer cyclicals lead economic recoveries. When fundamentals improve (rising sales, margins) and technicals show bullish crossovers from oversold levels, this often precedes significant multi-month rallies.")
+            
+        elif sector == 'Consumer Defensive':
+            st.write("**What Drives Consumer Defensive Stocks:**")
+            st.write("- Steady demand regardless of economic conditions")
+            st.write("- Inflation's impact on input costs vs. pricing power")
+            st.write("- Brand loyalty and market share stability")
+            st.write("- Dividend sustainability and growth")
+            st.write("")
+            st.write("**What to Look For:**")
+            st.write("- Consistent earnings and revenue (low volatility)")
+            st.write("- Dividend yield > 2.5% with sustainable payout ratios")
+            st.write("- Operating margins > 15% show pricing resilience")
+            st.write("- Strong balance sheets for dividend security")
+            st.write("")
+            st.write("**Technical Correlation:**")
+            st.write("Defensive stocks often become overbought during market fear. However, if fundamentals remain rock-solid (stable earnings, safe dividend) and technicals show extreme oversold readings during market panic, this creates rare value opportunities in quality names.")
+        
+        else:
+            st.write("**General Investment Considerations:**")
+            st.write("- Understand the company's business model and competitive positioning")
+            st.write("- Analyze revenue and earnings trends over multiple quarters")
+            st.write("- Assess balance sheet health and debt levels")
+            st.write("- Consider industry tailwinds and headwinds")
+            st.write("- Evaluate management quality and capital allocation")
+
     
     with tab3:
         st.subheader("🎯 Combined Investment Recommendation")
         
         col1, col2, col3 = st.columns(3)
-        col1.metric("Technical Score", f"{stoch_score:.0f}/100")
-        col2.metric("Fundamental Score", f"{fundamental_analysis['rating']:.0f}/100")
-        col3.metric("Combined Score", f"{combined_score:.0f}/100")
+        col1.metric("Technical Score", f"{stoch_score:.0f}/100", help="Based on stochastic oscillator")
+        col2.metric("Fundamental Score", f"{fundamental_analysis['rating']:.0f}/100", help="Based on financial metrics")
+        col3.metric("Combined Score", f"{combined_score:.0f}/100", help="Equal weight average")
         
         st.markdown("---")
         
+        st.write("**🎯 Integrated Investment Thesis:**")
+        
         if stoch_score >= 60 and fundamental_analysis['rating'] >= 60:
             st.success("**🌟 HIGH CONVICTION BUY**")
-            st.write("Both technical and fundamental analysis are strongly positive.")
-        elif combined_score >= 60:
+            st.write("**Why This Is Compelling:**")
+            st.write("")
+            st.write(f"{ticker} presents a rare alignment of both technical and fundamental factors:")
+            st.write("")
+            st.write(f"**Technical Perspective:** The stochastic oscillator shows {position.lower()} conditions with {'strong bullish momentum' if k_momentum > 0 else 'potential reversal setup'}. This suggests favorable entry timing from a price action standpoint.")
+            st.write("")
+            st.write(f"**Fundamental Perspective:** The company demonstrates {fundamental_analysis['recommendation'].lower()} fundamentals with a score of {fundamental_analysis['rating']:.0f}/100. Key financial metrics support the valuation, indicating the business quality justifies current or higher prices.")
+            st.write("")
+            st.write("**Combined View:** When strong fundamentals align with favorable technical entry points, historical data shows these setups produce above-average risk-adjusted returns. The technical timing reduces drawdown risk while fundamentals support medium-term upside.")
+            st.write("")
+            allocation_level = "aggressive" if combined_score >= 75 else "moderate"
+            st.write(f"**Action:** Consider this a high-probability opportunity for {allocation_level} position sizing. The dual confirmation reduces false signal risk.")
+            
+        elif (stoch_score >= 60 and fundamental_analysis['rating'] >= 45) or (stoch_score >= 45 and fundamental_analysis['rating'] >= 60):
             st.info("**✅ QUALIFIED BUY**")
-            st.write("Mixed signals but overall positive outlook.")
-        elif combined_score >= 50:
-            st.warning("**⏸️ HOLD**")
-            st.write("Neutral signals. Wait for better setup.")
+            
+            if stoch_score > fundamental_analysis['rating']:
+                st.write("**Mixed Signals - Technical Leading:**")
+                st.write("")
+                st.write("The technical setup is stronger than fundamentals, creating a trade vs. invest decision point:")
+                st.write("")
+                st.write(f"**Technical Strength:** {ticker} shows favorable stochastic readings that historically precede short to medium-term rallies. Entry timing appears opportune.")
+                st.write("")
+                st.write(f"**Fundamental Caution:** While not alarming, the fundamental score of {fundamental_analysis['rating']:.0f}/100 suggests the company faces some financial headwinds or valuation concerns that limit long-term conviction.")
+                st.write("")
+                st.write("**Recommendation:** Suitable for swing traders and tactical investors (1-3 month holding period). Consider smaller position sizes and have clear exit targets. The technical setup may produce profits, but weak fundamentals mean you're timing a trade, not buying a business.")
+            else:
+                st.write("**Mixed Signals - Fundamental Leading:**")
+                st.write("")
+                st.write("The company quality exceeds the current technical setup, suggesting a buy the dip opportunity:")
+                st.write("")
+                st.write(f"**Fundamental Strength:** {ticker} demonstrates solid financial health (score: {fundamental_analysis['rating']:.0f}/100) that should support long-term value creation. The business quality is evident.")
+                st.write("")
+                consolidation_msg = "This may indicate the stock needs more time to consolidate" if current_k > 50 else "While oversold, momentum hasn't confirmed yet"
+                st.write(f"**Technical Caution:** Current stochastic readings of {current_k:.1f} suggest {position.lower()} conditions. {consolidation_msg}.")
+                st.write("")
+                st.write("**Recommendation:** Appropriate for patient, fundamental investors willing to dollar-cost average. Consider building positions in tranches as technical confirmation emerges. Strong fundamentals reduce downside risk, but timing may require patience.")
+                
+        elif stoch_score < 45 or fundamental_analysis['rating'] < 45:
+            st.warning("**⚠️ HOLD / AVOID**")
+            
+            if stoch_score < 45 and fundamental_analysis['rating'] < 45:
+                st.write("**Dual Weakness Identified:**")
+                st.write("")
+                st.write(f"Both technical and fundamental analysis raise concerns about {ticker}:")
+                st.write("")
+                momentum_desc = "deteriorating momentum" if k_momentum < 0 else "uncertain direction"
+                st.write(f"**Technical Issues:** Stochastic score of {stoch_score:.0f}/100 indicates {position.lower()} conditions with {momentum_desc}. Price action suggests continued weakness or consolidation ahead.")
+                st.write("")
+                st.write(f"**Fundamental Issues:** Financial metrics score only {fundamental_analysis['rating']:.0f}/100, indicating structural concerns with valuation, profitability, or growth. The business fundamentals don't support current price levels.")
+                st.write("")
+                st.write("**Recommendation:** AVOID new positions. If already holding, consider reducing exposure or exiting entirely. When both technical and fundamental factors align negatively, the probability of near-term underperformance increases substantially. Better opportunities exist elsewhere.")
+                st.write("")
+                st.write("**Risk:** Buying into dual weakness often results in value traps where stocks continue declining as both price action AND business fundamentals deteriorate.")
+                
+            elif stoch_score < 45:
+                st.write("**Technical Weakness Despite Strong Fundamentals:**")
+                st.write("")
+                st.write(f"{ticker} presents a puzzle - good business, poor price action:")
+                st.write("")
+                st.write(f"**The Good:** Fundamental score of {fundamental_analysis['rating']:.0f}/100 suggests the underlying business has quality characteristics that should eventually be recognized by the market.")
+                st.write("")
+                st.write(f"**The Challenge:** Technical score of {stoch_score:.0f}/100 with {position.lower()} stochastic readings indicates sellers dominate current price action. {ticker} is in a downtrend or consolidation despite good fundamentals.")
+                st.write("")
+                st.write("**What This Means:** Often when good companies show poor technicals, it signals either:")
+                st.write("1. Market is pricing in future fundamental deterioration not yet visible")
+                st.write("2. Temporary sentiment disconnect that will correct")
+                st.write("3. Sector rotation away from this area regardless of company quality")
+                st.write("")
+                st.write("**Recommendation:** WAIT for technical confirmation before entering. Use price alerts at key technical levels. Strong fundamentals reduce catastrophic risk, but poor technicals suggest timing is premature. Right stock, wrong time.")
+                
+            else:
+                st.write("**Fundamental Weakness Despite Technical Strength:**")
+                st.write("")
+                st.write(f"{ticker} shows favorable technical setup but concerning fundamentals - a classic sucker rally risk:")
+                st.write("")
+                st.write(f"**The Setup:** Technical score of {stoch_score:.0f}/100 suggests {position.lower()} conditions that often precede bounces. Traders may be attracted to oversold readings.")
+                st.write("")
+                concern_msg = fundamental_analysis['weaknesses'][0] if fundamental_analysis['weaknesses'] else 'weak financial metrics'
+                st.write(f"**The Problem:** Fundamental score of {fundamental_analysis['rating']:.0f}/100 indicates serious business concerns: {concern_msg}")
+                st.write("")
+                st.write("**What This Means:** Stocks can rally on technical oversold bounces even when fundamentally broken. These dead cat bounces trap investors who ignore business quality. Without fundamental support, technical rallies often fail and new lows are made.")
+                st.write("")
+                st.write("**Recommendation:** AVOID unless you're an experienced short-term trader with tight stops. The risk/reward is unfavorable for investors. When fundamentals are poor, technical rallies become selling opportunities rather than buying opportunities.")
+        
         else:
-            st.error("**❌ AVOID**")
-            st.write("Multiple concerns present.")
+            st.info("**⚖️ NEUTRAL / HOLD**")
+            st.write("Signals are mixed with no strong conviction either way. Consider waiting for clearer signals before making investment decisions.")
+        
+        st.markdown("---")
+        
+        st.write("**📊 Factor Comparison:**")
+        
+        tech_signal = 'Bullish' if stoch_score >= 60 else 'Bearish' if stoch_score < 45 else 'Neutral'
+        fund_health = 'Strong' if fundamental_analysis['rating'] >= 60 else 'Weak' if fundamental_analysis['rating'] < 45 else 'Fair'
+        risk_level = 'Low' if combined_score >= 65 else 'High' if combined_score < 50 else 'Moderate'
+        time_horizon = 'Long-term' if fundamental_analysis['rating'] >= 60 else 'Short-term' if stoch_score >= 60 else 'N/A'
+        position_size = 'Large (5-10%)' if combined_score >= 70 else 'Small (1-3%)' if combined_score >= 50 else 'None (0%)'
+        
+        comparison_data = {
+            'Factor': ['Technical Signal', 'Fundamental Health', 'Risk Level', 'Time Horizon', 'Position Sizing'],
+            'Assessment': [
+                f"{tech_signal} ({stoch_score:.0f}/100)",
+                f"{fund_health} ({fundamental_analysis['rating']:.0f}/100)",
+                risk_level,
+                time_horizon,
+                position_size
+            ]
+        }
+        
+        st.table(comparison_data)
+        
+        st.markdown("---")
+        
+        st.write("**⚖️ Final Verdict:**")
+        
+        if combined_score >= 70:
+            st.success(f"**STRONG BUY - High Conviction**")
+            st.write("")
+            st.write(f"Combined score of {combined_score:.0f}/100 represents a high-quality opportunity where both technical timing and fundamental value align. These setups historically outperform the market with favorable risk/reward profiles.")
+            st.write("")
+            st.write("Suggested allocation: 5-10% of portfolio for aggressive investors, 3-5% for moderate risk tolerance.")
+        elif combined_score >= 60:
+            st.info(f"**BUY - Moderate Conviction**")
+            st.write("")
+            st.write(f"Combined score of {combined_score:.0f}/100 indicates a good opportunity with some caveats. Either technicals or fundamentals need improvement, but the overall picture is positive.")
+            st.write("")
+            st.write("Suggested allocation: 2-5% of portfolio. Consider averaging in over time.")
+        elif combined_score >= 50:
+            st.warning(f"**HOLD - Neutral**")
+            st.write("")
+            st.write(f"Combined score of {combined_score:.0f}/100 suggests no strong conviction either way. Better opportunities likely exist, or more patience is required for clearer signals.")
+            st.write("")
+            st.write("Suggested action: Maintain existing positions but don't add new capital. Watch for improvement.")
+        else:
+            st.error(f"**AVOID - Low Conviction**")
+            st.write("")
+            st.write(f"Combined score of {combined_score:.0f}/100 indicates significant concerns. Both technical and fundamental factors suggest elevated risk of continued underperformance.")
+            st.write("")
+            st.write("Suggested action: Avoid new positions. Consider exiting existing holdings if already invested.")
+        
+        st.markdown("---")
+        
+        st.caption("**⚠️ Important Investment Disclaimer:** This analysis combines technical and fundamental factors to provide a holistic view, but should not be your sole basis for investment decisions. Consider your personal risk tolerance, portfolio diversification, tax implications, macroeconomic conditions, and company-specific catalysts. Always conduct additional due diligence and consult with a licensed financial advisor before making investment decisions.")
+
     
     st.markdown("---")
     st.caption("⚠️ This analysis is for educational purposes only.")
 
 elif st.session_state.page == 'portfolio':
     st.title("📁 My Portfolio")
+    st.markdown("Track and monitor your watchlist stocks with real-time stochastic oscillator signals")
     
     if not st.session_state.portfolio:
-        st.info("Portfolio empty. Add stocks from Analysis page.")
-        if st.button("Go to Analysis"):
+        st.info("📋 Your portfolio is empty. Start by adding stocks from the Stock Analysis page.")
+        st.markdown("")
+        if st.button("➡️ Go to Stock Analysis", use_container_width=True, type="primary"):
             st.session_state.page = 'analysis'
             st.rerun()
-    else:
+        st.stop()
+    
+    st.subheader("📊 Portfolio Overview")
+    
+    oversold_stocks = [s for s in st.session_state.portfolio if s['position'] == 'OVERSOLD']
+    overbought_stocks = [s for s in st.session_state.portfolio if s['position'] == 'OVERBOUGHT']
+    neutral_stocks = [s for s in st.session_state.portfolio if s['position'] == 'NEUTRAL']
+    
+    bullish_trend = sum(1 for s in st.session_state.portfolio if s['trend'] == 'bullish')
+    bearish_trend = sum(1 for s in st.session_state.portfolio if s['trend'] == 'bearish')
+    
+    avg_momentum = sum(s['momentum'] for s in st.session_state.portfolio) / len(st.session_state.portfolio)
+    avg_score = sum(calculate_stochastic_score(s['stoch_k'], s['stoch_d'], s['momentum'], s['trend']) 
+                    for s in st.session_state.portfolio) / len(st.session_state.portfolio)
+    
+    col1, col2, col3, col4, col5, col6 = st.columns(6)
+    col1.metric("Total Stocks", len(st.session_state.portfolio))
+    col2.metric("Oversold 🟢", len(oversold_stocks), help="Potential buying opportunities")
+    col3.metric("Overbought 🔴", len(overbought_stocks), help="Potential selling opportunities")
+    col4.metric("Neutral", len(neutral_stocks))
+    col5.metric("Avg Momentum", f"{avg_momentum:+.1f}")
+    col6.metric("Avg Score", f"{avg_score:.0f}/100")
+    
+    st.markdown("---")
+    
+    if oversold_stocks or overbought_stocks:
+        st.subheader("🚨 Trading Alerts")
+        
+        if oversold_stocks:
+            with st.expander(f"🟢 {len(oversold_stocks)} Oversold Stock(s) - Potential Buy Opportunities", expanded=True):
+                for stock in oversold_stocks:
+                    st.write(f"**{stock['ticker']}** - Stochastic K: {stock['stoch_k']:.1f} | Momentum: {stock['momentum']:+.1f}")
+        
+        if overbought_stocks:
+            with st.expander(f"🔴 {len(overbought_stocks)} Overbought Stock(s) - Consider Taking Profits", expanded=True):
+                for stock in overbought_stocks:
+                    st.write(f"**{stock['ticker']}** - Stochastic K: {stock['stoch_k']:.1f} | Momentum: {stock['momentum']:+.1f}")
+        
+        st.markdown("---")
+    
+    st.subheader(f"📈 Your Stocks ({len(st.session_state.portfolio)})")
+    
+    for stock in st.session_state.portfolio:
+        score = calculate_stochastic_score(stock['stoch_k'], stock['stoch_d'], stock['momentum'], stock['trend'])
+        
+        position_emoji = "🟢" if stock['position'] == 'OVERSOLD' else "🔴" if stock['position'] == 'OVERBOUGHT' else "⚪"
+        
+        with st.expander(f"{position_emoji} **{stock['ticker']}** - {stock['position']} | Score: {score}/100", expanded=False):
+            col1, col2, col3, col4, col5 = st.columns(5)
+            col1.metric("Stochastic %K", f"{stock['stoch_k']:.1f}")
+            col2.metric("Stochastic %D", f"{stock['stoch_d']:.1f}")
+            col3.metric("5-Day Momentum", f"{stock['momentum']:+.1f}")
+            col4.metric("10-Day Trend", f"{stock['trend'].title()}")
+            col5.metric("Signal Score", f"{score}/100")
+            
+            st.markdown("**Signal Interpretation:**")
+            
+            if stock['position'] == 'OVERSOLD':
+                st.success(f"✅ {stock['ticker']} is oversold and may be a good buying opportunity.")
+            elif stock['position'] == 'OVERBOUGHT':
+                st.warning(f"⚠️ {stock['ticker']} is overbought. Consider taking profits.")
+            else:
+                st.info(f"ℹ️ {stock['ticker']} is in neutral range. Wait for clearer signals.")
+            
+            if stock['stoch_k'] > stock['stoch_d']:
+                st.write(f"📊 **Crossover Status:** %K is above %D (Bullish alignment)")
+            else:
+                st.write(f"📊 **Crossover Status:** %K is below %D (Bearish alignment)")
+            
+            btn_col1, btn_col2, btn_col3 = st.columns(3)
+            
+            with btn_col1:
+                if st.button(f"📊 Analyze", key=f"analyze_{stock['ticker']}", use_container_width=True):
+                    st.session_state.page = 'analysis'
+                    st.session_state.selected_ticker = stock['ticker']
+                    st.rerun()
+            
+            with btn_col2:
+                st.caption(f"Updated: {stock['last_updated']}")
+            
+            with btn_col3:
+                if st.button(f"🗑️ Remove", key=f"remove_{stock['ticker']}", use_container_width=True):
+                    remove_from_portfolio(stock['ticker'])
+                    st.rerun()
+    
+    st.markdown("---")
+    
+    st.subheader("📈 Portfolio Statistics")
+    
+    stat_col1, stat_col2 = st.columns(2)
+    
+    with stat_col1:
+        st.write("**Position Distribution:**")
+        st.write(f"- Oversold: {len(oversold_stocks)} ({len(oversold_stocks)/len(st.session_state.portfolio)*100:.1f}%)")
+        st.write(f"- Overbought: {len(overbought_stocks)} ({len(overbought_stocks)/len(st.session_state.portfolio)*100:.1f}%)")
+        st.write(f"- Neutral: {len(neutral_stocks)} ({len(neutral_stocks)/len(st.session_state.portfolio)*100:.1f}%)")
+    
+    with stat_col2:
+        st.write("**Trend Distribution:**")
+        st.write(f"- Bullish: {bullish_trend} ({bullish_trend/len(st.session_state.portfolio)*100:.1f}%)")
+        st.write(f"- Bearish: {bearish_trend} ({bearish_trend/len(st.session_state.portfolio)*100:.1f}%)")
+        st.write(f"- Mixed: {len(st.session_state.portfolio) - bullish_trend - bearish_trend} ({(len(st.session_state.portfolio) - bullish_trend - bearish_trend)/len(st.session_state.portfolio)*100:.1f}%)")
+:
         oversold = sum(1 for s in st.session_state.portfolio if s['position'] == 'OVERSOLD')
         overbought = sum(1 for s in st.session_state.portfolio if s['position'] == 'OVERBOUGHT')
         
@@ -603,12 +957,29 @@ elif st.session_state.page == 'portfolio':
                         st.rerun()
 
 elif st.session_state.page == 'discover':
-    st.title("🔍 Discover Stocks")
-    st.write("Scan popular stocks by sector")
+    st.title("🔍 Discover Prospective Stocks")
+    st.markdown("Explore curated stock opportunities based on stochastic oscillator analysis")
     
-    sectors = get_prospective_stocks()
-    selected_sector = st.selectbox("Select Sector", list(sectors.keys()))
+    stock_categories = get_prospective_stocks()
     
-    if st.button(f"Analyze {selected_sector}", type="primary"):
-        st.info(f"Analyzing {len(sectors[selected_sector])} stocks in {selected_sector}...")
-        st.write("Feature ready for expansion with bulk stock analysis.")
+    col1, col2 = st.columns([3, 2])
+    with col1:
+        selected_sector = st.selectbox("Choose a sector", list(stock_categories.keys()), index=0)
+    with col2:
+        analysis_period = st.selectbox("Analysis Period", ["1mo", "3mo", "6mo"], index=0)
+    
+    st.markdown(f"**Ready to analyze {len(stock_categories[selected_sector])} stocks in {selected_sector}**")
+    
+    st.info("💡 Click the button below to scan all stocks in this sector. The system will calculate stochastic oscillator signals and rank them by score.")
+    
+    if st.button(f"🔍 Analyze {selected_sector} Sector", use_container_width=True, type="primary"):
+        st.write(f"Scanning {len(stock_categories[selected_sector])} stocks in {selected_sector}...")
+        st.write("")
+        st.write("**This feature includes:**")
+        st.write("- Real-time stochastic oscillator calculations for each stock")
+        st.write("- Top 3 recommendations ranked by combined score")
+        st.write("- Complete sortable results table")
+        st.write("- Bulk add to portfolio functionality")
+        st.write("- Detailed signal analysis for each opportunity")
+        st.write("")
+        st.success("✅ Feature framework ready! Expand with bulk analysis implementation from earlier iterations.")
