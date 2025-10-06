@@ -25,7 +25,7 @@ def add_to_portfolio(ticker, current_k, current_d, k_momentum, trend):
             stock['stoch_d'] = current_d
             stock['momentum'] = k_momentum
             stock['trend'] = trend
-            stock['position'] = "OVERSOLD" if current_k < 20 else "Overbought" if current_k > 80 else "NEUTRAL"
+            stock['position'] = "Oversold" if current_k < 20 else "Overbought" if current_k > 80 else "Neutral"
             stock['last_updated'] = datetime.now().strftime("%Y-%m-%d %H:%M")
             return False
     
@@ -35,7 +35,7 @@ def add_to_portfolio(ticker, current_k, current_d, k_momentum, trend):
         'stoch_d': current_d,
         'momentum': k_momentum,
         'trend': trend,
-        'position': "OVERSOLD" if current_k < 20 else "Overbought" if current_k > 80 else "NEUTRAL",
+        'position': "Oversold" if current_k < 20 else "Overbought" if current_k > 80 else "Neutral",
         'last_updated': datetime.now().strftime("%Y-%m-%d %H:%M")
     })
     return True
@@ -198,15 +198,15 @@ def analyze_fundamentals(info, sector):
         analysis['rating'] = max(0, min(100, score))
     
     if analysis['rating'] >= 70:
-        analysis['recommendation'] = "STRONG BUY"
+        analysis['recommendation'] = "Strong Buy"
     elif analysis['rating'] >= 60:
-        analysis['recommendation'] = "BUY"
+        analysis['recommendation'] = "Buy"
     elif analysis['rating'] >= 50:
-        analysis['recommendation'] = "HOLD"
+        analysis['recommendation'] = "Hold"
     elif analysis['rating'] >= 40:
-        analysis['recommendation'] = "UNDERPERFORM"
+        analysis['recommendation'] = "Underperform"
     else:
-        analysis['recommendation'] = "SELL"
+        analysis['recommendation'] = "Sell"
     
     return analysis
 
@@ -220,12 +220,12 @@ def get_stock_data(ticker, period):
 
 def get_prospective_stocks():
     return {
-        "Tech Giants": ['AAPL', 'MSFT', 'GOOGL', 'AMZN', 'META', 'NVDA', 'TSLA'],
+        "Magnificent 7 (Tech)": ['AAPL', 'MSFT', 'GOOGL', 'AMZN', 'META', 'NVDA', 'TSLA'],
         "Finance": ['JPM', 'BAC', 'GS', 'WFC', 'V', 'MA', 'BRK-B'],
-        "Healthcare": ['JNJ', 'UNH', 'PFE', 'ABBV', 'TMO', 'ABT', 'MRK'],
-        "Consumer": ['WMT', 'HD', 'NKE', 'SBUX', 'MCD', 'DIS', 'COST'],
+        "Healthcare Industry": ['JNJ', 'UNH', 'PFE', 'ABBV', 'TMO', 'ABT', 'MRK'],
+        "Consumer Staples": ['WMT', 'HD', 'NKE', 'SBUX', 'MCD', 'DIS', 'COST'],
         "Energy": ['XOM', 'CVX', 'COP', 'SLB', 'EOG', 'MPC', 'PSX'],
-        "Industrial": ['BA', 'CAT', 'GE', 'HON', 'UPS', 'MMM', 'DE']
+        "Industrials": ['BA', 'CAT', 'GE', 'HON', 'UPS', 'MMM', 'DE']
     }
 
 with st.sidebar:
@@ -319,7 +319,7 @@ if st.session_state.page == 'analysis':
     sector = get_sector_from_info(info)
     fundamental_analysis = analyze_fundamentals(info, sector)
     combined_score = (stoch_score + fundamental_analysis['rating']) / 2
-    position = "OVERSOLD" if current_k < 20 else "Overbought" if current_k > 80 else "NEUTRAL"
+    position = "Oversold" if current_k < 20 else "Overbought" if current_k > 80 else "Neutral"
     
     is_in_portfolio = any(s['ticker'] == ticker for s in st.session_state.portfolio)
     
@@ -352,8 +352,8 @@ if st.session_state.page == 'analysis':
     with tab1:
         st.subheader("Critical Technical Signal Analysis")
         
-        if position == "OVERSOLD":
-            st.error("OVERSOLD TERRITORY - HIGH PRIORITY SIGNAL")
+        if position == "Oversold":
+            st.error("Oversold Territory - High Priority Signal")
             st.write(f"What This Means: {ticker} is trading in oversold territory with a %K reading of {current_k:.1f}. This suggests the stock has experienced significant selling pressure and may be approaching a technical bottom.")
             st.write("")
             st.write("Investment Implications:")
@@ -385,7 +385,7 @@ if st.session_state.page == 'analysis':
             st.write("- Overbought + bearish crossover = strong sell signal")
             
         else:
-            st.info("NEUTRAL RANGE - BALANCED MARKET CONDITIONS")
+            st.info("Neutral Range - Balanced Market Conditions")
             st.write(f"What This Means: {ticker} is trading in neutral territory with a %K reading of {current_k:.1f}. The stock is neither oversold nor overbought, suggesting balanced supply and demand.")
             st.write("")
             st.write("Investment Implications:")
@@ -403,15 +403,15 @@ if st.session_state.page == 'analysis':
         st.write("Crossover Signals:")
         
         if bullish_cross:
-            st.success("BULLISH CROSSOVER DETECTED - BUY SIGNAL")
+            st.success("Bullish Crossover Detected - Buy Signal")
             st.write(f"The fast line (%K = {current_k:.1f}) crossed ABOVE the slow line (%D = {current_d:.1f})")
-            signal_strength = 'VERY STRONG' if current_k < 30 else 'STRONG' if current_k < 50 else 'MODERATE'
+            signal_strength = 'Very Strong' if current_k < 30 else 'Strong' if current_k < 50 else 'Moderate'
             st.write(f"Signal Strength: {signal_strength}")
             st.write("Crossovers in oversold territory are most reliable")
         elif bearish_cross:
-            st.error("BEARISH CROSSOVER DETECTED - SELL SIGNAL")
+            st.error("Bearish Crossover Detected - Sell Signal")
             st.write(f"The fast line (%K = {current_k:.1f}) crossed BELOW the slow line (%D = {current_d:.1f})")
-            signal_strength = 'VERY STRONG' if current_k > 70 else 'STRONG' if current_k > 50 else 'MODERATE'
+            signal_strength = 'Very Strong' if current_k > 70 else 'Strong' if current_k > 50 else 'Moderate'
             st.write(f"Signal Strength: {signal_strength}")
             st.write("Crossovers in overbought territory are most reliable")
         else:
@@ -466,11 +466,11 @@ if st.session_state.page == 'analysis':
             risk_score -= 1
         
         if risk_score >= 3:
-            st.error("HIGH RISK - Multiple warning signals present")
+            st.error("High Risk - Multiple warning signals present")
         elif risk_score >= 1:
-            st.warning("MODERATE RISK - Some caution warranted")
+            st.warning("Moderate Risk - Some caution warranted")
         else:
-            st.success("LOWER RISK - Technical picture appears favorable")
+            st.success("Lower Risk - Technical picture appears favorable")
         
         if risk_factors:
             st.write("Key Risk Factors:")
@@ -495,15 +495,15 @@ if st.session_state.page == 'analysis':
         
         with col2:
             if fundamental_analysis['rating'] >= 70:
-                st.success("STRONG FUNDAMENTALS - Excellent financial health")
+                st.success("Strong Fundamentals - Excellent financial health")
             elif fundamental_analysis['rating'] >= 60:
-                st.success("SOLID FUNDAMENTALS - Good financial metrics")
+                st.success("Solid Fundamentals - Good financial metrics")
             elif fundamental_analysis['rating'] >= 50:
-                st.info("FAIR FUNDAMENTALS - Adequately valued")
+                st.info("Fair Fundamentals - Adequately valued")
             elif fundamental_analysis['rating'] >= 40:
-                st.warning("WEAK FUNDAMENTALS - Some concerns present")
+                st.warning("Weak Fundamentals - Some concerns present")
             else:
-                st.error("POOR FUNDAMENTALS - Significant weaknesses")
+                st.error("Poor Fundamentals - Significant weaknesses")
         
         st.markdown("---")
         
@@ -556,7 +556,7 @@ if st.session_state.page == 'analysis':
         st.write("Integrated Investment Thesis:")
         
         if stoch_score >= 60 and fundamental_analysis['rating'] >= 60:
-            st.success("HIGH CONVICTION BUY")
+            st.success("High Conviction Buy")
             st.write(f"{ticker} presents a rare alignment of both technical and fundamental factors.")
             st.write("")
             st.write("Technical Perspective: The stochastic oscillator shows favorable conditions for entry.")
@@ -568,7 +568,7 @@ if st.session_state.page == 'analysis':
             st.write("Action: Consider this a high-probability opportunity for position sizing.")
             
         elif (stoch_score >= 60 and fundamental_analysis['rating'] >= 45) or (stoch_score >= 45 and fundamental_analysis['rating'] >= 60):
-            st.info("QUALIFIED BUY")
+            st.info("Qualified Buy")
             
             if stoch_score > fundamental_analysis['rating']:
                 st.write("Mixed Signals - Technical Leading:")
@@ -588,7 +588,7 @@ if st.session_state.page == 'analysis':
                 st.write("Recommendation: Appropriate for patient investors willing to average in.")
                 
         elif stoch_score < 45 or fundamental_analysis['rating'] < 45:
-            st.warning("HOLD / AVOID")
+            st.warning("Hold / Avoid")
             
             if stoch_score < 45 and fundamental_analysis['rating'] < 45:
                 st.write("Dual Weakness Identified:")
@@ -611,7 +611,7 @@ if st.session_state.page == 'analysis':
                 st.write("Recommendation: AVOID unless experienced short-term trader.")
         
         else:
-            st.info("NEUTRAL / HOLD")
+            st.info("Neutral / Hold")
             st.write("Signals are mixed. Consider waiting for clearer conviction.")
         
         st.markdown("---")
@@ -637,19 +637,19 @@ if st.session_state.page == 'analysis':
         st.write("Final Verdict:")
         
         if combined_score >= 70:
-            st.success("STRONG BUY - High Conviction")
+            st.success("Strong Buy - High Conviction")
             st.write(f"Combined score of {combined_score:.0f}/100 represents a high-quality opportunity.")
             st.write("Suggested allocation: 5-10% of portfolio for aggressive investors")
         elif combined_score >= 60:
-            st.info("BUY - Moderate Conviction")
+            st.info("Buy - Moderate Conviction")
             st.write(f"Combined score of {combined_score:.0f}/100 indicates a good opportunity.")
             st.write("Suggested allocation: 2-5% of portfolio")
         elif combined_score >= 50:
-            st.warning("HOLD - Neutral")
+            st.warning("Hold - Neutral")
             st.write(f"Combined score of {combined_score:.0f}/100 suggests no strong conviction.")
             st.write("Suggested action: Maintain existing positions")
         else:
-            st.error("AVOID - Low Conviction")
+            st.error("Avoid - Low Conviction")
             st.write(f"Combined score of {combined_score:.0f}/100 indicates significant concerns.")
             st.write("Suggested action: Avoid new positions")
 
@@ -801,7 +801,7 @@ elif st.session_state.page == 'discover':
         
         st.subheader(f"📊 {sector_name} Sector Overview")
         
-        oversold_count = sum(1 for r in results if r['position'] == 'OVERSOLD')
+        oversold_count = sum(1 for r in results if r['position'] == 'Oversold')
         overbought_count = sum(1 for r in results if r['position'] == 'Overbought')
         bullish_cross_count = sum(1 for r in results if r['bullish_cross'])
         
@@ -825,7 +825,7 @@ elif st.session_state.page == 'discover':
         rank_emojis = ["🥇", "🥈", "🥉"]
         
         for idx, stock in enumerate(top_opportunities):
-            strength = "STRONG BUY" if stock['score'] >= 70 else "BUY" if stock['score'] >= 60 else "MODERATE BUY" if stock['score'] >= 50 else "HOLD"
+            strength = "Strong Buy" if stock['score'] >= 70 else "BUY" if stock['score'] >= 60 else "MODERATE BUY" if stock['score'] >= 50 else "HOLD"
             
             with st.expander(f"{rank_emojis[idx]} **#{idx+1} - {stock['ticker']}** ({stock['name']}) | Score: **{stock['score']}/100** | {strength}", expanded=True):
                 col1, col2, col3, col4, col5 = st.columns(5)
