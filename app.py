@@ -546,7 +546,7 @@ if st.session_state.page == 'analysis':
             - The stock is potentially undervalued on a short-term technical basis
             - Historical patterns suggest oversold conditions often precede rebounds
             - Risk/reward ratio may favor buyers at this level
-            - **However:** Oversold can remain oversold - dont catch a falling knife
+            - **However:** Oversold can remain oversold - don't catch a falling knife
             
             **Action Considerations:**
             - For aggressive traders: Consider scaling into a position
@@ -594,27 +594,31 @@ if st.session_state.page == 'analysis':
         st.write("**🔄 Crossover Signals (Most Critical):**")
         
         if bullish_cross:
-            st.success(f"**🚀 BULLISH CROSSOVER DETECTED - BUY SIGNAL**")
-            st.write(f"""
-            The fast line (%K = {current_k:.1f}) has just crossed ABOVE the slow line (%D = {current_d:.1f}). 
-            This is a **buy signal** indicating potential upward momentum.
+            st.success("**🚀 BULLISH CROSSOVER DETECTED - BUY SIGNAL**")
+            st.write(f"The fast line (%K = {current_k:.1f}) has just crossed ABOVE the slow line (%D = {current_d:.1f}). This is a **buy signal** indicating potential upward momentum.")
             
-            **Signal Strength:** {'VERY STRONG' if current_k < 30 else 'STRONG' if current_k < 50 else 'MODERATE'}
+            signal_strength = 'VERY STRONG' if current_k < 30 else 'STRONG' if current_k < 50 else 'MODERATE'
+            crossover_quality = 'in oversold territory - excellent entry point' if current_k < 20 else 'in neutral territory - decent signal' if current_k < 80 else 'in overbought territory - late entry, be cautious'
+            
+            st.write(f"""
+            **Signal Strength:** {signal_strength}
             - Crossovers in oversold territory (<20) are most reliable
-            - This crossover occurred at {current_k:.1f}, which is {'in oversold territory - excellent entry point' if current_k < 20 else 'in neutral territory - decent signal' if current_k < 80 else 'in overbought territory - late entry, be cautious'}
+            - This crossover occurred at {current_k:.1f}, which is {crossover_quality}
             
             **Recommended Action:** Consider initiating or adding to positions, but confirm with volume and price action.
             """)
             
         elif bearish_cross:
-            st.error(f"**📉 BEARISH CROSSOVER DETECTED - SELL SIGNAL**")
-            st.write(f"""
-            The fast line (%K = {current_k:.1f}) has just crossed BELOW the slow line (%D = {current_d:.1f}). 
-            This is a **sell signal** indicating potential downward momentum.
+            st.error("**📉 BEARISH CROSSOVER DETECTED - SELL SIGNAL**")
+            st.write(f"The fast line (%K = {current_k:.1f}) has just crossed BELOW the slow line (%D = {current_d:.1f}). This is a **sell signal** indicating potential downward momentum.")
             
-            **Signal Strength:** {'VERY STRONG' if current_k > 70 else 'STRONG' if current_k > 50 else 'MODERATE'}
+            signal_strength = 'VERY STRONG' if current_k > 70 else 'STRONG' if current_k > 50 else 'MODERATE'
+            crossover_quality = 'in overbought territory - strong sell signal' if current_k > 80 else 'in neutral territory - watch closely' if current_k > 20 else 'in oversold territory - may be oversold bounce ending'
+            
+            st.write(f"""
+            **Signal Strength:** {signal_strength}
             - Crossovers in overbought territory (>80) are most reliable
-            - This crossover occurred at {current_k:.1f}, which is {'in overbought territory - strong sell signal' if current_k > 80 else 'in neutral territory - watch closely' if current_k > 20 else 'in oversold territory - may be oversold bounce ending'}
+            - This crossover occurred at {current_k:.1f}, which is {crossover_quality}
             
             **Recommended Action:** Consider taking profits, reducing position size, or exiting entirely if risk-averse.
             """)
@@ -622,11 +626,14 @@ if st.session_state.page == 'analysis':
         else:
             st.info("**No Recent Crossover Detected**")
             k_above = current_k > current_d
+            momentum_direction = 'bullish' if k_above else 'bearish'
+            potential_signal = 'A bearish crossover (%K crossing below %D) would signal weakening momentum' if k_above else 'A bullish crossover (%K crossing above %D) would signal strengthening momentum'
+            
             st.write(f"""
-            %K is currently {'ABOVE' if k_above else 'BELOW'} %D, suggesting {'bullish' if k_above else 'bearish'} momentum remains intact.
+            %K is currently {'ABOVE' if k_above else 'BELOW'} %D, suggesting {momentum_direction} momentum remains intact.
             
             **What to Watch For:**
-            - {'A bearish crossover (%K crossing below %D) would signal weakening momentum' if k_above else 'A bullish crossover (%K crossing above %D) would signal strengthening momentum'}
+            - {potential_signal}
             - Monitor the gap between %K and %D - narrowing suggests potential crossover coming
             - Current gap: {abs(current_k - current_d):.1f} points
             """)
