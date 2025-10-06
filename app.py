@@ -539,7 +539,7 @@ if st.session_state.page == 'analysis':
         st.subheader("⚠️ Critical Technical Signal Analysis")
         
         if position == "OVERSOLD":
-            st.error(f"**OVERSOLD TERRITORY - HIGH PRIORITY SIGNAL**")
+            st.error("**OVERSOLD TERRITORY - HIGH PRIORITY SIGNAL**")
             st.write(f"""
             **What This Means:** {ticker} is trading in oversold territory with a %K reading of {current_k:.1f}. 
             This suggests the stock has experienced significant selling pressure and may be approaching a technical bottom.
@@ -558,7 +558,7 @@ if st.session_state.page == 'analysis':
             """)
             
         elif position == "OVERBOUGHT":
-            st.warning(f"**OVERBOUGHT TERRITORY - CAUTION ADVISED**")
+            st.warning("**OVERBOUGHT TERRITORY - CAUTION ADVISED**")
             st.write(f"""
             **What This Means:** {ticker} is trading in overbought territory with a %K reading of {current_k:.1f}. 
             This indicates strong buying pressure but also suggests limited upside in the near term.
@@ -577,7 +577,7 @@ if st.session_state.page == 'analysis':
             """)
             
         else:
-            st.info(f"**NEUTRAL RANGE - BALANCED MARKET CONDITIONS**")
+            st.info("**NEUTRAL RANGE - BALANCED MARKET CONDITIONS**")
             st.write(f"""
             **What This Means:** {ticker} is trading in neutral territory with a %K reading of {current_k:.1f}. 
             The stock is neither oversold nor overbought, suggesting balanced supply and demand.
