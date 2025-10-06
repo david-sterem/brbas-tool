@@ -230,7 +230,7 @@ def get_prospective_stocks():
 
 with st.sidebar:
     st.title("SternCurve")
-    if st.button("Stock Analyzer"):
+    if st.button("Equities Analyzer"):
         st.session_state.page = 'analysis'
     if st.button("SternCurve Portfolio"):
         st.session_state.page = 'portfolio'
@@ -241,7 +241,7 @@ with st.sidebar:
     st.caption(f"Stocks in Portfolio: {len(st.session_state.portfolio)}")
 
 if st.session_state.page == 'analysis':
-    st.title("SternCurve Stock Analyzer")
+    st.title("SternCurve Equities Analyzer")
     
     col1, col2 = st.columns([4, 2])
     with col1:
