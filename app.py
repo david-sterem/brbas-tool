@@ -345,7 +345,7 @@ if st.session_state.page == 'analysis':
     col4.metric("Combined Score", f"{combined_score:.0f}/100")
     
     st.markdown("---")
-    st.header("COMPREHENSIVE INVESTMENT ANALYSIS")
+    st.header("Comprehensive Investment Analysis")
     
     tab1, tab2, tab3 = st.tabs(["Technical", "Fundamental", "Combined"])
     
