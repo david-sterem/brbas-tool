@@ -25,7 +25,7 @@ def add_to_portfolio(ticker, current_k, current_d, k_momentum, trend):
             stock['stoch_d'] = current_d
             stock['momentum'] = k_momentum
             stock['trend'] = trend
-            stock['position'] = "Oversold" if current_k < 20 else "Overbought" if current_k > 80 else "Neutral"
+            stock['position'] = "OVERSOLD" if current_k < 20 else "Overbought" if current_k > 80 else "NEUTRAL"
             stock['last_updated'] = datetime.now().strftime("%Y-%m-%d %H:%M")
             return False
     
@@ -35,7 +35,7 @@ def add_to_portfolio(ticker, current_k, current_d, k_momentum, trend):
         'stoch_d': current_d,
         'momentum': k_momentum,
         'trend': trend,
-        'position': "Oversold" if current_k < 20 else "Overbought" if current_k > 80 else "Nuetral",
+        'position': "OVERSOLD" if current_k < 20 else "Overbought" if current_k > 80 else "NEUTRAL",
         'last_updated': datetime.now().strftime("%Y-%m-%d %H:%M")
     })
     return True
@@ -246,12 +246,12 @@ if st.session_state.page == 'analysis':
     col1, col2 = st.columns([4, 2])
     with col1:
         default_ticker = st.session_state.get('selected_ticker', 'AAPL')
-        ticker_input = st.text_input("Enter Ticker", default_ticker, key="ticker_input")
+        ticker_input = st.text_input("Enter ticker", default_ticker, key="ticker_input")
         ticker = search_ticker(ticker_input)
         if 'selected_ticker' in st.session_state:
             del st.session_state.selected_ticker
     with col2:
-        period = st.selectbox("Period", ["1 Month", "3 Months", "6 Months", "1 Year", "2 Years"], index=3)
+        period = st.selectbox("Period", ["1mo", "3mo", "6mo", "1y", "2y"], index=3)
     
     with st.spinner(f"Analyzing {ticker}..."):
         data, info, error = get_stock_data(ticker, period)
@@ -274,7 +274,7 @@ if st.session_state.page == 'analysis':
     c1.metric("Price", f"${price:.2f}", f"{change:+.2f}%")
     c2.metric("Market Cap", f"${info.get('marketCap', 0)/1e9:.1f}B")
     c3.metric("P/E", f"{info.get('trailingPE', 0):.2f}" if info.get('trailingPE') else 'N/A')
-    c4.metric("Trading Volume", f"{data['Volume'].iloc[-1]/1e6:.1f}M")
+    c4.metric("Volume", f"{data['Volume'].iloc[-1]/1e6:.1f}M")
     c5.metric("52W Range", f"${info.get('fiftyTwoWeekLow', 0):.0f}-{info.get('fiftyTwoWeekHigh', 0):.0f}")
     
     st.subheader("Stochastic Oscillator Chart")
@@ -319,7 +319,7 @@ if st.session_state.page == 'analysis':
     sector = get_sector_from_info(info)
     fundamental_analysis = analyze_fundamentals(info, sector)
     combined_score = (stoch_score + fundamental_analysis['rating']) / 2
-    position = "Oversold" if current_k < 20 else "Overbought" if current_k > 80 else "Neutral"
+    position = "OVERSOLD" if current_k < 20 else "Overbought" if current_k > 80 else "NEUTRAL"
     
     is_in_portfolio = any(s['ticker'] == ticker for s in st.session_state.portfolio)
     
@@ -352,8 +352,8 @@ if st.session_state.page == 'analysis':
     with tab1:
         st.subheader("Critical Technical Signal Analysis")
         
-        if position == "Oversold":
-            st.error("Oversold Territory - High Priority Signal")
+        if position == "OVERSOLD":
+            st.error("OVERSOLD TERRITORY - HIGH PRIORITY SIGNAL")
             st.write(f"What This Means: {ticker} is trading in oversold territory with a %K reading of {current_k:.1f}. This suggests the stock has experienced significant selling pressure and may be approaching a technical bottom.")
             st.write("")
             st.write("Investment Implications:")
@@ -385,7 +385,7 @@ if st.session_state.page == 'analysis':
             st.write("- Overbought + bearish crossover = strong sell signal")
             
         else:
-            st.info("Neutral Range - Balanced Market Conditions")
+            st.info("NEUTRAL RANGE - BALANCED MARKET CONDITIONS")
             st.write(f"What This Means: {ticker} is trading in neutral territory with a %K reading of {current_k:.1f}. The stock is neither oversold nor overbought, suggesting balanced supply and demand.")
             st.write("")
             st.write("Investment Implications:")
@@ -466,11 +466,11 @@ if st.session_state.page == 'analysis':
             risk_score -= 1
         
         if risk_score >= 3:
-            st.error("High Risk - Multiple warning signals present")
+            st.error("HIGH RISK - Multiple warning signals present")
         elif risk_score >= 1:
-            st.warning("Moderate Risk - Some caution warranted")
+            st.warning("MODERATE RISK - Some caution warranted")
         else:
-            st.success("Lower Risk - Technical picture appears favorable")
+            st.success("LOWER RISK - Technical picture appears favorable")
         
         if risk_factors:
             st.write("Key Risk Factors:")
@@ -495,15 +495,15 @@ if st.session_state.page == 'analysis':
         
         with col2:
             if fundamental_analysis['rating'] >= 70:
-                st.success("Strong Fundamentals - Excellent financial health")
+                st.success("STRONG FUNDAMENTALS - Excellent financial health")
             elif fundamental_analysis['rating'] >= 60:
-                st.success("Solid Fundamentals - Good financial metrics")
+                st.success("SOLID FUNDAMENTALS - Good financial metrics")
             elif fundamental_analysis['rating'] >= 50:
-                st.info("Fair Fundamentals - Adequately valued")
+                st.info("FAIR FUNDAMENTALS - Adequately valued")
             elif fundamental_analysis['rating'] >= 40:
-                st.warning("Weak Fundamentals - Some concerns present")
+                st.warning("WEAK FUNDAMENTALS - Some concerns present")
             else:
-                st.error("Poor Fundamentals - Significant weaknesses")
+                st.error("POOR FUNDAMENTALS - Significant weaknesses")
         
         st.markdown("---")
         
@@ -556,7 +556,7 @@ if st.session_state.page == 'analysis':
         st.write("Integrated Investment Thesis:")
         
         if stoch_score >= 60 and fundamental_analysis['rating'] >= 60:
-            st.success("High Conviction Buy")
+            st.success("HIGH CONVICTION BUY")
             st.write(f"{ticker} presents a rare alignment of both technical and fundamental factors.")
             st.write("")
             st.write("Technical Perspective: The stochastic oscillator shows favorable conditions for entry.")
@@ -568,7 +568,7 @@ if st.session_state.page == 'analysis':
             st.write("Action: Consider this a high-probability opportunity for position sizing.")
             
         elif (stoch_score >= 60 and fundamental_analysis['rating'] >= 45) or (stoch_score >= 45 and fundamental_analysis['rating'] >= 60):
-            st.info("Qualified Buy")
+            st.info("QUALIFIED BUY")
             
             if stoch_score > fundamental_analysis['rating']:
                 st.write("Mixed Signals - Technical Leading:")
@@ -588,7 +588,7 @@ if st.session_state.page == 'analysis':
                 st.write("Recommendation: Appropriate for patient investors willing to average in.")
                 
         elif stoch_score < 45 or fundamental_analysis['rating'] < 45:
-            st.warning("Hold / Avoid")
+            st.warning("HOLD / AVOID")
             
             if stoch_score < 45 and fundamental_analysis['rating'] < 45:
                 st.write("Dual Weakness Identified:")
@@ -611,7 +611,7 @@ if st.session_state.page == 'analysis':
                 st.write("Recommendation: AVOID unless experienced short-term trader.")
         
         else:
-            st.info("Neutral / Hold")
+            st.info("NEUTRAL / HOLD")
             st.write("Signals are mixed. Consider waiting for clearer conviction.")
         
         st.markdown("---")
@@ -702,7 +702,7 @@ elif st.session_state.page == 'discover':
     with col1:
         selected_sector = st.selectbox("Choose a sector", list(stock_categories.keys()), index=0)
     with col2:
-        analysis_period = st.selectbox("Analysis Period", ["1 Month", "3 Months", "6 Months"], index=0)
+        analysis_period = st.selectbox("Analysis Period", ["1mo", "3mo", "6mo"], index=0)
     
     st.markdown(f"**Ready to analyze {len(stock_categories[selected_sector])} stocks in {selected_sector}**")
     
@@ -748,7 +748,7 @@ elif st.session_state.page == 'discover':
                 price = data['Close'].iloc[-1]
                 change = ((data['Close'].iloc[-1] / data['Close'].iloc[0]) - 1) * 100 if len(data) > 0 else 0
                 
-                position = "Oversold" if current_k < 20 else "Overbought" if current_k > 80 else "Neutral"
+                position = "OVERSOLD" if current_k < 20 else "Overbought" if current_k > 80 else "NEUTRAL"
                 score = calculate_stochastic_score(current_k, current_d, k_momentum, trend)
                 
                 if len(data) >= 2:
@@ -801,7 +801,7 @@ elif st.session_state.page == 'discover':
         
         st.subheader(f"📊 {sector_name} Sector Overview")
         
-        oversold_count = sum(1 for r in results if r['position'] == 'Oversold')
+        oversold_count = sum(1 for r in results if r['position'] == 'OVERSOLD')
         overbought_count = sum(1 for r in results if r['position'] == 'Overbought')
         bullish_cross_count = sum(1 for r in results if r['bullish_cross'])
         
@@ -846,7 +846,7 @@ elif st.session_state.page == 'discover':
                 else:
                     reasons.append(f"⚠️ **Moderate Score ({stock['score']}/100)** - Decent but not exceptional")
                 
-                if stock['position'] == 'Oversold':
+                if stock['position'] == 'OVERSOLD':
                     reasons.append("✅ **Oversold Position** - Potential buying opportunity")
                 elif stock['position'] == 'Overbought':
                     reasons.append("⚠️ **Overbought Position** - Caution advised")
@@ -873,9 +873,9 @@ elif st.session_state.page == 'discover':
                 
                 st.markdown("**Investment Recommendation:**")
                 
-                if stock['score'] >= 70 and stock['position'] == 'Oversold':
+                if stock['score'] >= 70 and stock['position'] == 'OVERSOLD':
                     st.success(f"🎯 **STRONG BUY CANDIDATE** - {stock['ticker']} shows exceptional technical strength with oversold positioning.")
-                elif stock['score'] >= 60 and stock['position'] == 'Oversold':
+                elif stock['score'] >= 60 and stock['position'] == 'OVERSOLD':
                     st.success(f"✅ **BUY CANDIDATE** - {stock['ticker']} has strong signals and is oversold.")
                 elif stock['score'] >= 60:
                     st.info(f"📊 **SOLID CHOICE** - {stock['ticker']} has good technical signals.")
@@ -909,7 +909,7 @@ elif st.session_state.page == 'discover':
         with sort_col1:
             sort_by = st.selectbox("Sort by", ["Score (High to Low)", "Score (Low to High)", "Momentum", "Position"], index=0)
         with sort_col2:
-            position_filter = st.multiselect("Filter by Position", ["Oversold", "Neutral", "Overbought"], default=["Oversold", "Neutral", "Overbought"])
+            position_filter = st.multiselect("Filter by Position", ["OVERSOLD", "NEUTRAL", "Overbought"], default=["OVERSOLD", "NEUTRAL", "Overbought"])
         
         filtered_results = [r for r in results if r['position'] in position_filter]
         
@@ -923,7 +923,7 @@ elif st.session_state.page == 'discover':
             filtered_results = sorted(filtered_results, key=lambda x: x['position'])
         
         for stock in filtered_results:
-            position_emoji = "🟢" if stock['position'] == 'Oversold' else "🔴" if stock['position'] == 'Overbought' else "⚪"
+            position_emoji = "🟢" if stock['position'] == 'OVERSOLD' else "🔴" if stock['position'] == 'Overbought' else "⚪"
             
             with st.expander(f"{position_emoji} **{stock['ticker']}** - {stock['position']} | Score: {stock['score']}/100"):
                 col1, col2, col3, col4 = st.columns(4)
@@ -932,7 +932,7 @@ elif st.session_state.page == 'discover':
                 col3.metric("Momentum", f"{stock['momentum']:+.1f}")
                 col4.metric("Trend", stock['trend'].title())
                 
-                if stock['position'] == 'Oversold':
+                if stock['position'] == 'OVERSOLD':
                     st.success(f"💡 **Potential Buy:** {stock['ticker']} is oversold.")
                 elif stock['position'] == 'Overbought':
                     st.warning(f"⚠️ **Caution:** {stock['ticker']} is overbought.")
