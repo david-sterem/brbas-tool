@@ -428,11 +428,11 @@ if st.session_state.page == 'analysis':
         with col1:
             st.write("5-Day Momentum:")
             if k_momentum > 10:
-                st.success(f"+{k_momentum:.1f} - Strong upward momentum")
+                st.success(f"+{k_momentum:.1f} - Strong Upward Momentum")
             elif k_momentum > 0:
-                st.info(f"+{k_momentum:.1f} - Positive momentum")
+                st.info(f"+{k_momentum:.1f} - Positive Momentum")
             elif k_momentum > -10:
-                st.warning(f"{k_momentum:.1f} - Negative momentum")
+                st.warning(f"{k_momentum:.1f} - Negative Momentum")
             else:
                 st.error(f"{k_momentum:.1f} - Strong downward momentum")
         
@@ -495,15 +495,15 @@ if st.session_state.page == 'analysis':
         
         with col2:
             if fundamental_analysis['rating'] >= 70:
-                st.success("Strong Fundamentals - Excellent financial health")
+                st.success("Strong Fundamentals - Excellent Financial Health")
             elif fundamental_analysis['rating'] >= 60:
-                st.success("Solid Fundamentals - Good financial metrics")
+                st.success("Solid Fundamentals - Good Financial Metrics")
             elif fundamental_analysis['rating'] >= 50:
-                st.info("Fair Fundamentals - Adequately valued")
+                st.info("Fair Fundamentals - Adequately Valued")
             elif fundamental_analysis['rating'] >= 40:
-                st.warning("Weak Fundamentals - Some concerns present")
+                st.warning("Weak Fundamentals - Some Concerns Present")
             else:
-                st.error("Poor Fundamentals - Significant weaknesses")
+                st.error("Poor Fundamentals - Significant Weaknesses")
         
         st.markdown("---")
         
