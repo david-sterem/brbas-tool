@@ -85,25 +85,25 @@ def get_sector_from_info(info):
     sector = info.get('sector', '').lower()
     industry = info.get('industry', '').lower()
     
-    if 'financial' in sector or 'bank' in industry or 'insurance' in industry:
+    if 'financial' in sector or 'bank' in industry or 'insurance' in industry or 'credit' in industry:
         return 'Financial Services'
-    elif 'technology' in sector or 'software' in industry or 'semiconductor' in industry:
+    elif 'technology' in sector or 'software' in industry or 'semiconductor' in industry or 'information technology' in sector:
         return 'Technology'
-    elif 'industrial' in sector or 'aerospace' in industry or 'defense' in industry:
+    elif 'industrial' in sector or 'aerospace' in industry or 'defense' in industry or 'machinery' in industry or 'construction' in industry:
         return 'Industrial'
-    elif 'energy' in sector or 'oil' in industry or 'gas' in industry:
+    elif 'energy' in sector or 'oil' in industry or 'gas' in industry or 'petroleum' in industry:
         return 'Energy'
     elif 'real estate' in sector or 'reit' in industry:
         return 'Real Estate'
-    elif 'consumer' in sector or 'retail' in industry or 'automotive' in industry:
+    elif 'consumer cyclical' in sector or 'retail' in industry or 'automotive' in industry or 'apparel' in industry or 'travel' in industry:
         return 'Consumer Cyclical'
-    elif 'consumer defensive' in sector or 'consumer staples' in sector:
+    elif 'consumer defensive' in sector or 'consumer staples' in sector or 'food' in industry or 'beverage' in industry or 'household' in industry:
         return 'Consumer Defensive'
-    elif 'communication' in sector or 'media' in industry or 'telecom' in industry:
+    elif 'communication' in sector or 'media' in industry or 'telecom' in industry or 'entertainment' in industry:
         return 'Communication Services'
-    elif 'basic materials' in sector or 'materials' in sector:
+    elif 'basic materials' in sector or 'materials' in sector or 'chemical' in industry or 'metal' in industry or 'mining' in industry:
         return 'Basic Materials'
-    elif 'utilities' in sector or 'utility' in industry:
+    elif 'utilities' in sector or 'utility' in industry or 'electric' in industry:
         return 'Utilities'
     else:
         return 'Other'
@@ -115,70 +115,419 @@ def analyze_fundamentals(info, sector):
         'strengths': [],
         'weaknesses': [],
         'rating': 0,
-        'recommendation': ''
+        'recommendation': '',
+        'drivers': [],
+        'what_to_look_for': [],
+        'peer_examples': []
     }
     
     pe_ratio = info.get('trailingPE', info.get('forwardPE'))
     
     if sector == 'Financial Services':
+        analysis['drivers'] = ['Interest rates', 'Loan growth', 'Credit quality', 'Regulation']
+        analysis['peer_examples'] = ['JPM', 'BAC', 'GS', 'WFC', 'BRK-B']
+        analysis['what_to_look_for'] = ['Growing deposits', 'Stable loan portfolio', 'Good risk management']
+        
         roe = info.get('returnOnEquity', 0) * 100 if info.get('returnOnEquity') else None
         book_value = info.get('bookValue')
         pb_ratio = info.get('priceToBook')
         
         analysis['metrics'] = {
             'P/E Ratio': f"{pe_ratio:.2f}" if pe_ratio else 'N/A',
-            'ROE': f"{roe:.1f}%" if roe else 'N/A',
-            'Price-to-Book': f"{pb_ratio:.2f}" if pb_ratio else 'N/A',
-            'Book Value': f"${book_value:.2f}" if book_value else 'N/A'
+            'ROE (Return on Equity)': f"{roe:.1f}%" if roe else 'N/A',
+            'Price-to-Book (P/B)': f"{pb_ratio:.2f}" if pb_ratio else 'N/A',
+            'Book Value per Share': f"${book_value:.2f}" if book_value else 'N/A'
         }
         
         score = 50
-        if roe and roe > 15:
-            analysis['strengths'].append(f"Strong ROE of {roe:.1f}%")
-            score += 15
-        elif roe and roe < 8:
-            analysis['weaknesses'].append(f"Low ROE of {roe:.1f}%")
-            score -= 10
+        if roe:
+            if roe > 15:
+                analysis['strengths'].append(f"Strong ROE of {roe:.1f}% - Efficient use of capital")
+                score += 20
+            elif roe > 10:
+                analysis['strengths'].append(f"Adequate ROE of {roe:.1f}%")
+                score += 10
+            elif roe < 8:
+                analysis['weaknesses'].append(f"Low ROE of {roe:.1f}% - Inefficient capital deployment")
+                score -= 15
         
-        if pb_ratio and pb_ratio < 1.5:
-            analysis['strengths'].append(f"Attractive P/B of {pb_ratio:.2f}")
-            score += 10
-        elif pb_ratio and pb_ratio > 3:
-            analysis['weaknesses'].append(f"High P/B of {pb_ratio:.2f}")
-            score -= 10
+        if pb_ratio:
+            if pb_ratio < 1.0:
+                analysis['strengths'].append(f"Attractive P/B of {pb_ratio:.2f} - Trading below book value")
+                score += 15
+            elif pb_ratio < 1.5:
+                analysis['strengths'].append(f"Reasonable P/B of {pb_ratio:.2f}")
+                score += 10
+            elif pb_ratio > 3:
+                analysis['weaknesses'].append(f"High P/B of {pb_ratio:.2f} - May be overvalued")
+                score -= 15
+        
+        if pe_ratio:
+            if pe_ratio < 12:
+                analysis['strengths'].append(f"Low P/E of {pe_ratio:.2f} - Potential value")
+                score += 5
+            elif pe_ratio > 20:
+                analysis['weaknesses'].append(f"High P/E of {pe_ratio:.2f} - May be expensive")
+                score -= 5
         
         analysis['rating'] = max(0, min(100, score))
         
     elif sector == 'Technology':
+        analysis['drivers'] = ['Innovation cycles', 'AI growth', 'Cloud adoption', 'Consumer demand']
+        analysis['peer_examples'] = ['AAPL', 'NVDA', 'MSFT', 'AMD', 'ADBE']
+        analysis['what_to_look_for'] = ['Scalable software models', 'High customer retention', 'IP moats and competitive advantages']
+        
         revenue_growth = info.get('revenueGrowth', 0) * 100 if info.get('revenueGrowth') else None
         gross_margin = info.get('grossMargins', 0) * 100 if info.get('grossMargins') else None
         free_cash_flow = info.get('freeCashflow', 0)
         
         analysis['metrics'] = {
             'P/E Ratio': f"{pe_ratio:.2f}" if pe_ratio else 'N/A',
-            'Revenue Growth': f"{revenue_growth:.1f}%" if revenue_growth else 'N/A',
+            'Revenue Growth (YoY)': f"{revenue_growth:.1f}%" if revenue_growth else 'N/A',
             'Gross Margin': f"{gross_margin:.1f}%" if gross_margin else 'N/A',
             'Free Cash Flow': f"${free_cash_flow/1e9:.2f}B" if free_cash_flow else 'N/A'
         }
         
         score = 50
-        if revenue_growth and revenue_growth > 15:
-            analysis['strengths'].append(f"Strong revenue growth of {revenue_growth:.1f}%")
-            score += 20
-        elif revenue_growth and revenue_growth < 5:
-            analysis['weaknesses'].append(f"Slow revenue growth of {revenue_growth:.1f}%")
-            score -= 15
+        if revenue_growth:
+            if revenue_growth > 20:
+                analysis['strengths'].append(f"Exceptional revenue growth of {revenue_growth:.1f}%")
+                score += 25
+            elif revenue_growth > 15:
+                analysis['strengths'].append(f"Strong revenue growth of {revenue_growth:.1f}%")
+                score += 20
+            elif revenue_growth > 10:
+                analysis['strengths'].append(f"Solid revenue growth of {revenue_growth:.1f}%")
+                score += 10
+            elif revenue_growth < 5:
+                analysis['weaknesses'].append(f"Slow revenue growth of {revenue_growth:.1f}%")
+                score -= 20
         
-        if gross_margin and gross_margin > 60:
-            analysis['strengths'].append(f"High gross margin of {gross_margin:.1f}%")
-            score += 15
-        elif gross_margin and gross_margin < 40:
-            analysis['weaknesses'].append(f"Low gross margin of {gross_margin:.1f}%")
-            score -= 10
+        if gross_margin:
+            if gross_margin > 70:
+                analysis['strengths'].append(f"Excellent gross margin of {gross_margin:.1f}% - Strong competitive advantage")
+                score += 20
+            elif gross_margin > 60:
+                analysis['strengths'].append(f"High gross margin of {gross_margin:.1f}%")
+                score += 15
+            elif gross_margin < 40:
+                analysis['weaknesses'].append(f"Low gross margin of {gross_margin:.1f}% - Limited pricing power")
+                score -= 15
+        
+        if free_cash_flow:
+            if free_cash_flow > 5e9:
+                analysis['strengths'].append("Strong free cash flow generation")
+                score += 15
+            elif free_cash_flow > 0:
+                analysis['strengths'].append("Positive free cash flow")
+                score += 10
+            else:
+                analysis['weaknesses'].append("Negative free cash flow")
+                score -= 10
+        
+        analysis['rating'] = max(0, min(100, score))
+        
+    elif sector == 'Industrial':
+        analysis['drivers'] = ['Economic growth', 'Infrastructure spending', 'Supply chain health']
+        analysis['peer_examples'] = ['BA', 'CAT', 'GE', 'HON', 'RTX']
+        analysis['what_to_look_for'] = ['Operational efficiency', 'Diversified client base', 'Government contracts']
+        
+        operating_margin = info.get('operatingMargins', 0) * 100 if info.get('operatingMargins') else None
+        debt_to_equity = info.get('debtToEquity')
+        free_cash_flow = info.get('freeCashflow', 0)
+        
+        analysis['metrics'] = {
+            'Operating Margin': f"{operating_margin:.1f}%" if operating_margin else 'N/A',
+            'Debt-to-Equity': f"{debt_to_equity:.2f}" if debt_to_equity else 'N/A',
+            'Free Cash Flow': f"${free_cash_flow/1e9:.2f}B" if free_cash_flow else 'N/A',
+            'P/E Ratio': f"{pe_ratio:.2f}" if pe_ratio else 'N/A'
+        }
+        
+        score = 50
+        if operating_margin:
+            if operating_margin > 15:
+                analysis['strengths'].append(f"Strong operating margin of {operating_margin:.1f}%")
+                score += 20
+            elif operating_margin > 10:
+                analysis['strengths'].append(f"Healthy operating margin of {operating_margin:.1f}%")
+                score += 10
+            elif operating_margin < 5:
+                analysis['weaknesses'].append(f"Low operating margin of {operating_margin:.1f}%")
+                score -= 15
+        
+        if debt_to_equity:
+            if debt_to_equity < 50:
+                analysis['strengths'].append(f"Low debt-to-equity of {debt_to_equity:.2f} - Strong balance sheet")
+                score += 15
+            elif debt_to_equity > 150:
+                analysis['weaknesses'].append(f"High debt-to-equity of {debt_to_equity:.2f} - Leverage risk")
+                score -= 20
         
         if free_cash_flow and free_cash_flow > 0:
-            analysis['strengths'].append("Positive free cash flow")
-            score += 10
+            analysis['strengths'].append("Positive free cash flow - Financial stability")
+            score += 15
+        
+        analysis['rating'] = max(0, min(100, score))
+        
+    elif sector == 'Energy':
+        analysis['drivers'] = ['Commodity prices (oil, natural gas)', 'Geopolitical factors', 'OPEC decisions']
+        analysis['peer_examples'] = ['XOM', 'CVX', 'COP', 'SLB', 'NEE']
+        analysis['what_to_look_for'] = ['Low-cost producers', 'Strong reserves', 'Diversification into renewables']
+        
+        pb_ratio = info.get('priceToBook')
+        debt_to_equity = info.get('debtToEquity')
+        free_cash_flow = info.get('freeCashflow', 0)
+        
+        analysis['metrics'] = {
+            'Price-to-Book (P/B)': f"{pb_ratio:.2f}" if pb_ratio else 'N/A',
+            'Debt-to-Equity': f"{debt_to_equity:.2f}" if debt_to_equity else 'N/A',
+            'Free Cash Flow': f"${free_cash_flow/1e9:.2f}B" if free_cash_flow else 'N/A',
+            'P/E Ratio': f"{pe_ratio:.2f}" if pe_ratio else 'N/A'
+        }
+        
+        score = 50
+        if pb_ratio:
+            if pb_ratio < 1.5:
+                analysis['strengths'].append(f"Attractive P/B of {pb_ratio:.2f}")
+                score += 15
+            elif pb_ratio > 3:
+                analysis['weaknesses'].append(f"High P/B of {pb_ratio:.2f}")
+                score -= 10
+        
+        if debt_to_equity:
+            if debt_to_equity < 40:
+                analysis['strengths'].append(f"Low debt-to-equity of {debt_to_equity:.2f}")
+                score += 20
+            elif debt_to_equity > 100:
+                analysis['weaknesses'].append(f"High debt-to-equity of {debt_to_equity:.2f}")
+                score -= 15
+        
+        if free_cash_flow and free_cash_flow > 2e9:
+            analysis['strengths'].append("Strong free cash flow coverage")
+            score += 15
+        
+        analysis['rating'] = max(0, min(100, score))
+        
+    elif sector == 'Real Estate':
+        analysis['drivers'] = ['Interest rates', 'Occupancy rates', 'Property values']
+        analysis['peer_examples'] = ['PLD', 'O', 'SPG', 'AMT']
+        analysis['what_to_look_for'] = ['Quality assets', 'Low leverage', 'Stable rental income']
+        
+        dividend_yield = info.get('dividendYield', 0) * 100 if info.get('dividendYield') else None
+        payout_ratio = info.get('payoutRatio', 0) * 100 if info.get('payoutRatio') else None
+        debt_to_equity = info.get('debtToEquity')
+        
+        analysis['metrics'] = {
+            'Dividend Yield': f"{dividend_yield:.2f}%" if dividend_yield else 'N/A',
+            'Payout Ratio': f"{payout_ratio:.1f}%" if payout_ratio else 'N/A',
+            'Debt-to-Equity': f"{debt_to_equity:.2f}" if debt_to_equity else 'N/A',
+            'P/E Ratio': f"{pe_ratio:.2f}" if pe_ratio else 'N/A'
+        }
+        
+        score = 50
+        if dividend_yield:
+            if dividend_yield > 4:
+                analysis['strengths'].append(f"Attractive dividend yield of {dividend_yield:.2f}%")
+                score += 20
+            elif dividend_yield > 3:
+                analysis['strengths'].append(f"Solid dividend yield of {dividend_yield:.2f}%")
+                score += 10
+        
+        if payout_ratio:
+            if 50 < payout_ratio < 80:
+                analysis['strengths'].append(f"Sustainable payout ratio of {payout_ratio:.1f}%")
+                score += 15
+            elif payout_ratio > 90:
+                analysis['weaknesses'].append(f"High payout ratio of {payout_ratio:.1f}% - Dividend risk")
+                score -= 15
+        
+        if debt_to_equity:
+            if debt_to_equity < 100:
+                analysis['strengths'].append(f"Manageable debt-to-equity of {debt_to_equity:.2f}")
+                score += 15
+            elif debt_to_equity > 200:
+                analysis['weaknesses'].append(f"High debt-to-equity of {debt_to_equity:.2f}")
+                score -= 20
+        
+        analysis['rating'] = max(0, min(100, score))
+        
+    elif sector == 'Consumer Cyclical':
+        analysis['drivers'] = ['Consumer confidence', 'Disposable income', 'Inflation']
+        analysis['peer_examples'] = ['AMZN', 'TSLA', 'NKE', 'MCD', 'DIS']
+        analysis['what_to_look_for'] = ['Strong brands', 'Pricing power', 'Global presence']
+        
+        gross_margin = info.get('grossMargins', 0) * 100 if info.get('grossMargins') else None
+        revenue_growth = info.get('revenueGrowth', 0) * 100 if info.get('revenueGrowth') else None
+        
+        analysis['metrics'] = {
+            'P/E Ratio': f"{pe_ratio:.2f}" if pe_ratio else 'N/A',
+            'Gross Margin': f"{gross_margin:.1f}%" if gross_margin else 'N/A',
+            'Revenue Growth': f"{revenue_growth:.1f}%" if revenue_growth else 'N/A'
+        }
+        
+        score = 50
+        if gross_margin:
+            if gross_margin > 40:
+                analysis['strengths'].append(f"Strong gross margin of {gross_margin:.1f}% - Pricing power")
+                score += 20
+            elif gross_margin < 25:
+                analysis['weaknesses'].append(f"Low gross margin of {gross_margin:.1f}%")
+                score -= 15
+        
+        if revenue_growth:
+            if revenue_growth > 10:
+                analysis['strengths'].append(f"Solid revenue growth of {revenue_growth:.1f}%")
+                score += 15
+            elif revenue_growth < 0:
+                analysis['weaknesses'].append(f"Negative revenue growth of {revenue_growth:.1f}%")
+                score -= 20
+        
+        analysis['rating'] = max(0, min(100, score))
+        
+    elif sector == 'Consumer Defensive':
+        analysis['drivers'] = ['Defensive sector - steady demand', 'Economic resilience', 'Brand loyalty']
+        analysis['peer_examples'] = ['PG', 'KO', 'PEP', 'COST', 'WMT']
+        analysis['what_to_look_for'] = ['Consistent earnings', 'Loyal customer base', 'Pricing resilience']
+        
+        revenue_growth = info.get('revenueGrowth', 0) * 100 if info.get('revenueGrowth') else None
+        dividend_yield = info.get('dividendYield', 0) * 100 if info.get('dividendYield') else None
+        operating_margin = info.get('operatingMargins', 0) * 100 if info.get('operatingMargins') else None
+        
+        analysis['metrics'] = {
+            'Revenue Growth': f"{revenue_growth:.1f}%" if revenue_growth else 'N/A',
+            'Dividend Yield': f"{dividend_yield:.2f}%" if dividend_yield else 'N/A',
+            'Operating Margin': f"{operating_margin:.1f}%" if operating_margin else 'N/A',
+            'P/E Ratio': f"{pe_ratio:.2f}" if pe_ratio else 'N/A'
+        }
+        
+        score = 50
+        if revenue_growth and revenue_growth > 3:
+            analysis['strengths'].append(f"Stable revenue growth of {revenue_growth:.1f}%")
+            score += 15
+        
+        if dividend_yield:
+            if dividend_yield > 3:
+                analysis['strengths'].append(f"Attractive dividend yield of {dividend_yield:.2f}%")
+                score += 20
+            elif dividend_yield > 2:
+                analysis['strengths'].append(f"Solid dividend yield of {dividend_yield:.2f}%")
+                score += 10
+        
+        if operating_margin and operating_margin > 15:
+            analysis['strengths'].append(f"Strong operating margin of {operating_margin:.1f}%")
+            score += 15
+        
+        analysis['rating'] = max(0, min(100, score))
+        
+    elif sector == 'Communication Services':
+        analysis['drivers'] = ['Ad revenue', 'Subscriptions', 'Data usage', 'Competition']
+        analysis['peer_examples'] = ['GOOGL', 'META', 'NFLX', 'VZ', 'T']
+        analysis['what_to_look_for'] = ['Scale advantage', 'Diverse revenue streams', 'Global footprint']
+        
+        revenue_growth = info.get('revenueGrowth', 0) * 100 if info.get('revenueGrowth') else None
+        operating_margin = info.get('operatingMargins', 0) * 100 if info.get('operatingMargins') else None
+        
+        analysis['metrics'] = {
+            'Revenue Growth': f"{revenue_growth:.1f}%" if revenue_growth else 'N/A',
+            'Operating Margin': f"{operating_margin:.1f}%" if operating_margin else 'N/A',
+            'P/E Ratio': f"{pe_ratio:.2f}" if pe_ratio else 'N/A'
+        }
+        
+        score = 50
+        if revenue_growth:
+            if revenue_growth > 15:
+                analysis['strengths'].append(f"Strong revenue growth of {revenue_growth:.1f}%")
+                score += 20
+            elif revenue_growth < 5:
+                analysis['weaknesses'].append(f"Slow revenue growth of {revenue_growth:.1f}%")
+                score -= 15
+        
+        if operating_margin:
+            if operating_margin > 25:
+                analysis['strengths'].append(f"Excellent operating margin of {operating_margin:.1f}%")
+                score += 20
+            elif operating_margin < 10:
+                analysis['weaknesses'].append(f"Low operating margin of {operating_margin:.1f}%")
+                score -= 15
+        
+        analysis['rating'] = max(0, min(100, score))
+        
+    elif sector == 'Basic Materials':
+        analysis['drivers'] = ['Commodity cycles', 'Construction demand', 'Inflation trends']
+        analysis['peer_examples'] = ['DOW', 'DD', 'FCX', 'NUE', 'LIN']
+        analysis['what_to_look_for'] = ['Cost leadership', 'Vertical integration', 'Low leverage']
+        
+        gross_margin = info.get('grossMargins', 0) * 100 if info.get('grossMargins') else None
+        operating_cash_flow = info.get('operatingCashflow', 0)
+        debt_to_equity = info.get('debtToEquity')
+        
+        analysis['metrics'] = {
+            'Gross Margin': f"{gross_margin:.1f}%" if gross_margin else 'N/A',
+            'Operating Cash Flow': f"${operating_cash_flow/1e9:.2f}B" if operating_cash_flow else 'N/A',
+            'Debt-to-Equity': f"{debt_to_equity:.2f}" if debt_to_equity else 'N/A',
+            'P/E Ratio': f"{pe_ratio:.2f}" if pe_ratio else 'N/A'
+        }
+        
+        score = 50
+        if gross_margin:
+            if gross_margin > 30:
+                analysis['strengths'].append(f"Strong gross margin of {gross_margin:.1f}%")
+                score += 15
+            elif gross_margin < 15:
+                analysis['weaknesses'].append(f"Low gross margin of {gross_margin:.1f}% - Cyclical pressure")
+                score -= 10
+        
+        if operating_cash_flow and operating_cash_flow > 1e9:
+            analysis['strengths'].append("Solid operating cash flow generation")
+            score += 15
+        
+        if debt_to_equity:
+            if debt_to_equity < 50:
+                analysis['strengths'].append(f"Low debt-to-equity of {debt_to_equity:.2f}")
+                score += 20
+            elif debt_to_equity > 100:
+                analysis['weaknesses'].append(f"High debt-to-equity of {debt_to_equity:.2f}")
+                score -= 15
+        
+        analysis['rating'] = max(0, min(100, score))
+        
+    elif sector == 'Utilities':
+        analysis['drivers'] = ['Regulation', 'Energy demand', 'Rate adjustments']
+        analysis['peer_examples'] = ['DUK', 'D', 'NEE', 'SO', 'AEP']
+        analysis['what_to_look_for'] = ['Stable cash flow', 'Dividend reliability', 'Green transition initiatives']
+        
+        dividend_yield = info.get('dividendYield', 0) * 100 if info.get('dividendYield') else None
+        payout_ratio = info.get('payoutRatio', 0) * 100 if info.get('payoutRatio') else None
+        debt_to_equity = info.get('debtToEquity')
+        
+        analysis['metrics'] = {
+            'Dividend Yield': f"{dividend_yield:.2f}%" if dividend_yield else 'N/A',
+            'Payout Ratio': f"{payout_ratio:.1f}%" if payout_ratio else 'N/A',
+            'Debt-to-Equity': f"{debt_to_equity:.2f}" if debt_to_equity else 'N/A',
+            'P/E Ratio': f"{pe_ratio:.2f}" if pe_ratio else 'N/A'
+        }
+        
+        score = 50
+        if dividend_yield:
+            if dividend_yield > 4:
+                analysis['strengths'].append(f"Attractive dividend yield of {dividend_yield:.2f}%")
+                score += 20
+            elif dividend_yield > 3:
+                analysis['strengths'].append(f"Solid dividend yield of {dividend_yield:.2f}%")
+                score += 10
+        
+        if payout_ratio:
+            if 50 < payout_ratio < 75:
+                analysis['strengths'].append(f"Sustainable payout ratio of {payout_ratio:.1f}%")
+                score += 15
+            elif payout_ratio > 85:
+                analysis['weaknesses'].append(f"High payout ratio of {payout_ratio:.1f}%")
+                score -= 10
+        
+        if debt_to_equity:
+            if debt_to_equity > 150:
+                analysis['weaknesses'].append(f"High debt-to-equity of {debt_to_equity:.2f} - Capital intensive")
+                score -= 5
         
         analysis['rating'] = max(0, min(100, score))
         
@@ -197,9 +546,9 @@ def analyze_fundamentals(info, sector):
         
         analysis['rating'] = max(0, min(100, score))
     
-    if analysis['rating'] >= 70:
+    if analysis['rating'] >= 75:
         analysis['recommendation'] = "Strong Buy"
-    elif analysis['rating'] >= 60:
+    elif analysis['rating'] >= 65:
         analysis['recommendation'] = "Buy"
     elif analysis['rating'] >= 50:
         analysis['recommendation'] = "Hold"
@@ -345,6 +694,195 @@ if st.session_state.page == 'analysis':
     col4.metric("Combined Score", f"{combined_score:.0f}/100")
     
     st.markdown("---")
+    
+    st.subheader("Technical Analysis: Momentum & Trend")
+    
+    if position == "Oversold":
+        st.error("Oversold Territory - High Priority Signal")
+        st.write(f"What This Means: {ticker} is trading in oversold territory with a %K reading of {current_k:.1f}. This suggests the stock has experienced significant selling pressure and may be approaching a technical bottom.")
+        st.write("")
+        st.write("Investment Implications:")
+        st.write("- The stock is potentially undervalued on a short-term technical basis")
+        st.write("- Historical patterns suggest oversold conditions often precede rebounds")
+        st.write("- Risk/reward ratio may favor buyers at this level")
+        st.write("- However: Oversold can remain oversold - don't catch a falling knife")
+        st.write("")
+        st.write("Action Considerations:")
+        st.write("- For aggressive traders: Consider scaling into a position")
+        st.write("- For conservative investors: Wait for confirmation of reversal")
+        st.write("- Set tight stop-losses if entering")
+        st.write("- Monitor volume for signs of capitulation or accumulation")
+        
+    elif position == "Overbought":
+        st.warning("Overbought Territory - Caution Advised")
+        st.write(f"What This Means: {ticker} is trading in overbought territory with a %K reading of {current_k:.1f}. This indicates strong buying pressure but also suggests limited upside in the near term.")
+        st.write("")
+        st.write("Investment Implications:")
+        st.write("- The rally may be overextended and due for consolidation or pullback")
+        st.write("- Momentum is strong, but price may have run ahead of fundamentals")
+        st.write("- Risk/reward ratio currently favors taking profits")
+        st.write("- However: Strong trends can remain overbought for extended periods")
+        st.write("")
+        st.write("Action Considerations:")
+        st.write("- For current holders: Consider taking partial profits")
+        st.write("- For potential buyers: Wait for a pullback to more favorable entry levels")
+        st.write("- Watch for bearish divergence")
+        st.write("- Overbought + bearish crossover = strong sell signal")
+        
+    else:
+        st.info("Neutral Range - Balanced Market Conditions")
+        st.write(f"What This Means: {ticker} is trading in neutral territory with a %K reading of {current_k:.1f}. The stock is neither oversold nor overbought, suggesting balanced supply and demand.")
+        st.write("")
+        st.write("Investment Implications:")
+        st.write("- No extreme technical signals at this time")
+        st.write("- Market is in equilibrium - wait for clearer directional signals")
+        st.write("- Risk/reward is unclear without additional confirmation")
+        st.write("")
+        st.write("Action Considerations:")
+        st.write("- Wait for the stock to enter oversold or overbought territory")
+        st.write("- Focus on crossover signals and momentum shifts")
+        st.write("- Use this time to monitor fundamentals")
+    
+    st.markdown("---")
+    
+    st.write("Crossover Signals:")
+    
+    if bullish_cross:
+        st.success("Bullish Crossover Detected - Buy Signal")
+        st.write(f"The fast line (%K = {current_k:.1f}) crossed ABOVE the slow line (%D = {current_d:.1f})")
+        signal_strength = 'Very Strong' if current_k < 30 else 'Strong' if current_k < 50 else 'Moderate'
+        st.write(f"Signal Strength: {signal_strength}")
+        st.write("Crossovers in oversold territory are most reliable")
+    elif bearish_cross:
+        st.error("Bearish Crossover Detected - Sell Signal")
+        st.write(f"The fast line (%K = {current_k:.1f}) crossed BELOW the slow line (%D = {current_d:.1f})")
+        signal_strength = 'Very Strong' if current_k > 70 else 'Strong' if current_k > 50 else 'Moderate'
+        st.write(f"Signal Strength: {signal_strength}")
+        st.write("Crossovers in overbought territory are most reliable")
+    else:
+        st.info("No Recent Crossover Detected")
+        k_above = current_k > current_d
+        st.write(f"%K is currently {'ABOVE' if k_above else 'BELOW'} %D")
+    
+    st.markdown("---")
+    
+    st.write("Momentum and Trend Analysis:")
+    
+    col1, col2 = st.columns(2)
+    
+    with col1:
+        st.write("5-Day Momentum:")
+        if k_momentum > 10:
+            st.success(f"+{k_momentum:.1f} - Strong Upward Momentum")
+        elif k_momentum > 0:
+            st.info(f"+{k_momentum:.1f} - Positive Momentum")
+        elif k_momentum > -10:
+            st.warning(f"{k_momentum:.1f} - Negative Momentum")
+        else:
+            st.error(f"{k_momentum:.1f} - Strong downward momentum")
+    
+    with col2:
+        st.write("10-Day Trend:")
+        if trend_direction == "bullish":
+            st.success("Consistently Rising - Strong Uptrend")
+        elif trend_direction == "bearish":
+            st.error("Consistently Falling - Strong Downtrend")
+        else:
+            st.info("Mixed Signals - Choppy Action")
+    
+    st.markdown("---")
+    
+    st.subheader("Fundamental Investment Analysis")
+    
+    st.info(f"Sector Classification: **{sector}**")
+    
+    col1, col2 = st.columns([2, 3])
+    
+    with col1:
+        st.write("**What Drives This Sector:**")
+        for driver in fundamental_analysis['drivers']:
+            st.write(f"• {driver}")
+    
+    with col2:
+        if fundamental_analysis['peer_examples']:
+            st.write("**Compare To (Peer Examples):**")
+            st.write(", ".join(fundamental_analysis['peer_examples']))
+    
+    st.markdown("---")
+    
+    st.write("**Key Financial Metrics:**")
+    
+    metric_cols = st.columns(len(fundamental_analysis['metrics']))
+    for idx, (metric_name, metric_value) in enumerate(fundamental_analysis['metrics'].items()):
+        with metric_cols[idx]:
+            st.metric(metric_name, metric_value)
+    
+    st.markdown("---")
+    
+    col_rating, col_rec = st.columns(2)
+    with col_rating:
+        st.metric("Fundamental Score", f"{fundamental_analysis['rating']:.0f}/100")
+    with col_rec:
+        if fundamental_analysis['rating'] >= 75:
+            st.success(f"Rating: {fundamental_analysis['recommendation']}")
+        elif fundamental_analysis['rating'] >= 65:
+            st.success(f"Rating: {fundamental_analysis['recommendation']}")
+        elif fundamental_analysis['rating'] >= 50:
+            st.info(f"Rating: {fundamental_analysis['recommendation']}")
+        elif fundamental_analysis['rating'] >= 40:
+            st.warning(f"Rating: {fundamental_analysis['recommendation']}")
+        else:
+            st.error(f"Rating: {fundamental_analysis['recommendation']}")
+    
+    if fundamental_analysis['strengths']:
+        st.write("**Fundamental Strengths:**")
+        for strength in fundamental_analysis['strengths']:
+            st.success(f"✓ {strength}")
+    
+    if fundamental_analysis['weaknesses']:
+        st.write("**Fundamental Concerns:**")
+        for weakness in fundamental_analysis['weaknesses']:
+            st.warning(f"⚠ {weakness}")
+    
+    if fundamental_analysis['what_to_look_for']:
+        st.write(f"**Investment Strategy for {sector}:**")
+        st.write("Look for companies with:")
+        for item in fundamental_analysis['what_to_look_for']:
+            st.write(f"• {item}")
+    
+    st.markdown("---")
+    
+    st.write("Risk Assessment:")
+    
+    risk_factors = []
+    risk_score = 0
+    
+    if current_k > 80:
+        risk_factors.append("Overbought Condition Increases Pullback Risk")
+        risk_score += 2
+    if current_k < 20:
+        risk_factors.append("Oversold Condition Suggests Potential Reversal")
+        risk_score -= 1
+    if bearish_cross:
+        risk_factors.append("Recent Bearish Crossover Signals Downside")
+        risk_score += 2
+    if bullish_cross:
+        risk_factors.append("Recent Bullish Crossover Signals Upside")
+        risk_score -= 1
+    
+    if risk_score >= 3:
+        st.error("High Risk - Multiple Warning Signals Present")
+    elif risk_score >= 1:
+        st.warning("Moderate Risk - Some Caution Warranted")
+    else:
+        st.success("Lower Risk - Technical Picture Appears Favorable")
+    
+    if risk_factors:
+        st.write("Key Risk Factors:")
+        for factor in risk_factors:
+            st.write(f"- {factor}")
+    
+    st.markdown("---")
     st.header("Comprehensive Investment Analysis")
     
     tab1, tab2, tab3 = st.tabs(["Technical", "Fundamental", "Combined"])
@@ -438,9 +976,9 @@ if st.session_state.page == 'analysis':
         
         with col2:
             st.write("10-Day Trend:")
-            if trend_direction == "Bullish":
+            if trend_direction == "bullish":
                 st.success("Consistently Rising - Strong Uptrend")
-            elif trend_direction == "Bearish":
+            elif trend_direction == "bearish":
                 st.error("Consistently Falling - Strong Downtrend")
             else:
                 st.info("Mixed Signals - Choppy Action")
@@ -846,7 +1384,7 @@ elif st.session_state.page == 'discover':
                 else:
                     reasons.append(f"⚠️ **Moderate Score ({stock['score']}/100)** - Decent but not exceptional")
                 
-                if stock['position'] == 'OVERSOLD':
+                if stock['position'] == 'Oversold':
                     reasons.append("✅ **Oversold Position** - Potential buying opportunity")
                 elif stock['position'] == 'Overbought':
                     reasons.append("⚠️ **Overbought Position** - Caution advised")
@@ -873,9 +1411,9 @@ elif st.session_state.page == 'discover':
                 
                 st.markdown("**Investment Recommendation:**")
                 
-                if stock['score'] >= 70 and stock['position'] == 'OVERSOLD':
+                if stock['score'] >= 70 and stock['position'] == 'Oversold':
                     st.success(f"🎯 **STRONG BUY CANDIDATE** - {stock['ticker']} shows exceptional technical strength with oversold positioning.")
-                elif stock['score'] >= 60 and stock['position'] == 'OVERSOLD':
+                elif stock['score'] >= 60 and stock['position'] == 'Oversold':
                     st.success(f"✅ **BUY CANDIDATE** - {stock['ticker']} has strong signals and is oversold.")
                 elif stock['score'] >= 60:
                     st.info(f"📊 **SOLID CHOICE** - {stock['ticker']} has good technical signals.")
